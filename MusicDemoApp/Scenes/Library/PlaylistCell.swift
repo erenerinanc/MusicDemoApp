@@ -36,4 +36,5 @@ class PlaylistCell: UITableViewCell {
         collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseID)
     }
     
+    
 }

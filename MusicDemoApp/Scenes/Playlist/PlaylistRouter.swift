@@ -11,7 +11,7 @@ protocol PlaylistRoutingLogic: AnyObject {
     
 }
 
-protocol PlaylistDataPassing: class {
+protocol PlaylistDataPassing: AnyObject {
     var dataStore: PlaylistDataStore? { get }
 }
 

@@ -11,7 +11,7 @@ protocol LibraryRoutingLogic: AnyObject {
     
 }
 
-protocol LibraryDataPassing: class {
+protocol LibraryDataPassing: AnyObject {
     var dataStore: LibraryDataStore? { get }
 }
 

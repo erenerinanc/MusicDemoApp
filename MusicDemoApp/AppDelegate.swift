@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import StoreKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,7 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow()
-        let navController = UINavigationController(rootViewController: LibraryViewController())
+        
+        let loadingViewController = UIViewController()
+        let indicator = UIActivityIndicatorView()
+        loadingViewController.view.addSubview(indicator)
+        indicator.snp.makeConstraints { $0.center.equalToSuperview() }
+        
+        let navController = UINavigationController(rootViewController: loadingViewController)
         navController.navigationBar.tintColor = .white
         navController.navigationBar.barTintColor = Colors.background
         navController.navigationBar.barStyle = .blackTranslucent
@@ -23,10 +30,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = navController
         window?.makeKeyAndVisible()
         
-        let jwt = JWT()
-        let token = jwt.generateToken()
-        print(token)
-        
+        let developerToken = JWT.shared.generateToken()
+        UserToken(developerToken: developerToken).generateToken { result in
+            switch result {
+            case .success(let token):
+                let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)
+                let libraryVC = LibraryViewController(musicAPI: musicAPI)
+                navController.setViewControllers([libraryVC], animated: true)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+                
         return true
     }
 

@@ -11,7 +11,7 @@ protocol MediaPlayerRoutingLogic: AnyObject {
     
 }
 
-protocol MediaPlayerDataPassing: class {
+protocol MediaPlayerDataPassing: AnyObject {
     var dataStore: MediaPlayerDataStore? { get }
 }
 

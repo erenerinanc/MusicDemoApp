@@ -8,11 +8,20 @@
 import Foundation
 
 protocol LibraryPresentationLogic: AnyObject {
-    
+    func presentPlaylists(response: Library.Fetch.Response)
 }
 
 final class LibraryPresenter: LibraryPresentationLogic {
-    
+
     weak var viewController: LibraryDisplayLogic?
+    
+    func presentPlaylists(response: Library.Fetch.Response) {
+        let playlists = response.playlists.compactMap {  Library.Fetch.ViewModel.Playlist(artworkURL: $0.attributes?.artwork?.url ?? "",
+                                                                                          playlistName: $0.attributes?.name ?? "",
+                                                                                          songCount: $0.href?.count ?? 0
+            )
+        }
+        viewController?.displayPlaylists(for: Library.Fetch.ViewModel(playlists: playlists))
+    }
     
 }

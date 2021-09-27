@@ -17,17 +17,16 @@ enum Library {
         }
         
         struct Response {
-            
+            var playlists: [PlaylistData]
         }
         
         struct ViewModel {
-            var favoriteSongs: [Library.Fetch.ViewModel.Song]
+            var playlists: [Library.Fetch.ViewModel.Playlist]
             
-            struct Song {
-                var id: String
-                var name: String
-                var artistName: String
+            struct Playlist {
                 var artworkURL: String
+                var playlistName: String
+                var songCount: Int
             }
             
         }
