@@ -18,6 +18,7 @@ class CarouselCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        configure()
     }
     
     required init?(coder: NSCoder) {
@@ -30,12 +31,12 @@ class CarouselCell: UICollectionViewCell {
         contentView.addSubview(descriptionLabel)
         
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = CGFloat(20)
+        imageView.layer.cornerRadius = CGFloat(35)
         imageView.clipsToBounds = true
-        playlistNameLabel.font = UIFont.preferredFont(forTextStyle: .body)
+        playlistNameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         playlistNameLabel.textColor = .white
-        descriptionLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
         descriptionLabel.textColor = Colors.secondaryLabel
+        descriptionLabel.font = UIFont.preferredFont(forTextStyle: .caption1)
         
         imageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -49,16 +50,18 @@ class CarouselCell: UICollectionViewCell {
         }
         
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(playlistNameLabel.snp.bottom).offset(8)
-            make.leading.trailing.bottom.equalToSuperview().inset(8)
+            make.top.equalTo(playlistNameLabel.snp.bottom).offset(4)
+            make.leading.equalTo(playlistNameLabel.snp.leading)
         }
+    
     }
     
     func set(for viewModel: Library.Fetch.ViewModel.Playlist) {
         DispatchQueue.main.async {
-            Nuke.loadImage(with: viewModel.artworkURL, into: self.imageView)
+            let artworkurl = viewModel.artworkURL.replacingOccurrences(of: "{w}", with: "300").replacingOccurrences(of: "{h}", with: "300")
+            Nuke.loadImage(with: artworkurl, into: self.imageView)
             self.playlistNameLabel.text = viewModel.playlistName
-            self.descriptionLabel.text = String("\(viewModel.songCount) Songs")
+            self.descriptionLabel.text = "\(viewModel.songCount) Songs"
         }
     }
 }

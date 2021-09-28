@@ -45,6 +45,8 @@ final class LibraryViewController: BaseViewController {
         router.dataStore = interactor
         tableView.delegate = self
         tableView.dataSource = self
+        playlistCell.collectionView.delegate = self
+        playlistCell.collectionView.dataSource = self
     }
     
     override func viewDidLoad() {
@@ -53,12 +55,21 @@ final class LibraryViewController: BaseViewController {
         askForPermission()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.navigationBar.sizeToFit()
+    }
+    
     private func layoutUI() {
         navigationItem.title = "Library"
         view.addSubview(tableView)
+        view.backgroundColor = Colors.background
         tableView.backgroundColor = Colors.background
         tableView.indicatorStyle = .white
-        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview()}
+        tableView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(16)
+            make.top.bottom.trailing.equalToSuperview()
+        }
         tableView.register(FavoriteSongCell.self, forCellReuseIdentifier: FavoriteSongCell.reuseID)
     }
     
@@ -75,8 +86,8 @@ final class LibraryViewController: BaseViewController {
         }
     }
         
-  
 }
+//MARK: - Display Logic
 
 extension LibraryViewController: LibraryDisplayLogic {
     func displayPlaylists(for viewModel: Library.Fetch.ViewModel) {
@@ -88,21 +99,28 @@ extension LibraryViewController: LibraryDisplayLogic {
     }
 }
 
-extension LibraryViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
-            return CGFloat(266)
-        } else {
-            return CGFloat(50 + 24)
-        }
-    }
-}
+//MARK: - TableView Delegate & Datasource
 
-extension LibraryViewController: UITableViewDataSource {
+extension LibraryViewController: UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 0 {
+            return CGFloat(276)
+        } else {
+            return CGFloat(50 + 24)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //routing logic
+    }
+}
+
+extension LibraryViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
@@ -121,6 +139,54 @@ extension LibraryViewController: UITableViewDataSource {
             cell.subtitleLabel.text = "A Synthwave Mix"
             return cell
         }
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        let headerLabel = UILabel()
+        headerLabel.backgroundColor = Colors.background.withAlphaComponent(0.6)
+        if section == 0 {
+            headerLabel.text = "Playlists"
+        } else {
+            headerLabel.text = "Favorite"
+        }
+        
+        headerLabel.textColor = .white
+        headerLabel.font = UIFont.preferredFont(forTextStyle: .title3)
+        headerView.addSubview(headerLabel)
+        headerLabel.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(headerView.layoutMarginsGuide)
+            make.top.equalToSuperview().offset(16)
+            make.bottom.equalToSuperview().inset(8)
+        }
+        
+        headerView.backgroundColor = Colors.background
+        return headerView
+    }
+
+}
+
+//MARK: - CollectionView Delegate & DataSource
+
+extension LibraryViewController: UICollectionViewDelegateFlowLayout {
+    
+}
+
+extension LibraryViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel?.playlists.count ?? 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.reuseID, for: indexPath) as? CarouselCell else {
+            fatalError("Unable to dequeue reusable cell")
+        }
+        guard let model = viewModel?.playlists[indexPath.row] else {
+            fatalError("Cannot display model")
+        }
+        cell.set(for: model)
+        return cell
     }
     
     

@@ -37,7 +37,7 @@ class FavoriteSongCell: UITableViewCell {
         songNameLabel.textColor = .white
         songNameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitleLabel.textColor = Colors.secondaryLabel
-        subtitleLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
+        subtitleLabel.font = UIFont.preferredFont(forTextStyle: .caption1)
         
         musicImageView.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top).inset(8)
@@ -53,7 +53,7 @@ class FavoriteSongCell: UITableViewCell {
         
         subtitleLabel.snp.makeConstraints { make in
             make.leading.equalTo(musicImageView.snp.trailing).offset(8)
-            make.top.equalTo(songNameLabel.snp.bottom)
+            make.top.equalTo(songNameLabel.snp.bottom).offset(4)
             
         }
         

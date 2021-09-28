@@ -18,7 +18,7 @@ final class LibraryPresenter: LibraryPresentationLogic {
     func presentPlaylists(response: Library.Fetch.Response) {
         let playlists = response.playlists.compactMap {  Library.Fetch.ViewModel.Playlist(artworkURL: $0.attributes?.artwork?.url ?? "",
                                                                                           playlistName: $0.attributes?.name ?? "",
-                                                                                          songCount: $0.href?.count ?? 0
+                                                                                          songCount: 40
             )
         }
         viewController?.displayPlaylists(for: Library.Fetch.ViewModel(playlists: playlists))

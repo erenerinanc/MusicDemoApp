@@ -137,7 +137,6 @@ extension AppleMusicAPI: LibraryPlaylist {
             do {
                 let playlists = try JSONDecoder().decode(Playlists.self, from: data)
                 completion(.success(playlists))
-                print(playlists)
             } catch {
                 let error = error
                 print("Failed to decode Playlists object:", error.localizedDescription)

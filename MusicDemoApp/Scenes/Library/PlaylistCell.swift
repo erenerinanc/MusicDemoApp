@@ -12,7 +12,7 @@ class PlaylistCell: UITableViewCell {
     static let reuseID = "PlaylistCell"
     
     lazy var layout = UICollectionViewFlowLayout().configure {
-        $0.itemSize = CGSize(width: 220, height: 250)
+        $0.itemSize = CGSize(width: 200, height: 260)
         $0.scrollDirection = .horizontal
         $0.minimumLineSpacing = 16
     }
@@ -32,6 +32,7 @@ class PlaylistCell: UITableViewCell {
     private func layoutUI() {
         contentView.addSubview(collectionView)
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.backgroundColor = Colors.background
         collectionView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
         collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseID)
     }
