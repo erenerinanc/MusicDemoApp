@@ -10,14 +10,16 @@ import SnapKit
 import StoreKit
 
 protocol LibraryDisplayLogic: AnyObject {
-    func displayPlaylists(for viewModel: Library.Fetch.ViewModel)
+    func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel)
+    func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel)
 }
 
 final class LibraryViewController: BaseViewController {
     
     var interactor: LibraryBusinessLogic?
     var router: (LibraryRoutingLogic & LibraryDataPassing)?
-    var viewModel: Library.Fetch.ViewModel?
+    var playlistViewModel: Library.Fetch.PlaylistViewModel?
+    var topSongsViewModel: Library.Fetch.TopSongsViewModel?
     
     lazy var searchController = UISearchController(searchResultsController: SearchResultsViewController())
     private lazy var tableView = UITableView()
@@ -25,16 +27,16 @@ final class LibraryViewController: BaseViewController {
     
     // MARK: Object lifecycle
     
-    init(musicAPI: AppleMusicAPI) {
+    init(musicAPI: AppleMusicAPI, storefrontID: String) {
         super.init()
-        setup(musicAPI: musicAPI)
+        setup(musicAPI: musicAPI, storefrontID: storefrontID)
     }
     
     // MARK: Setup
     
-    private func setup(musicAPI: AppleMusicAPI) {
+    private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
         let viewController = self
-        let interactor = LibraryInteractor(musicAPI: musicAPI)
+        let interactor = LibraryInteractor(musicAPI: musicAPI,storeFrontID: storefrontID)
         let presenter = LibraryPresenter()
         let router = LibraryRouter()
         viewController.interactor = interactor
@@ -52,6 +54,7 @@ final class LibraryViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
+        configureSearchController()
         askForPermission()
     }
     
@@ -70,7 +73,15 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().inset(16)
             make.top.bottom.trailing.equalToSuperview()
         }
-        tableView.register(FavoriteSongCell.self, forCellReuseIdentifier: FavoriteSongCell.reuseID)
+        tableView.register(TopSongsCell.self, forCellReuseIdentifier: TopSongsCell.reuseID)
+    }
+    
+    private func configureSearchController() {
+        searchController.searchResultsUpdater = searchController.searchResultsController as? UISearchResultsUpdating
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Song or artist..."
+        
+        navigationItem.searchController = searchController
     }
     
     private func askForPermission() {
@@ -78,6 +89,7 @@ final class LibraryViewController: BaseViewController {
             DispatchQueue.main.async {
                 if status == .authorized {
                     self.interactor?.fetchPlaylists()
+                    self.interactor?.fetchTopCharts()
                 } else {
                     let alertVC = UIAlertController(title: "Apple Music Permission Required", message: "Hebelek", preferredStyle: .alert)
                     self.present(alertVC, animated: true, completion: nil)
@@ -90,8 +102,17 @@ final class LibraryViewController: BaseViewController {
 //MARK: - Display Logic
 
 extension LibraryViewController: LibraryDisplayLogic {
-    func displayPlaylists(for viewModel: Library.Fetch.ViewModel) {
-        self.viewModel = viewModel
+    func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel) {
+        self.playlistViewModel = viewModel
+        DispatchQueue.main.async {
+            self.playlistCell.collectionView.reloadData()
+            self.tableView.reloadSections([1], with: .automatic)
+        }
+    }
+    
+    func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
+        self.topSongsViewModel = viewModel
+        print(viewModel)
         DispatchQueue.main.async {
             self.playlistCell.collectionView.reloadData()
             self.tableView.reloadSections([1], with: .automatic)
@@ -126,7 +147,7 @@ extension LibraryViewController: UITableViewDataSource {
         if section == 0 {
             return 1
         } else {
-            return 10
+            return topSongsViewModel?.topSongs.count ?? 0
         }
     }
     
@@ -134,9 +155,11 @@ extension LibraryViewController: UITableViewDataSource {
         if indexPath.section == 0 {
             return playlistCell
         } else {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: FavoriteSongCell.reuseID) as? FavoriteSongCell else { fatalError("Unable to dequeue reusabla cell")}
-            cell.songNameLabel.text = "Low Earth Orbit"
-            cell.subtitleLabel.text = "A Synthwave Mix"
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: TopSongsCell.reuseID) as? TopSongsCell else { fatalError("Unable to dequeue reusabla cell")}
+            guard let model = topSongsViewModel?.topSongs[indexPath.row] else {
+                fatalError("Cannot display model")
+            }
+            cell.set(for: model)
             return cell
         }
     }
@@ -148,7 +171,7 @@ extension LibraryViewController: UITableViewDataSource {
         if section == 0 {
             headerLabel.text = "Playlists"
         } else {
-            headerLabel.text = "Favorite"
+            headerLabel.text = "Top Songs"
         }
         
         headerLabel.textColor = .white
@@ -175,14 +198,14 @@ extension LibraryViewController: UICollectionViewDelegateFlowLayout {
 extension LibraryViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel?.playlists.count ?? 0
+        return playlistViewModel?.playlists.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.reuseID, for: indexPath) as? CarouselCell else {
             fatalError("Unable to dequeue reusable cell")
         }
-        guard let model = viewModel?.playlists[indexPath.row] else {
+        guard let model = playlistViewModel?.playlists[indexPath.row] else {
             fatalError("Cannot display model")
         }
         cell.set(for: model)

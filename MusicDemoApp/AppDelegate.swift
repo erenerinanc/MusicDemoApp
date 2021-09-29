@@ -35,8 +35,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             switch result {
             case .success(let token):
                 let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)
-                let libraryVC = LibraryViewController(musicAPI: musicAPI)
-                navController.setViewControllers([libraryVC], animated: true)
+                musicAPI.getUserStorefront { result in
+                    switch result {
+                    case .success(let response):
+                        guard let id = response.data?[0].id else { return }
+                        DispatchQueue.main.async {
+                            let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id)
+                            navController.setViewControllers([libraryVC], animated: true)
+                        }
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
             case .failure(let error):
                 print(error.localizedDescription)
             }

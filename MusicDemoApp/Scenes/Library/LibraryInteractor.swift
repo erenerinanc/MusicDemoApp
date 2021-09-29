@@ -8,8 +8,8 @@
 import Foundation
 
 protocol LibraryBusinessLogic: AnyObject {
-    func fetchStoreFrontID()
     func fetchPlaylists()
+    func fetchTopCharts()
 }
 
 protocol LibraryDataStore: AnyObject {
@@ -17,29 +17,17 @@ protocol LibraryDataStore: AnyObject {
 }
 
 final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
-    init(musicAPI: AppleMusicAPI) {
-        self.worker = LibraryWorker(musicAPI: musicAPI)
+    init(musicAPI: AppleMusicAPI, storeFrontID: String) {
+        self.worker = LibraryWorker(musicAPI: musicAPI, storeFrontID: storeFrontID)
     }
     
     var presenter: LibraryPresentationLogic?
     let worker: LibraryWorkingLogic
+    var storeFrontID: String = ""
     
     var playlists: [PlaylistData] = []
-    
-    //gonna use it @search request
-    func fetchStoreFrontID() {
-        print("Gonna fetch storefrontID...")
-        worker.fetchStorefrontID { result in
-            switch result {
-            case .success(let response):
-                guard let storefrontdata = response.data?[0] else { return }
-                guard let storefrontid = storefrontdata.id else { return }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
+    var topSongs: [SongData] = []
+
     func fetchPlaylists() {
         print("Gonna fetch playlists...")
         worker.fetchPlaylists { result in
@@ -47,7 +35,22 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
             case .success(let response):
                 guard let data = response.data else { return }
                 self.playlists = data
-                self.presenter?.presentPlaylists(response: Library.Fetch.Response(playlists: self.playlists))
+                self.presenter?.presentPlaylists(response: Library.Fetch.PlaylistResponse(playlists: self.playlists))
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    func fetchTopCharts() {
+        print("Gonna fetch top charts...")
+        worker.fetchTopCharts { result in
+            switch result {
+            case .success(let response):
+                guard let songs = response.results?.songs else { return }
+                guard let songData = songs[0].data else { return }
+                self.topSongs = songData
+                self.presenter?.presentTopSongs(response: Library.Fetch.TopSongsResponse(topSongs: self.topSongs))
             case .failure(let error):
                 print(error.localizedDescription)
             }

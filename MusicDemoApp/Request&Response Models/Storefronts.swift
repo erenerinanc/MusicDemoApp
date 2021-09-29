@@ -12,7 +12,7 @@ struct Storefront: Codable {
     let data: [StorefrontData]?
 }
 
-// MARK: - Datum
+// MARK: - StorefrontData
 struct StorefrontData: Codable {
     let id, type, href: String?
     let languageAttributes: LanguageAttribute?

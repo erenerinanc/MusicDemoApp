@@ -8,20 +8,30 @@
 import Foundation
 
 protocol LibraryPresentationLogic: AnyObject {
-    func presentPlaylists(response: Library.Fetch.Response)
+    func presentPlaylists(response: Library.Fetch.PlaylistResponse)
+    func presentTopSongs(response: Library.Fetch.TopSongsResponse)
 }
 
 final class LibraryPresenter: LibraryPresentationLogic {
 
     weak var viewController: LibraryDisplayLogic?
     
-    func presentPlaylists(response: Library.Fetch.Response) {
-        let playlists = response.playlists.compactMap {  Library.Fetch.ViewModel.Playlist(artworkURL: $0.attributes?.artwork?.url ?? "",
+    func presentPlaylists(response: Library.Fetch.PlaylistResponse) {
+        let playlists = response.playlists.compactMap {  Library.Fetch.PlaylistViewModel.Playlist(artworkURL: $0.attributes?.artwork?.url ?? "",
                                                                                           playlistName: $0.attributes?.name ?? "",
                                                                                           songCount: 40
             )
         }
-        viewController?.displayPlaylists(for: Library.Fetch.ViewModel(playlists: playlists))
+        viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
+    }
+    
+    func presentTopSongs(response: Library.Fetch.TopSongsResponse) {
+        let topSongs = response.topSongs.compactMap { Library.Fetch.TopSongsViewModel.TopSongs(artistName: $0.attributes?.artistName ?? "",
+                                                                                               songName: $0.attributes?.name ?? "",
+                                                                                               artworkURL: $0.attributes?.artwork?.url ?? ""
+                                                                                               )
+        }
+        viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))
     }
     
 }

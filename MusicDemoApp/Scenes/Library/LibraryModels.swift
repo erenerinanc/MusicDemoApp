@@ -16,19 +16,33 @@ enum Library {
             
         }
         
-        struct Response {
+        struct PlaylistResponse {
             var playlists: [PlaylistData]
         }
         
-        struct ViewModel {
-            var playlists: [Library.Fetch.ViewModel.Playlist]
-            
+        struct TopSongsResponse {
+            var topSongs: [SongData]
+        }
+        
+        struct PlaylistViewModel {
+            var playlists: [Library.Fetch.PlaylistViewModel.Playlist]
+        
             struct Playlist {
                 var artworkURL: String
                 var playlistName: String
                 var songCount: Int
             }
+
+        }
+        
+        struct TopSongsViewModel {
+            var topSongs: [Library.Fetch.TopSongsViewModel.TopSongs]
             
+            struct TopSongs {
+                var artistName: String
+                var songName: String
+                var artworkURL: String
+            }
         }
         
     }

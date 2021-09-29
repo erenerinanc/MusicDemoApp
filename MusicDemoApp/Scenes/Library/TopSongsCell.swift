@@ -1,5 +1,5 @@
 //
-//  FavoriteSongCell.swift
+//  TopSongsCell.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 22.09.2021.
@@ -7,8 +7,9 @@
 
 import UIKit
 import SnapKit
+import Nuke
 
-class FavoriteSongCell: UITableViewCell {
+class TopSongsCell: UITableViewCell {
     static let reuseID = "FavoriteSongCell"
     
     let musicImageView = UIImageView()
@@ -33,7 +34,9 @@ class FavoriteSongCell: UITableViewCell {
         contentView.addSubview(hearthIcon)
         
        
-        musicImageView.tintColor = .white
+        musicImageView.contentMode = .scaleAspectFill
+        musicImageView.layer.cornerRadius = CGFloat(10)
+        musicImageView.clipsToBounds = true
         songNameLabel.textColor = .white
         songNameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         subtitleLabel.textColor = Colors.secondaryLabel
@@ -56,8 +59,15 @@ class FavoriteSongCell: UITableViewCell {
             make.top.equalTo(songNameLabel.snp.bottom).offset(4)
             
         }
-        
-        
+    }
+    
+    func set(for viewModel: Library.Fetch.TopSongsViewModel.TopSongs) {
+        DispatchQueue.main.async {
+            let artworkurl = viewModel.artworkURL.replacingOccurrences(of: "{w}", with: "60").replacingOccurrences(of: "{h}", with: "60")
+            Nuke.loadImage(with: artworkurl, into: self.musicImageView)
+            self.songNameLabel.text = viewModel.songName
+            self.subtitleLabel.text = viewModel.artistName
+        }
     }
 
 }

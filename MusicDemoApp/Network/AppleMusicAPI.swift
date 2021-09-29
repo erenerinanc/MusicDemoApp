@@ -14,17 +14,25 @@ enum EndPoints {
     static let rootPath = "https://api.music.apple.com/v1/"
     static let storeFront = "https://api.music.apple.com/v1/me/storefront"
     static let libraryPlaylist = "https://api.music.apple.com/v1/me/library/playlists"
+    static let search = "https://api.music.apple.com/v1/catalog/{storefront}/search"
+    static let topCharts = "https://api.music.apple.com/v1/catalog/{storefront}/charts?types=songs"
     
 }
 
-var placeHolderImageURL: URL = URL(string: "https://media.rawg.io/media/games/456/456dea5e1c7e3cd07060c14e96612001.jpg")!
-
 protocol StoreFront {
-    func getUserStorefront(_ completion: @escaping (Result<Storefront,Error>) -> Void) -> String
+    func getUserStorefront(_ completion: @escaping (Result<Storefront,Error>) -> Void)
 }
 
 protocol LibraryPlaylist {
     func getLibraryPlaylist(_ completion: @escaping (Result<Playlists,Error>) -> Void )
+}
+
+//protocol SearchLogic {
+//    func getSongsOrArtists(with storefrontID: String,_ completion: @escaping (Result<SearchResponse,Error>) -> Void )
+//}
+
+protocol TopChart {
+    func getTopCharts(with storeFrontId: String, _ completion: @escaping (Result<TopCharts,Error>) -> Void)
 }
 
 final class AppleMusicAPI {
@@ -52,22 +60,18 @@ enum APIError: Error {
 }
 
 extension AppleMusicAPI: StoreFront {
-    func getUserStorefront(_ completion: @escaping (Result<Storefront,Error>) -> Void) -> String {
-        var storefrontID = ""
+    func getUserStorefront(_ completion: @escaping (Result<Storefront,Error>) ->Void) {
         let storeFrontURL = URL(string: EndPoints.storeFront)!
         var storeFrontRequest = URLRequest(url: storeFrontURL)
         storeFrontRequest.httpMethod = "GET"
         urlSession.dataTask(with: storeFrontRequest) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
+            guard error == nil else { return }
             
             guard let urlResponse = response as? HTTPURLResponse else {
                 completion(.failure(APIError.noResponse))
                 return
             }
-            print("API Request HTTP Status Code:", urlResponse.statusCode)
+            print(urlResponse.statusCode)
             
             guard urlResponse.statusCode == 200 else {
                 print("API Response is not OK")
@@ -84,16 +88,11 @@ extension AppleMusicAPI: StoreFront {
             do {
                 let storeFrontResponse = try JSONDecoder().decode(Storefront.self, from: data)
                 completion(.success(storeFrontResponse))
-                guard let storefrontdata = storeFrontResponse.data?[0] else { return }
-                guard let storefrontid = storefrontdata.id else { return }
-                storefrontID = storefrontid
             } catch {
                 print("Failed to decode storefront ID", error.localizedDescription)
             }
             
         }.resume()
-        
-        return storefrontID
     }
 }
 
@@ -131,9 +130,6 @@ extension AppleMusicAPI: LibraryPlaylist {
                 return
             }
             
-            let response = String(data: data, encoding: .utf8)!
-            print("API Response is:", response)
-            
             do {
                 let playlists = try JSONDecoder().decode(Playlists.self, from: data)
                 completion(.success(playlists))
@@ -146,5 +142,81 @@ extension AppleMusicAPI: LibraryPlaylist {
     }
 }
 
+//extension AppleMusicAPI: SearchLogic {
+//    func getSongsOrArtists(with storefrontID: String, _ completion: @escaping (Result<SearchResponse, Error>) -> Void) {
+//        let searchURLString = EndPoints.search.replacingOccurrences(of: "{storefront}", with: storefrontID)
+//        let searchURL = URL(string: searchURLString)!
+//        var searchRequest = URLRequest(url: searchURL)
+//        searchRequest.httpMethod = "GET"
+//
+//        urlSession.dataTask(with: searchRequest) { data, response, error in
+//            if let error = error {
+//                completion(.failure(error))
+//                return
+//            }
+//            guard let urlResponse = response as? HTTPURLResponse else {
+//                completion(.failure(APIError.noResponse))
+//                return
+//            }
+//            print("API Request HTTP Status Code:", urlResponse.statusCode)
+//            guard urlResponse.statusCode == 200 else {
+//                print("API Response is not OK")
+//                if let data = data, let responseString = String(data: data, encoding: .utf8) {
+//                    print("API Response is:", responseString)
+//                }
+//                completion(.failure(APIError.noResponse))
+//                return
+//            }
+//
+//            guard let data = data else {
+//                completion(.failure(APIError.noResponse))
+//                return
+//            }
+//            do {
+//                let searchResult = try JSONDecoder().decode(SearchResponse.self, from: data)
+//                completion(.success(searchResult))
+//            } catch {
+//                print("Failed to decode Search Result", error.localizedDescription)
+//                completion(.failure(error))
+//            }
+//        }.resume()
+//    }
+//}
+
+extension AppleMusicAPI: TopChart {
+    func getTopCharts(with storeFrontID: String,_ completion: @escaping (Result<TopCharts, Error>) -> Void) {
+        let topchartURLString = EndPoints.topCharts.replacingOccurrences(of: "{storefront}", with: storeFrontID)
+        let url = URL(string: topchartURLString)!
+        var topchartRequest = URLRequest(url: url)
+        topchartRequest.httpMethod = "GET"
+        
+        urlSession.dataTask(with: topchartRequest) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                print(error.localizedDescription)
+            }
+            
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            guard response.statusCode == 200 else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            guard let data = data else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            do {
+                let result = try JSONDecoder().decode(TopCharts.self, from: data)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
+        
+    }
+}
   
     

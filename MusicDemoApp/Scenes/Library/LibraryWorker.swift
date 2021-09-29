@@ -8,24 +8,32 @@
 import Foundation
 
 protocol LibraryWorkingLogic: AnyObject {
-    func fetchStorefrontID(_ completion: @escaping (Result<Storefront, Error>) -> Void)
     func fetchPlaylists(_ completion: @escaping (Result<Playlists, Error>) -> Void)
+    func fetchTopCharts(_ completion: @escaping (Result<TopCharts, Error>) -> Void)
 }
 
 final class LibraryWorker: LibraryWorkingLogic {
   
     let musicAPI: AppleMusicAPI
-    init(musicAPI: AppleMusicAPI) {
+    let storeFrontID: String
+    init(musicAPI: AppleMusicAPI, storeFrontID: String) {
         self.musicAPI = musicAPI
-    }
-    
-    //gonna use it @search request
-    func fetchStorefrontID(_ completion: @escaping (Result<Storefront, Error>) -> Void) {
-        
+        self.storeFrontID = storeFrontID
     }
     
     func fetchPlaylists(_ completion: @escaping (Result<Playlists, Error>) -> Void) {
         musicAPI.getLibraryPlaylist { result in
+            switch result {
+            case .success(let response):
+                completion(.success(response))
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func fetchTopCharts(_ completion: @escaping (Result<TopCharts, Error>) -> Void) {
+        musicAPI.getTopCharts(with: storeFrontID) { result in
             switch result {
             case .success(let response):
                 completion(.success(response))

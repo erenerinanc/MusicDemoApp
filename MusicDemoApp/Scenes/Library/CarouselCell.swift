@@ -56,7 +56,7 @@ class CarouselCell: UICollectionViewCell {
     
     }
     
-    func set(for viewModel: Library.Fetch.ViewModel.Playlist) {
+    func set(for viewModel: Library.Fetch.PlaylistViewModel.Playlist) {
         DispatchQueue.main.async {
             let artworkurl = viewModel.artworkURL.replacingOccurrences(of: "{w}", with: "300").replacingOccurrences(of: "{h}", with: "300")
             Nuke.loadImage(with: artworkurl, into: self.imageView)
