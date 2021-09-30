@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let navController = UINavigationController(rootViewController: loadingViewController)
         navController.navigationBar.tintColor = .white
+
         navController.navigationBar.barTintColor = Colors.background
         navController.navigationBar.barStyle = .blackTranslucent
         navController.navigationBar.prefersLargeTitles = true
@@ -31,27 +32,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         
         let developerToken = JWT.shared.generateToken()
-        UserToken(developerToken: developerToken).generateToken { result in
-            switch result {
-            case .success(let token):
-                let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)
-                musicAPI.getUserStorefront { result in
+        SKCloudServiceController.requestAuthorization { status in
+            if status == .authorized {
+                UserToken(developerToken: developerToken).generateToken { result in
                     switch result {
-                    case .success(let response):
-                        guard let id = response.data?[0].id else { return }
-                        DispatchQueue.main.async {
-                            let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id)
-                            navController.setViewControllers([libraryVC], animated: true)
+                    case .success(let token):
+                        let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)
+                        musicAPI.getUserStorefront { result in
+                            switch result {
+                            case .success(let response):
+                                guard let id = response.data?[0].id else { return }
+                                DispatchQueue.main.async {
+                                    let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id)
+                                    navController.setViewControllers([libraryVC], animated: true)
+                                }
+                            case .failure(let error):
+                                print(error.localizedDescription)
+                            }
                         }
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
                 }
-            case .failure(let error):
-                print(error.localizedDescription)
+            } else {
+                let alertVC = UIAlertController(title: "Apple Music Permission Required", message: nil, preferredStyle: .alert)
+                loadingViewController.present(alertVC, animated: true)
             }
         }
-                
+          
         return true
     }
 
