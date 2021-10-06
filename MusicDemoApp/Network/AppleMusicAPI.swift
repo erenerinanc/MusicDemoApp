@@ -16,6 +16,7 @@ enum EndPoints {
     static let libraryPlaylist = "https://api.music.apple.com/v1/me/library/playlists"
     static let search = "https://api.music.apple.com/v1/catalog/{storefront}/search"
     static let topCharts = "https://api.music.apple.com/v1/catalog/{storefront}/charts?types=songs"
+    static let catalogPlaylist = "https://api.music.apple.com/v1/catalog/{storefront}/playlists/{globalID}"
     
 }
 
@@ -33,6 +34,10 @@ protocol LibraryPlaylist {
 
 protocol TopChart {
     func getTopCharts(with storeFrontId: String, _ completion: @escaping (Result<TopCharts,Error>) -> Void)
+}
+
+protocol GetCatalogPlaylist {
+    func getCatalogPlaylist(storeFrontId: String,globalId: String,_ completion: @escaping (Result<CatalogPlaylist,Error>) -> Void)
 }
 
 final class AppleMusicAPI {
@@ -71,7 +76,6 @@ extension AppleMusicAPI: StoreFront {
                 completion(.failure(APIError.noResponse))
                 return
             }
-            print(urlResponse.statusCode)
             
             guard urlResponse.statusCode == 200 else {
                 print("API Response is not OK")
@@ -113,7 +117,6 @@ extension AppleMusicAPI: LibraryPlaylist {
                 return
             }
             
-            print("API Request HTTP Status Code:", urlResponse.statusCode)
             guard urlResponse.statusCode == 200 else {
                 print("API Response is not OK")
                 if let data = data, let responseString = String(data: data, encoding: .utf8) {
@@ -216,6 +219,41 @@ extension AppleMusicAPI: TopChart {
             }
         }.resume()
         
+    }
+}
+
+extension AppleMusicAPI: GetCatalogPlaylist {
+    func getCatalogPlaylist(storeFrontId: String, globalId: String, _ completion: @escaping (Result<CatalogPlaylist, Error>) -> Void) {
+        let catalogURLString = EndPoints.catalogPlaylist.replacingOccurrences(of: "{storefront}", with: storeFrontId).replacingOccurrences(of: "{globalID}", with: globalId)
+        let url = URL(string: catalogURLString)!
+        var catalogRequest = URLRequest(url: url)
+        catalogRequest.httpMethod = "GET"
+        
+        urlSession.dataTask(with: catalogRequest) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                print(error.localizedDescription)
+            }
+            
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            guard response.statusCode == 200 else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            guard let data = data else {
+                completion(.failure(APIError.noResponse))
+                return
+            }
+            do {
+                let result = try JSONDecoder().decode(CatalogPlaylist.self, from: data)
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }.resume()
     }
 }
   

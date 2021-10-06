@@ -38,7 +38,7 @@ final class LibraryViewController: BaseViewController {
         let viewController = self
         let interactor = LibraryInteractor(musicAPI: musicAPI,storeFrontID: storefrontID)
         let presenter = LibraryPresenter()
-        let router = LibraryRouter()
+        let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI)
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -70,10 +70,10 @@ final class LibraryViewController: BaseViewController {
         tableView.backgroundColor = Colors.background
         tableView.indicatorStyle = .white
         tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(16)
+            make.leading.equalToSuperview().inset(8)
             make.top.bottom.trailing.equalToSuperview()
         }
-        tableView.register(TopSongsCell.self, forCellReuseIdentifier: TopSongsCell.reuseID)
+        tableView.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
     
     private func configureSearchController() {
@@ -106,15 +106,12 @@ extension LibraryViewController: LibraryDisplayLogic {
         self.playlistViewModel = viewModel
         DispatchQueue.main.async {
             self.playlistCell.collectionView.reloadData()
-            self.tableView.reloadSections([1], with: .automatic)
         }
     }
     
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
         self.topSongsViewModel = viewModel
-        print(viewModel)
         DispatchQueue.main.async {
-            self.playlistCell.collectionView.reloadData()
             self.tableView.reloadSections([1], with: .automatic)
         }
     }
@@ -132,12 +129,15 @@ extension LibraryViewController: UITableViewDelegate {
         if indexPath.section == 0 {
             return CGFloat(276)
         } else {
-            return CGFloat(50 + 24)
+            return CGFloat(74)
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //routing logic
+        if let songID = topSongsViewModel?.topSongs[indexPath.row].id {
+            musicPlayer.setQueue(with: [songID])
+            musicPlayer.play()
+        }
     }
 }
 
@@ -155,7 +155,7 @@ extension LibraryViewController: UITableViewDataSource {
         if indexPath.section == 0 {
             return playlistCell
         } else {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: TopSongsCell.reuseID) as? TopSongsCell else { fatalError("Unable to dequeue reusabla cell")}
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: SongCell.reuseID) as? SongCell else { fatalError("Unable to dequeue reusabla cell")}
             guard let model = topSongsViewModel?.topSongs[indexPath.row] else {
                 fatalError("Cannot display model")
             }
@@ -192,6 +192,11 @@ extension LibraryViewController: UITableViewDataSource {
 //MARK: - CollectionView Delegate & DataSource
 
 extension LibraryViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let globalID = playlistViewModel?.playlists[indexPath.item].id else { return }
+        router?.routeToCatalogPlaylist(globalID: globalID)
+    }
     
 }
 

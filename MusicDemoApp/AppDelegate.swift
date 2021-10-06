@@ -30,11 +30,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         window?.rootViewController = navController
         window?.makeKeyAndVisible()
-        
+        print("Application started")
         let developerToken = JWT.shared.generateToken()
         SKCloudServiceController.requestAuthorization { status in
+            print("Authentication requested")
             if status == .authorized {
                 UserToken(developerToken: developerToken).generateToken { result in
+                    print("Authorized")
                     switch result {
                     case .success(let token):
                         let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)

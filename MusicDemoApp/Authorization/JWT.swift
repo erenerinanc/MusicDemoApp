@@ -8,10 +8,11 @@
 import Foundation
 import SwiftJWT
 
+
 class JWT {
     static let shared = JWT()
     private init() {}
-    
+
     let teamID = "RE9892F24F"
     let keyID = "J766FNQUAL"
     let authToken = """
@@ -22,15 +23,15 @@ class JWT {
         R67v9MnJ
         -----END PRIVATE KEY-----
         """
-    
+
     func generateToken() -> String {
         var developerToken = ""
         let header = Header(kid: keyID)
         let claims = JWTClaims(iss: teamID, iat: Date(), exp: Date() + 60 * 60 * 24 * 100)
         var jwt = SwiftJWT.JWT(header: header, claims: claims)
-        
+
         guard let tokenData = authToken.data(using: .utf8) else { return ""}
-        
+
         do {
             let token = try jwt.sign(using: .es256(privateKey: tokenData))
             developerToken = token
@@ -46,3 +47,4 @@ struct JWTClaims: Claims {
     let iat: Date?
     let exp: Date?
 }
+

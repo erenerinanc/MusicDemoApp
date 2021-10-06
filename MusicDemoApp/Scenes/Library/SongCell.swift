@@ -1,5 +1,5 @@
 //
-//  TopSongsCell.swift
+//  SongCell.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 22.09.2021.
@@ -9,8 +9,8 @@ import UIKit
 import SnapKit
 import Nuke
 
-class TopSongsCell: UITableViewCell {
-    static let reuseID = "FavoriteSongCell"
+class SongCell: UITableViewCell {
+    static let reuseID = "SongCell"
     
     let musicImageView = UIImageView()
     let songNameLabel = UILabel()
@@ -45,7 +45,7 @@ class TopSongsCell: UITableViewCell {
         musicImageView.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top).inset(8)
             make.bottom.equalTo(self.snp.bottom).inset(8)
-            make.leading.equalTo(self.snp.leading).inset(24)
+            make.leading.equalTo(self.snp.leading).inset(16)
             make.width.equalTo(60)
         }
         
@@ -67,6 +67,15 @@ class TopSongsCell: UITableViewCell {
             Nuke.loadImage(with: artworkurl, into: self.musicImageView)
             self.songNameLabel.text = viewModel.songName
             self.subtitleLabel.text = viewModel.artistName
+        }
+    }
+    
+    func set(for catalogViewModel: Playlist.Fetch.ViewModel.Song) {
+        DispatchQueue.main.async {
+            let artworkurl = catalogViewModel.artworkURL.replacingOccurrences(of: "{w}", with: "60").replacingOccurrences(of: "{h}", with: "60")
+            Nuke.loadImage(with: artworkurl, into: self.musicImageView)
+            self.songNameLabel.text = catalogViewModel.name
+            self.subtitleLabel.text = catalogViewModel.description
         }
     }
 

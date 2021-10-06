@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		110F696E26FC5C63001BBA32 /* AppleMusicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F696D26FC5C63001BBA32 /* AppleMusicAPI.swift */; };
+		1128E92F270AEC1600BF6FCA /* HeaderImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1128E92E270AEC1600BF6FCA /* HeaderImageCell.swift */; };
+		1128E931270B128600BF6FCA /* PlayerStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1128E930270B128600BF6FCA /* PlayerStackView.swift */; };
 		112D7BFC2701C6F200B9C59B /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFB2701C6F200B9C59B /* BaseViewController.swift */; };
 		112D7BFE2702655000B9C59B /* Storefronts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFD2702655000B9C59B /* Storefronts.swift */; };
 		112D7C00270345D500B9C59B /* SearchResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFF270345D500B9C59B /* SearchResults.swift */; };
@@ -34,7 +36,8 @@
 		1142ADC926F9C827001B1F53 /* MediaPlayerWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1142ADC226F9C827001B1F53 /* MediaPlayerWorker.swift */; };
 		1142ADCA26F9C827001B1F53 /* MediaPlayerRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1142ADC326F9C827001B1F53 /* MediaPlayerRouter.swift */; };
 		1142ADCD26F9C8BC001B1F53 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1142ADCC26F9C8BC001B1F53 /* Colors.swift */; };
-		1157D09026FB0DEC00D52A3F /* SwiftJWT in Frameworks */ = {isa = PBXBuildFile; productRef = 1157D08F26FB0DEC00D52A3F /* SwiftJWT */; };
+		114999E62706F75F00F385D9 /* SwiftJWT in Frameworks */ = {isa = PBXBuildFile; productRef = 114999E52706F75F00F385D9 /* SwiftJWT */; };
+		114999E82707026F00F385D9 /* CatalogPlaylist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 114999E72707026F00F385D9 /* CatalogPlaylist.swift */; };
 		1157D09326FB0E0E00D52A3F /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1157D09226FB0E0E00D52A3F /* SnapKit */; };
 		1157D09626FB0E2C00D52A3F /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 1157D09526FB0E2C00D52A3F /* Nuke */; };
 		1157D09926FB0E5600D52A3F /* JWT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D09826FB0E5600D52A3F /* JWT.swift */; };
@@ -44,12 +47,10 @@
 		1157D0A626FB283E00D52A3F /* SearchResultsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D09F26FB283E00D52A3F /* SearchResultsModels.swift */; };
 		1157D0A726FB283E00D52A3F /* SearchResultsWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0A026FB283E00D52A3F /* SearchResultsWorker.swift */; };
 		1157D0A826FB283E00D52A3F /* SearchResultsRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0A126FB283E00D52A3F /* SearchResultsRouter.swift */; };
-		1157D0AA26FB28CC00D52A3F /* TopSongsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0A926FB28CC00D52A3F /* TopSongsCell.swift */; };
+		1157D0AA26FB28CC00D52A3F /* SongCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0A926FB28CC00D52A3F /* SongCell.swift */; };
 		1157D0AC26FB28E100D52A3F /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */; };
 		1157D0AE26FB29FD00D52A3F /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */; };
 		1157D0B326FB2AA900D52A3F /* Configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0B226FB2AA900D52A3F /* Configure.swift */; };
-		11C7F2D126FCCC05004153F6 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 11C7F2D026FCCC05004153F6 /* SwiftyJSON */; };
-		11C7F2DF270078E3004153F6 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 11C7F2DE270078E3004153F6 /* Alamofire */; };
 		11C7F2E127007E2E004153F6 /* MusicUserTokenGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C7F2E027007E2E004153F6 /* MusicUserTokenGenerator.swift */; };
 		11C7F2E32700A290004153F6 /* Playlists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C7F2E22700A290004153F6 /* Playlists.swift */; };
 		11DA04AE270462CA00782772 /* TopCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DA04AD270462CA00782772 /* TopCharts.swift */; };
@@ -57,6 +58,8 @@
 
 /* Begin PBXFileReference section */
 		110F696D26FC5C63001BBA32 /* AppleMusicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicAPI.swift; sourceTree = "<group>"; };
+		1128E92E270AEC1600BF6FCA /* HeaderImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderImageCell.swift; sourceTree = "<group>"; };
+		1128E930270B128600BF6FCA /* PlayerStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStackView.swift; sourceTree = "<group>"; };
 		112D7BFB2701C6F200B9C59B /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		112D7BFD2702655000B9C59B /* Storefronts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefronts.swift; sourceTree = "<group>"; };
 		112D7BFF270345D500B9C59B /* SearchResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResults.swift; sourceTree = "<group>"; };
@@ -85,6 +88,7 @@
 		1142ADC226F9C827001B1F53 /* MediaPlayerWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerWorker.swift; sourceTree = "<group>"; };
 		1142ADC326F9C827001B1F53 /* MediaPlayerRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerRouter.swift; sourceTree = "<group>"; };
 		1142ADCC26F9C8BC001B1F53 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		114999E72707026F00F385D9 /* CatalogPlaylist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogPlaylist.swift; sourceTree = "<group>"; };
 		1157D09826FB0E5600D52A3F /* JWT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JWT.swift; sourceTree = "<group>"; };
 		1157D09C26FB283E00D52A3F /* SearchResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsViewController.swift; sourceTree = "<group>"; };
 		1157D09D26FB283E00D52A3F /* SearchResultsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsPresenter.swift; sourceTree = "<group>"; };
@@ -92,7 +96,7 @@
 		1157D09F26FB283E00D52A3F /* SearchResultsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsModels.swift; sourceTree = "<group>"; };
 		1157D0A026FB283E00D52A3F /* SearchResultsWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsWorker.swift; sourceTree = "<group>"; };
 		1157D0A126FB283E00D52A3F /* SearchResultsRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsRouter.swift; sourceTree = "<group>"; };
-		1157D0A926FB28CC00D52A3F /* TopSongsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopSongsCell.swift; sourceTree = "<group>"; };
+		1157D0A926FB28CC00D52A3F /* SongCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongCell.swift; sourceTree = "<group>"; };
 		1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
 		1157D0B226FB2AA900D52A3F /* Configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configure.swift; sourceTree = "<group>"; };
@@ -106,11 +110,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11C7F2DF270078E3004153F6 /* Alamofire in Frameworks */,
 				1157D09626FB0E2C00D52A3F /* Nuke in Frameworks */,
-				1157D09026FB0DEC00D52A3F /* SwiftJWT in Frameworks */,
-				11C7F2D126FCCC05004153F6 /* SwiftyJSON in Frameworks */,
 				1157D09326FB0E0E00D52A3F /* SnapKit in Frameworks */,
+				114999E62706F75F00F385D9 /* SwiftJWT in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +134,7 @@
 				112D7BFD2702655000B9C59B /* Storefronts.swift */,
 				112D7BFF270345D500B9C59B /* SearchResults.swift */,
 				11DA04AD270462CA00782772 /* TopCharts.swift */,
+				114999E72707026F00F385D9 /* CatalogPlaylist.swift */,
 			);
 			path = "Request&Response Models";
 			sourceTree = "<group>";
@@ -190,7 +193,7 @@
 				1142ADA526F9C806001B1F53 /* LibraryModels.swift */,
 				1142ADA626F9C806001B1F53 /* LibraryWorker.swift */,
 				1142ADA726F9C806001B1F53 /* LibraryRouter.swift */,
-				1157D0A926FB28CC00D52A3F /* TopSongsCell.swift */,
+				1157D0A926FB28CC00D52A3F /* SongCell.swift */,
 				1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */,
 				1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */,
 			);
@@ -206,6 +209,7 @@
 				1142ADB326F9C817001B1F53 /* PlaylistModels.swift */,
 				1142ADB426F9C817001B1F53 /* PlaylistWorker.swift */,
 				1142ADB526F9C817001B1F53 /* PlaylistRouter.swift */,
+				1128E92E270AEC1600BF6FCA /* HeaderImageCell.swift */,
 			);
 			path = Playlist;
 			sourceTree = "<group>";
@@ -219,6 +223,7 @@
 				1142ADC126F9C827001B1F53 /* MediaPlayerModels.swift */,
 				1142ADC226F9C827001B1F53 /* MediaPlayerWorker.swift */,
 				1142ADC326F9C827001B1F53 /* MediaPlayerRouter.swift */,
+				1128E930270B128600BF6FCA /* PlayerStackView.swift */,
 			);
 			path = MediaPlayer;
 			sourceTree = "<group>";
@@ -279,11 +284,9 @@
 			);
 			name = MusicDemoApp;
 			packageProductDependencies = (
-				1157D08F26FB0DEC00D52A3F /* SwiftJWT */,
 				1157D09226FB0E0E00D52A3F /* SnapKit */,
 				1157D09526FB0E2C00D52A3F /* Nuke */,
-				11C7F2D026FCCC05004153F6 /* SwiftyJSON */,
-				11C7F2DE270078E3004153F6 /* Alamofire */,
+				114999E52706F75F00F385D9 /* SwiftJWT */,
 			);
 			productName = MusicDemoApp;
 			productReference = 1142AD8226F9C5F3001B1F53 /* MusicDemoApp.app */;
@@ -296,7 +299,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1250;
+				LastUpgradeCheck = 1300;
 				TargetAttributes = {
 					1142AD8126F9C5F3001B1F53 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -313,11 +316,9 @@
 			);
 			mainGroup = 1142AD7926F9C5F3001B1F53;
 			packageReferences = (
-				1157D08E26FB0DEC00D52A3F /* XCRemoteSwiftPackageReference "Swift-JWT" */,
 				1157D09126FB0E0E00D52A3F /* XCRemoteSwiftPackageReference "SnapKit" */,
 				1157D09426FB0E2C00D52A3F /* XCRemoteSwiftPackageReference "Nuke" */,
-				11C7F2CF26FCCC05004153F6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
-				11C7F2DD270078E3004153F6 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				114999E42706F75F00F385D9 /* XCRemoteSwiftPackageReference "Swift-JWT" */,
 			);
 			productRefGroup = 1142AD8326F9C5F3001B1F53 /* Products */;
 			projectDirPath = "";
@@ -349,8 +350,9 @@
 				1157D09926FB0E5600D52A3F /* JWT.swift in Sources */,
 				1142ADC726F9C827001B1F53 /* MediaPlayerInteractor.swift in Sources */,
 				11DA04AE270462CA00782772 /* TopCharts.swift in Sources */,
-				1157D0AA26FB28CC00D52A3F /* TopSongsCell.swift in Sources */,
+				1157D0AA26FB28CC00D52A3F /* SongCell.swift in Sources */,
 				1142ADBA26F9C817001B1F53 /* PlaylistModels.swift in Sources */,
+				1128E931270B128600BF6FCA /* PlayerStackView.swift in Sources */,
 				1142ADBC26F9C817001B1F53 /* PlaylistRouter.swift in Sources */,
 				112D7BFE2702655000B9C59B /* Storefronts.swift in Sources */,
 				1157D0A826FB283E00D52A3F /* SearchResultsRouter.swift in Sources */,
@@ -370,6 +372,8 @@
 				1142ADC526F9C827001B1F53 /* MediaPlayerViewController.swift in Sources */,
 				1142ADC626F9C827001B1F53 /* MediaPlayerPresenter.swift in Sources */,
 				1142ADB926F9C817001B1F53 /* PlaylistInteractor.swift in Sources */,
+				1128E92F270AEC1600BF6FCA /* HeaderImageCell.swift in Sources */,
+				114999E82707026F00F385D9 /* CatalogPlaylist.swift in Sources */,
 				11C7F2E32700A290004153F6 /* Playlists.swift in Sources */,
 				1142ADC926F9C827001B1F53 /* MediaPlayerWorker.swift in Sources */,
 				1142ADB726F9C817001B1F53 /* PlaylistViewController.swift in Sources */,
@@ -452,7 +456,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -507,7 +511,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -579,12 +583,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1157D08E26FB0DEC00D52A3F /* XCRemoteSwiftPackageReference "Swift-JWT" */ = {
+		114999E42706F75F00F385D9 /* XCRemoteSwiftPackageReference "Swift-JWT" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Kitura/Swift-JWT";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.6.200;
+				branch = master;
+				kind = branch;
 			};
 		};
 		1157D09126FB0E0E00D52A3F /* XCRemoteSwiftPackageReference "SnapKit" */ = {
@@ -603,28 +607,12 @@
 				minimumVersion = 10.4.1;
 			};
 		};
-		11C7F2CF26FCCC05004153F6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.1;
-			};
-		};
-		11C7F2DD270078E3004153F6 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.4.4;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1157D08F26FB0DEC00D52A3F /* SwiftJWT */ = {
+		114999E52706F75F00F385D9 /* SwiftJWT */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1157D08E26FB0DEC00D52A3F /* XCRemoteSwiftPackageReference "Swift-JWT" */;
+			package = 114999E42706F75F00F385D9 /* XCRemoteSwiftPackageReference "Swift-JWT" */;
 			productName = SwiftJWT;
 		};
 		1157D09226FB0E0E00D52A3F /* SnapKit */ = {
@@ -636,16 +624,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1157D09426FB0E2C00D52A3F /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = Nuke;
-		};
-		11C7F2D026FCCC05004153F6 /* SwiftyJSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11C7F2CF26FCCC05004153F6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
-			productName = SwiftyJSON;
-		};
-		11C7F2DE270078E3004153F6 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 11C7F2DD270078E3004153F6 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 

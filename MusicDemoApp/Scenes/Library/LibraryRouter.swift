@@ -8,7 +8,7 @@
 import Foundation
 
 protocol LibraryRoutingLogic: AnyObject {
-    
+    func routeToCatalogPlaylist(globalID: String)
 }
 
 protocol LibraryDataPassing: AnyObject {
@@ -19,5 +19,17 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
     
     weak var viewController: LibraryViewController?
     var dataStore: LibraryDataStore?
+    var musicAPI: AppleMusicAPI
+    var storeFrontID: String
+    
+    init(storeFrontID: String, musicAPI: AppleMusicAPI) {
+        self.musicAPI = musicAPI
+        self.storeFrontID = storeFrontID
+    }
+    
+    func routeToCatalogPlaylist(globalID: String) {
+        let destVC = PlaylistViewController(musicAPI: musicAPI, storeFrontID: storeFrontID, globalID: globalID)
+        self.viewController?.navigationController?.present(destVC, animated: true)
+    }
     
 }
