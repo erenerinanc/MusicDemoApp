@@ -137,6 +137,7 @@ extension LibraryViewController: UITableViewDelegate {
         if let songID = topSongsViewModel?.topSongs[indexPath.row].id {
             musicPlayer.setQueue(with: [songID])
             musicPlayer.play()
+            router?.routeToSong(index: indexPath.row)
         }
     }
 }

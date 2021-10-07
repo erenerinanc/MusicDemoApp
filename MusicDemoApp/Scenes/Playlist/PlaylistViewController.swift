@@ -16,8 +16,10 @@ protocol PlaylistDisplayLogic: AnyObject {
     
 }
 
-protocol PlayButtonDelegate {
+protocol HeaderUserInteractionDelegate {
     func playButtonTapped()
+    func pauseButtonTapped()
+    func imageSwiped()
 }
 
 public var musicPlayer = MPMusicPlayerController.systemMusicPlayer
@@ -29,6 +31,7 @@ final class PlaylistViewController: BaseViewController {
     var viewModel: Playlist.Fetch.ViewModel?
     var globalId: String?
     var storeFrontId: String?
+    var musicAPI: AppleMusicAPI?
     
     var tableView = UITableView()
     let headerCell = HeaderImageCell()
@@ -37,6 +40,7 @@ final class PlaylistViewController: BaseViewController {
     
     init(musicAPI: AppleMusicAPI, storeFrontID: String, globalID: String) {
         super.init()
+        self.musicAPI = musicAPI
         self.storeFrontId = storeFrontID
         self.globalId = globalID
         setup(musicAPI: musicAPI)
@@ -89,25 +93,35 @@ final class PlaylistViewController: BaseViewController {
     }
 }
 
+//MARK: - Display Logic
+
 extension PlaylistViewController: PlaylistDisplayLogic {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel) {
         DispatchQueue.main.async {
             self.viewModel = viewModel
-            self.tableView.reloadData()
             guard let model = self.viewModel?.catalogPlaylist[0] else { return }
             self.headerCell.set(for: model)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.tableView.reloadSections(IndexSet(integer: 1), with: .fade)
+            }
         }
     }
 }
 
+//MARK: - TableView Delegate & DataSource
+
 extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let songID = viewModel?.songs[indexPath.row].id {
-            musicPlayer.setQueue(with: [songID])
-            musicPlayer.play()
+        if indexPath.section == 1 {
+            if let songID = viewModel?.songs[indexPath.row].id {
+                headerCell.playButtonImage.image = UIImage(named: "pause")
+                headerCell.isButtonTapped = true
+                musicPlayer.setQueue(with: [songID])
+                musicPlayer.play()
+                router?.routeToSongs(index: indexPath.row)
+            }
         }
-        //route to mediplayer scene
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -152,14 +166,33 @@ extension PlaylistViewController: UITableViewDataSource {
     
 }
 
-extension PlaylistViewController: PlayButtonDelegate {
+//MARK: - Play&Pause Button Delegate
+
+extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
         print("Play the songs")
         var songIds: [String] = []
         viewModel?.songs.forEach({
             songIds.append($0.id)
         })
+        headerCell.isButtonTapped = true
         musicPlayer.setQueue(with: songIds)
         musicPlayer.play()
+        headerCell.playButtonImage.image = UIImage(named: "pause")
+    }
+    
+    func pauseButtonTapped() {
+        print("Stop playing")
+        headerCell.isButtonTapped = false
+        musicPlayer.stop()
+        headerCell.playButtonImage.image = UIImage(named: "play")
+    }
+    
+    func imageSwiped() {
+        print("Routing back to Library Scene")
+        guard let id = storeFrontId else { return }
+        guard let api = musicAPI else { return }
+        let destVC = LibraryViewController(musicAPI: api, storefrontID: id)
+        self.navigationController?.pushViewControllerFromLeft(controller: destVC)
     }
 }

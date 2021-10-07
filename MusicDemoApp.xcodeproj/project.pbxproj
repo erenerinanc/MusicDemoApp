@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		110F696E26FC5C63001BBA32 /* AppleMusicAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110F696D26FC5C63001BBA32 /* AppleMusicAPI.swift */; };
 		1128E92F270AEC1600BF6FCA /* HeaderImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1128E92E270AEC1600BF6FCA /* HeaderImageCell.swift */; };
-		1128E931270B128600BF6FCA /* PlayerStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1128E930270B128600BF6FCA /* PlayerStackView.swift */; };
+		1128E931270B128600BF6FCA /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1128E930270B128600BF6FCA /* PlayerView.swift */; };
 		112D7BFC2701C6F200B9C59B /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFB2701C6F200B9C59B /* BaseViewController.swift */; };
 		112D7BFE2702655000B9C59B /* Storefronts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFD2702655000B9C59B /* Storefronts.swift */; };
 		112D7C00270345D500B9C59B /* SearchResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112D7BFF270345D500B9C59B /* SearchResults.swift */; };
@@ -51,6 +51,7 @@
 		1157D0AC26FB28E100D52A3F /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */; };
 		1157D0AE26FB29FD00D52A3F /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */; };
 		1157D0B326FB2AA900D52A3F /* Configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0B226FB2AA900D52A3F /* Configure.swift */; };
+		1194756A270F082500CDED2D /* UINavigationController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11947569270F082500CDED2D /* UINavigationController+Ext.swift */; };
 		11C7F2E127007E2E004153F6 /* MusicUserTokenGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C7F2E027007E2E004153F6 /* MusicUserTokenGenerator.swift */; };
 		11C7F2E32700A290004153F6 /* Playlists.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C7F2E22700A290004153F6 /* Playlists.swift */; };
 		11DA04AE270462CA00782772 /* TopCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DA04AD270462CA00782772 /* TopCharts.swift */; };
@@ -59,7 +60,7 @@
 /* Begin PBXFileReference section */
 		110F696D26FC5C63001BBA32 /* AppleMusicAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicAPI.swift; sourceTree = "<group>"; };
 		1128E92E270AEC1600BF6FCA /* HeaderImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderImageCell.swift; sourceTree = "<group>"; };
-		1128E930270B128600BF6FCA /* PlayerStackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerStackView.swift; sourceTree = "<group>"; };
+		1128E930270B128600BF6FCA /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		112D7BFB2701C6F200B9C59B /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		112D7BFD2702655000B9C59B /* Storefronts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storefronts.swift; sourceTree = "<group>"; };
 		112D7BFF270345D500B9C59B /* SearchResults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResults.swift; sourceTree = "<group>"; };
@@ -100,6 +101,7 @@
 		1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
 		1157D0B226FB2AA900D52A3F /* Configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configure.swift; sourceTree = "<group>"; };
+		11947569270F082500CDED2D /* UINavigationController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Ext.swift"; sourceTree = "<group>"; };
 		11C7F2E027007E2E004153F6 /* MusicUserTokenGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicUserTokenGenerator.swift; sourceTree = "<group>"; };
 		11C7F2E22700A290004153F6 /* Playlists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlists.swift; sourceTree = "<group>"; };
 		11DA04AD270462CA00782772 /* TopCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopCharts.swift; sourceTree = "<group>"; };
@@ -223,7 +225,7 @@
 				1142ADC126F9C827001B1F53 /* MediaPlayerModels.swift */,
 				1142ADC226F9C827001B1F53 /* MediaPlayerWorker.swift */,
 				1142ADC326F9C827001B1F53 /* MediaPlayerRouter.swift */,
-				1128E930270B128600BF6FCA /* PlayerStackView.swift */,
+				1128E930270B128600BF6FCA /* PlayerView.swift */,
 			);
 			path = MediaPlayer;
 			sourceTree = "<group>";
@@ -233,6 +235,7 @@
 			children = (
 				1142ADCC26F9C8BC001B1F53 /* Colors.swift */,
 				1157D0B226FB2AA900D52A3F /* Configure.swift */,
+				11947569270F082500CDED2D /* UINavigationController+Ext.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -352,7 +355,7 @@
 				11DA04AE270462CA00782772 /* TopCharts.swift in Sources */,
 				1157D0AA26FB28CC00D52A3F /* SongCell.swift in Sources */,
 				1142ADBA26F9C817001B1F53 /* PlaylistModels.swift in Sources */,
-				1128E931270B128600BF6FCA /* PlayerStackView.swift in Sources */,
+				1128E931270B128600BF6FCA /* PlayerView.swift in Sources */,
 				1142ADBC26F9C817001B1F53 /* PlaylistRouter.swift in Sources */,
 				112D7BFE2702655000B9C59B /* Storefronts.swift in Sources */,
 				1157D0A826FB283E00D52A3F /* SearchResultsRouter.swift in Sources */,
@@ -387,6 +390,7 @@
 				1142ADAC26F9C806001B1F53 /* LibraryModels.swift in Sources */,
 				1157D0A726FB283E00D52A3F /* SearchResultsWorker.swift in Sources */,
 				1157D0A626FB283E00D52A3F /* SearchResultsModels.swift in Sources */,
+				1194756A270F082500CDED2D /* UINavigationController+Ext.swift in Sources */,
 				1157D0A426FB283E00D52A3F /* SearchResultsPresenter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

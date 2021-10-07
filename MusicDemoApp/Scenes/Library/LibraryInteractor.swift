@@ -13,7 +13,8 @@ protocol LibraryBusinessLogic: AnyObject {
 }
 
 protocol LibraryDataStore: AnyObject {
-    
+    var playlists: [PlaylistData]? {get}
+    var topSongs: [SongData]? {get}
 }
 
 final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
@@ -25,17 +26,17 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
     let worker: LibraryWorkingLogic
     var storeFrontID: String = ""
     
-    var playlists: [PlaylistData] = []
-    var topSongs: [SongData] = []
+    var playlists: [PlaylistData]?
+    var topSongs: [SongData]?
 
     func fetchPlaylists() {
         print("Gonna fetch playlists...")
-        worker.fetchPlaylists { result in
+        worker.fetchPlaylists { [weak self] result in
             switch result {
             case .success(let response):
                 guard let data = response.data else { return }
-                self.playlists = data
-                self.presenter?.presentPlaylists(response: Library.Fetch.PlaylistResponse(playlists: self.playlists))
+                self?.playlists = data
+                self?.presenter?.presentPlaylists(response: Library.Fetch.PlaylistResponse(playlists: data))
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -44,13 +45,13 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
     
     func fetchTopCharts() {
         print("Gonna fetch top charts...")
-        worker.fetchTopCharts { result in
+        worker.fetchTopCharts { [weak self] result in
             switch result {
             case .success(let response):
                 guard let songs = response.results?.songs else { return }
                 guard let songData = songs[0].data else { return }
-                self.topSongs = songData
-                self.presenter?.presentTopSongs(response: Library.Fetch.TopSongsResponse(topSongs: self.topSongs))
+                self?.topSongs = songData
+                self?.presenter?.presentTopSongs(response: Library.Fetch.TopSongsResponse(topSongs: songData))
             case .failure(let error):
                 print(error.localizedDescription)
             }

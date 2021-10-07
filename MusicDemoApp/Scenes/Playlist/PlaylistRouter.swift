@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PlaylistRoutingLogic: AnyObject {
-    
+    func routeToSongs(index: Int)
 }
 
 protocol PlaylistDataPassing: AnyObject {
@@ -20,4 +20,10 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
     weak var viewController: PlaylistViewController?
     var dataStore: PlaylistDataStore?
     
+    func routeToSongs(index: Int) {
+        let destVC = MediaPlayerViewController(index: index)
+        destVC.router?.dataStore?.playlistData = dataStore?.playlistData?[0].relationships?.tracks?.data
+        destVC.interactor?.getPlaylistSongs()
+        self.viewController?.navigationController?.present(destVC, animated: true)
+    }
 }

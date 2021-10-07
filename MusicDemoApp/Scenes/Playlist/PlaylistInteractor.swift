@@ -12,7 +12,8 @@ protocol PlaylistBusinessLogic: AnyObject {
 }
 
 protocol PlaylistDataStore: AnyObject {
-    
+    var playlistData: [CatalogPlaylistData]? {get}
+    var catalogSongs: [CatalogSongData]? {get}
 }
 
 final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
@@ -24,8 +25,8 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     var presenter: PlaylistPresentationLogic?
     var worker: PlaylistWorkingLogic?
     
-    var playlistData: [CatalogPlaylistData] = []
-    var catalogSongs: [CatalogSongData] = []
+    var playlistData: [CatalogPlaylistData]?
+    var catalogSongs: [CatalogSongData]?
     
     func fetchCatalogPlaylist(request: Playlist.Fetch.Request) {
         worker?.getCatalogPlaylists(request: request, { result in
