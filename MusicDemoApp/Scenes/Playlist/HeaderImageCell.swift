@@ -13,10 +13,12 @@ import Nuke
 class HeaderImageCell: UITableViewCell {
     static let reuseID = "Header"
     let headerImageView = UIImageView()
-    let playButtonImage = UIImageView()
+    var isButtonTapped = false
+    var playButtonImage = UIImageView() 
     let nameLabel = UILabel()
     let descriptionLabel = UILabel()
-    var delegate: PlayButtonDelegate?
+    var delegate: HeaderUserInteractionDelegate?
+    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -26,6 +28,7 @@ class HeaderImageCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     private func layoutUI() {
         contentView.backgroundColor = Colors.background
@@ -53,8 +56,8 @@ class HeaderImageCell: UITableViewCell {
         
         playButtonImage.snp.makeConstraints { make in
             make.centerY.equalTo(nameLabel.snp.bottom).offset(4)
-            make.width.equalTo(60)
-            make.height.equalTo(60)
+            make.width.equalTo(55)
+            make.height.equalTo(55)
             make.trailing.equalToSuperview().inset(24)
         }
         
@@ -63,19 +66,38 @@ class HeaderImageCell: UITableViewCell {
         descriptionLabel.textColor = Colors.secondaryLabel
         nameLabel.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         descriptionLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
-        playButtonImage.image = UIImage(named: "circled_play")
+        
+        let imageGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(imageSwiped))
+        headerImageView.addGestureRecognizer(imageGestureRecognizer)
+        headerImageView.isUserInteractionEnabled = true
+
         playButtonImage.contentMode = .scaleAspectFill
         playButtonImage.backgroundColor = .white
-        playButtonImage.layer.cornerRadius = CGFloat(30)
+        playButtonImage.layer.cornerRadius = CGFloat(28)
         playButtonImage.clipsToBounds = true
+        playButtonImage.layer.borderWidth = 6.0
+        playButtonImage.layer.borderColor = Colors.primaryLabel.cgColor
+        playButtonImage.image = UIImage(named: "play")
         
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(buttonTapped))
-        contentView.addGestureRecognizer(gestureRecognizer)
+        playButtonImage.addGestureRecognizer(gestureRecognizer)
+        playButtonImage.isUserInteractionEnabled = true
     }
     
     @objc func buttonTapped(_ gesture: UITapGestureRecognizer) {
         print("Button tapped")
-        delegate?.playButtonTapped()
+        if isButtonTapped {
+            delegate?.pauseButtonTapped()
+        } else {
+            delegate?.playButtonTapped()
+        }
+        
+    }
+    
+    @objc func imageSwiped(_ gesture: UISwipeGestureRecognizer) {
+        print("Image swiped")
+        delegate?.imageSwiped()
+        
     }
     
     func set(for viewModel: Playlist.Fetch.ViewModel.CatalogPlaylist) {
