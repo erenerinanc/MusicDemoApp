@@ -24,6 +24,7 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
         let destVC = MediaPlayerViewController(index: index)
         destVC.router?.dataStore?.playlistData = dataStore?.playlistData?[0].relationships?.tracks?.data
         destVC.interactor?.getPlaylistSongs()
+        destVC.isDisplayingPlaylistSongs = true
         self.viewController?.navigationController?.present(destVC, animated: true)
     }
 }

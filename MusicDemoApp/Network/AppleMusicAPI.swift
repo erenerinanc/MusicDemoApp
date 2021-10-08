@@ -8,9 +8,6 @@
 import Foundation
 import StoreKit
 
-enum EndPoints {
-    static let search = "https://api.music.apple.com/v1/catalog/{storefront}/search"
-}
 
 enum APIError: String, Error {
     case invalidRequest = "This URL does not exist"

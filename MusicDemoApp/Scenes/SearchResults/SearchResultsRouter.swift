@@ -8,7 +8,7 @@
 import Foundation
 
 protocol SearchResultsRoutingLogic: AnyObject {
-    
+    func routeToSong(index: Int)
 }
 
 protocol SearchResultsDataPassing: AnyObject {
@@ -20,4 +20,10 @@ final class SearchResultsRouter: SearchResultsRoutingLogic, SearchResultsDataPas
     weak var viewController: SearchResultsViewController?
     var dataStore: SearchResultsDataStore?
     
+    func routeToSong(index: Int) {
+//        let destVC = MediaPlayerViewController(index: index)
+//        destVC.router?.dataStore?.songData = dataStore?.searchedSongs
+//        destVC.isDisplayingPlaylistSongs = false
+//        viewController?.navigationController?.present(destVC, animated: true)
+    }
 }

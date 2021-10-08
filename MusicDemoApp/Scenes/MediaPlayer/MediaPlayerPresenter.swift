@@ -19,7 +19,8 @@ final class MediaPlayerPresenter: MediaPlayerPresentationLogic {
     func presentPlaylistSongDetails(response: MediaPlayer.Fetch.PlaylistResponse) {
         let playlist = response.catalogSongData.compactMap { MediaPlayer.Fetch.PlaylistViewModel.PlaylistSong(label: $0.attributes?.name ?? "",
                                                                                                               artworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                                              duration: $0.attributes?.durationInMillis ?? 0)
+                                                                                                              duration: $0.attributes?.durationInMillis ?? 0,
+                                                                                                              id: $0.id ?? "")
             
         }
         viewController?.displayPlaylistSongDetail(viewModel: MediaPlayer.Fetch.PlaylistViewModel(playlistData: playlist))
@@ -30,7 +31,8 @@ final class MediaPlayerPresenter: MediaPlayerPresentationLogic {
     func presentTopSongDetails(response: MediaPlayer.Fetch.TopSongResponse) {
         let song = response.songData.compactMap { MediaPlayer.Fetch.TopSongViewModel.TopSong(label: $0.attributes?.name ?? "",
                                                                                       artworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                      duration: $0.attributes?.durationInMillis ?? 0)
+                                                                                      duration: $0.attributes?.durationInMillis ?? 0,
+                                                                                             id: $0.id ?? "")
         }
         
         viewController?.displayTopSongDetail(viewModel: MediaPlayer.Fetch.TopSongViewModel(topSongData: song))

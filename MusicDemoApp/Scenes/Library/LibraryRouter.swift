@@ -37,6 +37,7 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
         let destVC = MediaPlayerViewController(index: index)
         destVC.router?.dataStore?.songData = dataStore?.topSongs
         destVC.interactor?.getTopSongs()
+        destVC.isDisplayingPlaylistSongs = false
         viewController?.navigationController?.present(destVC, animated: true)
     }
 

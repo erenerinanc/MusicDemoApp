@@ -31,6 +31,7 @@ enum MediaPlayer {
                 var label: String
                 var artworkURL: String
                 var duration: Int
+                var id: String
             }
         }
         
@@ -41,6 +42,7 @@ enum MediaPlayer {
                 var label: String
                 var artworkURL: String
                 var duration: Int
+                var id: String
             }
         }
         

@@ -58,7 +58,7 @@ class CarouselCell: UICollectionViewCell {
     
     func set(for viewModel: Library.Fetch.PlaylistViewModel.Playlist) {
         DispatchQueue.main.async {
-            let artworkurl = viewModel.artworkURL.replacingOccurrences(of: "{w}", with: "300").replacingOccurrences(of: "{h}", with: "300")
+            let artworkurl = viewModel.artworkURL.resizeWidhtAndHeight(width: 300, height: 300)
             Nuke.loadImage(with: artworkurl, into: self.imageView)
             self.playlistNameLabel.text = viewModel.playlistName
             self.descriptionLabel.text = "\(viewModel.songCount) Songs"

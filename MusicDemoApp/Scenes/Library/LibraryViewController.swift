@@ -21,7 +21,7 @@ final class LibraryViewController: BaseViewController {
     var playlistViewModel: Library.Fetch.PlaylistViewModel?
     var topSongsViewModel: Library.Fetch.TopSongsViewModel?
     
-    lazy var searchController = UISearchController(searchResultsController: SearchResultsViewController())
+    var searchController: UISearchController?
     private lazy var tableView = UITableView()
     private lazy var playlistCell = PlaylistCell()
     
@@ -49,6 +49,7 @@ final class LibraryViewController: BaseViewController {
         tableView.dataSource = self
         playlistCell.collectionView.delegate = self
         playlistCell.collectionView.dataSource = self
+        searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID))
     }
     
     override func viewDidLoad() {
@@ -77,9 +78,9 @@ final class LibraryViewController: BaseViewController {
     }
     
     private func configureSearchController() {
-        searchController.searchResultsUpdater = searchController.searchResultsController as? UISearchResultsUpdating
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Song or artist..."
+        searchController?.searchResultsUpdater = searchController?.searchResultsController as? UISearchResultsUpdating
+        searchController?.obscuresBackgroundDuringPresentation = false
+        searchController?.searchBar.placeholder = "Song or artist..."
         
         navigationItem.searchController = searchController
     }
