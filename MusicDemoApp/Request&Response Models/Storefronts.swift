@@ -7,6 +7,11 @@
 
 import Foundation
 
+extension APIRequest {
+    static func getStoreFront() -> APIRequest {
+        return APIRequest(path: "/me/storefront", parameters: [:])
+    }
+}
 // MARK: - Storefront
 struct Storefront: Codable {
     let data: [StorefrontData]?

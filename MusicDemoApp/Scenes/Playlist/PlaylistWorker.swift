@@ -19,7 +19,7 @@ final class PlaylistWorker: PlaylistWorkingLogic {
     }
     
     func getCatalogPlaylists(request: Playlist.Fetch.Request, _ completion: @escaping (Result<CatalogPlaylist, Error>) -> Void) {
-        musicAPI.getCatalogPlaylist(storeFrontId: request.storeFrontID, globalId: request.globalID) { result in
+        musicAPI.fetch(request: APIRequest.getCatalogPlaylists(storeFrontID: request.storeFrontID, globalID: request.globalID), model: CatalogPlaylist.self) { result in
             switch result {
             case .success(let response):
                 completion(.success(response))
@@ -28,6 +28,7 @@ final class PlaylistWorker: PlaylistWorkingLogic {
                 print(error.localizedDescription)
             }
         }
+        
     }
         
 }

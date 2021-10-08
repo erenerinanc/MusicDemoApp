@@ -22,7 +22,7 @@ final class LibraryWorker: LibraryWorkingLogic {
     }
     
     func fetchPlaylists(_ completion: @escaping (Result<Playlists, Error>) -> Void) {
-        musicAPI.getLibraryPlaylist { result in
+        musicAPI.fetch(request: APIRequest.getLibraryPlaylists(), model: Playlists.self) { result in
             switch result {
             case .success(let response):
                 completion(.success(response))
@@ -31,9 +31,9 @@ final class LibraryWorker: LibraryWorkingLogic {
             }
         }
     }
-    
+
     func fetchTopCharts(_ completion: @escaping (Result<TopCharts, Error>) -> Void) {
-        musicAPI.getTopCharts(with: storeFrontID) { result in
+        musicAPI.fetch(request: APIRequest.getTopCharts(with: storeFrontID), model: TopCharts.self) { result in
             switch result {
             case .success(let response):
                 completion(.success(response))

@@ -40,7 +40,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     switch result {
                     case .success(let token):
                         let musicAPI = AppleMusicAPI(developerToken: developerToken, userToken: token)
-                        musicAPI.getUserStorefront { result in
+                        musicAPI.fetch(request: APIRequest.getStoreFront(), model: Storefront.self) { result in
                             switch result {
                             case .success(let response):
                                 guard let id = response.data?[0].id else { return }

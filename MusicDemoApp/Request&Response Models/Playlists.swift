@@ -12,6 +12,12 @@
 
 import Foundation
 
+extension APIRequest {
+    static func getLibraryPlaylists() -> APIRequest {
+        return APIRequest(path: "/me/library/playlists", parameters: [:])
+    }
+}
+
 // MARK: - Playlists
 struct Playlists: Codable {
     let data: [PlaylistData]?

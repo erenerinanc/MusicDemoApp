@@ -7,6 +7,12 @@
 
 import Foundation
 
+extension APIRequest {
+    static func getTopCharts(with storeFrontID: String) -> APIRequest {
+        return APIRequest(path: "/catalog/\(storeFrontID)/charts", parameters: ["types":"songs"])
+    }
+}
+
 // MARK: - TopCharts
 struct TopCharts: Codable {
     let results: TopChartResults?

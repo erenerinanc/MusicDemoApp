@@ -7,6 +7,12 @@
 
 import Foundation
 
+extension APIRequest {
+    static func getCatalogPlaylists(storeFrontID: String, globalID: String) -> APIRequest {
+        return APIRequest(path: "/catalog/\(storeFrontID)/playlists/\(globalID)", parameters: [:])
+    }
+}
+
 // MARK: - CatalogPlaylist
 struct CatalogPlaylist: Codable {
     let data: [CatalogPlaylistData]?
