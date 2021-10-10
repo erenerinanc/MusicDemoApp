@@ -43,6 +43,9 @@ final class MediaPlayerViewController: BaseViewController {
     var topSongViewModel: MediaPlayer.Fetch.TopSongViewModel?
     var presentIndex: Int = 0
     var isDisplayingPlaylistSongs: Bool = true
+    let volumeView = MPVolumeView()
+    let contentView = UIView()
+    var volumetapped: Bool = false
     
     // MARK: Object lifecycle
     
@@ -257,7 +260,35 @@ extension MediaPlayerViewController: PlayerViewDelegate {
             musicPlayer.pause()
             playerView.playButton.image = UIImage(named: "play")
         case .volume:
-            break
+            volumetapped = true
+            contentView.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.7)
+            view.addSubview(contentView)
+            contentView.addSubview(volumeView)
+            contentView.layer.cornerRadius = CGFloat(30)
+            contentView.snp.makeConstraints { make in
+                make.centerX.centerY.equalToSuperview()
+                make.leading.trailing.equalToSuperview().inset(24)
+                make.height.equalTo(100)
+            }
+            volumeView.snp.makeConstraints { make in
+                make.centerX.equalToSuperview()
+                make.centerY.equalTo(contentView.snp.centerY).offset(8)
+                make.leading.trailing.equalToSuperview().inset(8)
+                make.height.equalTo(30)
+            }
+            volumeView.tintColor = Colors.secondaryLabel
+            volumeView.sizeToFit()
+            if volumetapped == true {
+                let tapRecognizer = UITapGestureRecognizer()
+                view.addGestureRecognizer(tapRecognizer)
+                tapRecognizer.addTarget(self, action: #selector(dismissVolumeView))
+            }
+            volumeView.isUserInteractionEnabled = true
         }
+    }
+    
+    @objc func dismissVolumeView() {
+        contentView.removeFromSuperview()
+        volumetapped = false
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 protocol MediaPlayerBusinessLogic: AnyObject {
     func getPlaylistSongs()
-    func getTopSongs()
+    func getSongs()
 }
 
 protocol MediaPlayerDataStore: AnyObject {
@@ -32,9 +32,10 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
         presenter?.presentPlaylistSongDetails(response: MediaPlayer.Fetch.PlaylistResponse(catalogSongData: playlistData))
     }
     
-    func getTopSongs() {
+    func getSongs() {
         guard let songData = songData else { return }
         presenter?.presentTopSongDetails(response: MediaPlayer.Fetch.TopSongResponse(songData: songData))
     }
+
     
 }

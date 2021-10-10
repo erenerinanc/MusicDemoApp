@@ -7,6 +7,7 @@
 
 import UIKit
 import WebKit
+import SnapKit
 
 class ArtistDetailsViewController: BaseViewController, WKNavigationDelegate {
     let webView = WKWebView()
@@ -24,7 +25,6 @@ class ArtistDetailsViewController: BaseViewController, WKNavigationDelegate {
     override func loadView() {
         super.loadView()
         webView.navigationDelegate = self
-        self.view = webView
     }
     
     override func viewDidLoad() {
@@ -32,6 +32,8 @@ class ArtistDetailsViewController: BaseViewController, WKNavigationDelegate {
         guard let webURL = webURL else { return}
         let url = URL(string: webURL)!
         let urlRequest = URLRequest(url: url)
+        view.addSubview(webView)
+        webView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
         webView.load(urlRequest)
         webView.allowsBackForwardNavigationGestures = true
     }

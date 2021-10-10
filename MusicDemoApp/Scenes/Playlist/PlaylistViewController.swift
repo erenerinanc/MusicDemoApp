@@ -190,9 +190,6 @@ extension PlaylistViewController: HeaderUserInteractionDelegate {
     
     func imageSwiped() {
         print("Routing back to Library Scene")
-        guard let id = storeFrontId else { return }
-        guard let api = musicAPI else { return }
-        let destVC = LibraryViewController(musicAPI: api, storefrontID: id)
-        self.navigationController?.pushViewControllerFromLeft(controller: destVC)
+        navigationController?.popToRootViewController(animated: true)
     }
 }
