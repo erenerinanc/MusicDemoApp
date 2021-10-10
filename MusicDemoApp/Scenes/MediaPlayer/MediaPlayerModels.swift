@@ -16,29 +16,14 @@ enum MediaPlayer {
             
         }
         
-        struct PlaylistResponse {
-            var catalogSongData: [CatalogSongData]
+        struct Response {
+            var songs: [SongData]
         }
         
-        struct TopSongResponse {
-            var songData: [SongData]
-        }
-        
-        struct PlaylistViewModel {
-            var playlistData: [MediaPlayer.Fetch.PlaylistViewModel.PlaylistSong]
+        struct ViewModel {
+            var songs: [MediaPlayer.Fetch.ViewModel.Song]
             
-            struct PlaylistSong {
-                var label: String
-                var artworkURL: String
-                var duration: Int
-                var id: String
-            }
-        }
-        
-        struct TopSongViewModel {
-            var topSongData: [MediaPlayer.Fetch.TopSongViewModel.TopSong]
-            
-            struct TopSong {
+            struct Song {
                 var label: String
                 var artworkURL: String
                 var duration: Int

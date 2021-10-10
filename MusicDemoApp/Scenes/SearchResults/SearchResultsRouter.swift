@@ -23,8 +23,6 @@ final class SearchResultsRouter: SearchResultsRoutingLogic, SearchResultsDataPas
     func routeToSong(index: Int) {
         let destVC = MediaPlayerViewController(index: index)
         destVC.router?.dataStore?.songData = dataStore?.searchedSongs
-        destVC.isDisplayingPlaylistSongs = false
-        destVC.interactor?.getSongs()
         self.viewController?.navigationController?.present(destVC, animated: true)
     }
 }

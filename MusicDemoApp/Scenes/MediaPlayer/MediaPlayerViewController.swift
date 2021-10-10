@@ -20,8 +20,7 @@ enum PlayerButton {
 }
 
 protocol MediaPlayerDisplayLogic: AnyObject {
-    func displayPlaylistSongDetail(viewModel: MediaPlayer.Fetch.PlaylistViewModel)
-    func displayTopSongDetail(viewModel: MediaPlayer.Fetch.TopSongViewModel)
+    func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel)
 }
 
 protocol PlayerViewDelegate {
@@ -32,17 +31,17 @@ final class MediaPlayerViewController: BaseViewController {
     
     var interactor: MediaPlayerBusinessLogic?
     var router: (MediaPlayerRoutingLogic & MediaPlayerDataPassing)?
+    var viewModel: MediaPlayer.Fetch.ViewModel?
+    
     var songID: String?
     var songImageview = UIImageView()
     var swipeView = UIView()
     var songNameLabel = UILabel()
     var descriptionLabel = UILabel()
-    var progressStackView = ProgressStackView()
+    var progressView = ProgressView()
     var playerView = PlayerView()
-    var playlistViewModel: MediaPlayer.Fetch.PlaylistViewModel?
-    var topSongViewModel: MediaPlayer.Fetch.TopSongViewModel?
+    
     var presentIndex: Int = 0
-    var isDisplayingPlaylistSongs: Bool = true
     let volumeView = MPVolumeView()
     let contentView = UIView()
     var volumetapped: Bool = false
@@ -73,21 +72,20 @@ final class MediaPlayerViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         layoutUI()
+        interactor?.getSongs()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureProgressView()
     }
  
-    
     private func layoutUI() {
         view.backgroundColor = Colors.background
         view.addSubview(swipeView)
         view.addSubview(songImageview)
         view.addSubview(songNameLabel)
         view.addSubview(descriptionLabel)
-        view.addSubview(progressStackView)
+        view.addSubview(progressView)
         view.addSubview(playerView)
         
         swipeView.snp.makeConstraints { make in
@@ -126,14 +124,14 @@ final class MediaPlayerViewController: BaseViewController {
         }
         descriptionLabel.textColor = Colors.secondaryLabel
         
-        progressStackView.snp.makeConstraints { make in
+        progressView.snp.makeConstraints { make in
             make.top.equalTo(descriptionLabel.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(30)
         }
         
         playerView.snp.makeConstraints { make in
-            make.top.equalTo(progressStackView.snp.bottom).offset(16)
+            make.top.equalTo(progressView.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(50)
         }
@@ -141,46 +139,81 @@ final class MediaPlayerViewController: BaseViewController {
         
     }
     
+    private func setMediaPlayer() {
+        guard var songIds = viewModel?.songs.compactMap({ $0.id }) else { return }
+        let songID = songIds[presentIndex]
+        guard let index = songIds.firstIndex(of: songID) else { return }
+        songIds.removeFirst(index)
+        musicPlayer.setQueue(with: songIds)
+        musicPlayer.play()
+        let artworkURL = viewModel?.songs[self.presentIndex].artworkURL.resizeWidhtAndHeight(width: 3000, height: 3000)
+        Nuke.loadImage(with: artworkURL, into: self.songImageview)
+        songNameLabel.text = musicPlayer.nowPlayingItem?.title
+        descriptionLabel.text = musicPlayer.nowPlayingItem?.artist
+        configureProgressView()
+    }
+    
     private func configureProgressView() {
-        progressStackView.progressView.progress = 0.0
+        progressView.progressView.progress = 0.0
         guard let songDuration = musicPlayer.nowPlayingItem?.playbackDuration else { return }
         let trackElapsed = musicPlayer.currentPlaybackTime
         
-        let trackDurationMinutes = Double(songDuration / 60)
+        let trackDurationMinutes = Int(songDuration / 60)
         let trackDurationSeconds = songDuration.truncatingRemainder(dividingBy: 60)
         let trackDurationInt = Int(trackDurationSeconds)
-        progressStackView.songDurationLabel.text = "\(trackDurationMinutes):\(trackDurationInt)"
+        progressView.songDurationLabel.text = "\(trackDurationMinutes):\(trackDurationInt)"
     
-        let trackElapsedMinutes = Double(trackElapsed / 60)
+        let trackElapsedMinutes = Int(trackElapsed / 60)
         let trackElapsedSeconds = trackElapsed.truncatingRemainder(dividingBy: 60)
         let trackElapsedInt = Int(trackElapsedSeconds)
-        progressStackView.durationLabel.text = "\(trackElapsedMinutes):\(trackElapsedInt)"
+        progressView.durationLabel.text = "\(trackElapsedMinutes):\(trackElapsedInt)"
+        
         
     }
+    
+    private func configureVolumeview() {
+        contentView.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.7)
+        view.addSubview(contentView)
+        contentView.addSubview(volumeView)
+        contentView.layer.cornerRadius = CGFloat(30)
+        contentView.snp.makeConstraints { make in
+            make.centerX.centerY.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.height.equalTo(100)
+        }
+        volumeView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalTo(contentView.snp.centerY).offset(8)
+            make.leading.trailing.equalToSuperview().inset(8)
+            make.height.equalTo(30)
+        }
+        volumeView.tintColor = Colors.secondaryLabel
+        volumeView.sizeToFit()
+        if volumetapped == true {
+            let tapRecognizer = UITapGestureRecognizer()
+            view.addGestureRecognizer(tapRecognizer)
+            tapRecognizer.addTarget(self, action: #selector(dismissVolumeView))
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.dismissVolumeView()
+        }
+    }
+    
+    @objc func dismissVolumeView() {
+        contentView.removeFromSuperview()
+        volumetapped = false
+    }
+    
+
 }
 
 //MARK: - Display Logic
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     
-    func displayPlaylistSongDetail(viewModel: MediaPlayer.Fetch.PlaylistViewModel) {
+    func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel) {
         DispatchQueue.main.async {
-            self.playlistViewModel = viewModel
-//            guard let index = self.presentIndex else { return }
-            let artworkURL = viewModel.playlistData[self.presentIndex].artworkURL.resizeWidhtAndHeight(width: 3000, height: 3000)
-            Nuke.loadImage(with: artworkURL, into: self.songImageview)
-            self.songNameLabel.text = musicPlayer.nowPlayingItem?.title
-            self.descriptionLabel.text = viewModel.playlistData[self.presentIndex].label
-        }
-    }
-    
-    func displayTopSongDetail(viewModel: MediaPlayer.Fetch.TopSongViewModel) {
-        DispatchQueue.main.async {
-            self.topSongViewModel = viewModel
-//            guard let index = self.presentIndex else { return }
-            let artworkURL = viewModel.topSongData[self.presentIndex].artworkURL.resizeWidhtAndHeight(width: 3000, height: 3000)
-            Nuke.loadImage(with: artworkURL, into: self.songImageview)
-            self.songNameLabel.text = musicPlayer.nowPlayingItem?.title
-            self.descriptionLabel.text = "Top Charts"
+            self.viewModel = viewModel
+            self.setMediaPlayer()
         }
     }
 }
@@ -190,69 +223,17 @@ extension MediaPlayerViewController: PlayerViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .replay:
-            if isDisplayingPlaylistSongs {
-                guard var songIds = playlistViewModel?.playlistData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = playlistViewModel else { return }
-                displayPlaylistSongDetail(viewModel: model)
-            } else {
-                guard var songIds = topSongViewModel?.topSongData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = topSongViewModel else { return }
-                displayTopSongDetail(viewModel: model)
-            }
-            musicPlayer.play()
+            setMediaPlayer()
         case .previous:
             if presentIndex > 0 {
                 presentIndex -= 1
             } else {
                 presentIndex = 0
             }
-            if isDisplayingPlaylistSongs {
-                guard var songIds = playlistViewModel?.playlistData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = playlistViewModel else { return }
-                displayPlaylistSongDetail(viewModel: model)
-            } else {
-                guard var songIds = topSongViewModel?.topSongData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = topSongViewModel else { return }
-                displayTopSongDetail(viewModel: model)
-            }
-            musicPlayer.play()
+            setMediaPlayer()
         case .next:
             presentIndex += 1
-            if isDisplayingPlaylistSongs {
-                guard var songIds = playlistViewModel?.playlistData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = playlistViewModel else { return }
-                displayPlaylistSongDetail(viewModel: model)
-            } else {
-                guard var songIds = topSongViewModel?.topSongData.compactMap({  $0.id }) else { return }
-                let songID = songIds[presentIndex]
-                guard let index = songIds.firstIndex(of: songID) else { return }
-                songIds.removeFirst(index)
-                musicPlayer.setQueue(with: songIds)
-                guard let model = topSongViewModel else { return }
-                displayTopSongDetail(viewModel: model)
-            }
-            musicPlayer.play()
-            
+            setMediaPlayer()
         case .play:
             musicPlayer.play()
             playerView.playButton.image = UIImage(named: "pause")
@@ -261,34 +242,8 @@ extension MediaPlayerViewController: PlayerViewDelegate {
             playerView.playButton.image = UIImage(named: "play")
         case .volume:
             volumetapped = true
-            contentView.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.7)
-            view.addSubview(contentView)
-            contentView.addSubview(volumeView)
-            contentView.layer.cornerRadius = CGFloat(30)
-            contentView.snp.makeConstraints { make in
-                make.centerX.centerY.equalToSuperview()
-                make.leading.trailing.equalToSuperview().inset(24)
-                make.height.equalTo(100)
-            }
-            volumeView.snp.makeConstraints { make in
-                make.centerX.equalToSuperview()
-                make.centerY.equalTo(contentView.snp.centerY).offset(8)
-                make.leading.trailing.equalToSuperview().inset(8)
-                make.height.equalTo(30)
-            }
-            volumeView.tintColor = Colors.secondaryLabel
-            volumeView.sizeToFit()
-            if volumetapped == true {
-                let tapRecognizer = UITapGestureRecognizer()
-                view.addGestureRecognizer(tapRecognizer)
-                tapRecognizer.addTarget(self, action: #selector(dismissVolumeView))
-            }
-            volumeView.isUserInteractionEnabled = true
+            configureVolumeview()
         }
     }
-    
-    @objc func dismissVolumeView() {
-        contentView.removeFromSuperview()
-        volumetapped = false
-    }
+
 }

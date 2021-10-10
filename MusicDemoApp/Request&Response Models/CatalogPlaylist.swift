@@ -71,46 +71,5 @@ struct CatalogPlaylistRelationships: Codable {
 // MARK: - PlaylistCurator
 struct PlaylistCurator: Codable {
     let href: String?
-    let data: [CatalogSongData]?
-}
-
-// MARK: - CatalogPlaylistcuratorDatum
-struct CatalogSongData: Codable {
-    let id: String?
-    let type: CatalogPlaylistTypeEnum?
-    let href: String?
-    let attributes: CatalogSong?
-}
-
-// MARK: - CatalogSong
-struct CatalogSong: Codable {
-    let previews: [SongPreview]?
-    let artwork: FluffyArtwork?
-    let artistName: String?
-    let url: String?
-    let discNumber: Int?
-    let genreNames: [String]?
-    let durationInMillis: Int?
-    let releaseDate, name, isrc: String?
-    let hasLyrics: Bool?
-    let albumName: String?
-    let playParams: PlayParams?
-    let trackNumber: Int?
-    let composerName: String?
-}
-
-// MARK: - FluffyArtwork
-struct FluffyArtwork: Codable {
-    let width, height: Int?
-    let url, bgColor, textColor1, textColor2: String?
-    let textColor3, textColor4: String?
-}
-
-// MARK: - SongPreview
-struct SongPreview: Codable {
-    let url: String?
-}
-
-enum CatalogPlaylistTypeEnum: String, Codable {
-    case songs = "songs"
+    let data: [SongData]?
 }

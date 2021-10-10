@@ -114,13 +114,9 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            if let songID = viewModel?.songs[indexPath.row].id {
-                headerCell.playButtonImage.image = UIImage(named: "pause")
-                headerCell.isButtonTapped = true
-                musicPlayer.setQueue(with: [songID])
-                musicPlayer.play()
-                router?.routeToSongs(index: indexPath.row)
-            }
+            headerCell.playButtonImage.image = UIImage(named: "pause")
+            headerCell.isButtonTapped = true
+            router?.routeToSongs(index: indexPath.row)
         }
     }
 

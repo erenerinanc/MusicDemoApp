@@ -128,11 +128,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0{
-            if let songID = songViewModel?.songs[indexPath.row].id {
-                musicPlayer.setQueue(with: [songID])
-                musicPlayer.play()
-                router?.routeToSong(index: indexPath.row)
-            }
+            router?.routeToSong(index: indexPath.row)
         } else {
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
             let destVC = ArtistDetailsViewController(url: urlString)

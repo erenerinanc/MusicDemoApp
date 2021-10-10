@@ -8,12 +8,10 @@
 import Foundation
 
 protocol MediaPlayerBusinessLogic: AnyObject {
-    func getPlaylistSongs()
     func getSongs()
 }
 
 protocol MediaPlayerDataStore: AnyObject {
-    var playlistData: [CatalogSongData]? {get set}
     var songData: [SongData]? {get set}
     
 }
@@ -23,18 +21,11 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
     var presenter: MediaPlayerPresentationLogic?
     var worker: MediaPlayerWorkingLogic = MediaPlayerWorker()
     
-    var playlistData: [CatalogSongData]?
     var songData: [SongData]?
-    
-    
-    func getPlaylistSongs() {
-        guard let playlistData = playlistData else { return }
-        presenter?.presentPlaylistSongDetails(response: MediaPlayer.Fetch.PlaylistResponse(catalogSongData: playlistData))
-    }
     
     func getSongs() {
         guard let songData = songData else { return }
-        presenter?.presentTopSongDetails(response: MediaPlayer.Fetch.TopSongResponse(songData: songData))
+        presenter?.presentSongDetails(response: MediaPlayer.Fetch.Response(songs: songData))
     }
 
     

@@ -135,11 +135,7 @@ extension LibraryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let songID = topSongsViewModel?.topSongs[indexPath.row].id {
-            musicPlayer.setQueue(with: [songID])
-            musicPlayer.play()
-            router?.routeToSong(index: indexPath.row)
-        }
+        router?.routeToSong(index: indexPath.row)
     }
 }
 

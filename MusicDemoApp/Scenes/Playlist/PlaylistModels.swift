@@ -19,7 +19,7 @@ enum Playlist {
         
         struct Response {
             var catalogPlaylistData: [CatalogPlaylistData]
-            var catalogSongData: [CatalogSongData]
+            var catalogSongData: [SongData]
         }
         
         struct ViewModel {

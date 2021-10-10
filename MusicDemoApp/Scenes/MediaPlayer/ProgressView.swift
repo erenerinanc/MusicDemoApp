@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import AudioToolbox
 
-class ProgressStackView: UIView{
+class ProgressView: UIView{
     let progressView = UIProgressView(progressViewStyle: .default)
     let durationLabel = UILabel()
     let songDurationLabel = UILabel()
