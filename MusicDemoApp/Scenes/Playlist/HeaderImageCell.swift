@@ -12,12 +12,40 @@ import Nuke
 
 class HeaderImageCell: UITableViewCell {
     static let reuseID = "Header"
-    let headerImageView = UIImageView()
+    lazy var headerImageView = UIImageView().configure {
+        $0.contentMode = .scaleAspectFill
+        let imageGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(imageSwiped))
+        $0.addGestureRecognizer(imageGestureRecognizer)
+        $0.isUserInteractionEnabled = true
+    }
     var isButtonTapped = false
-    var playButtonImage = UIImageView()
-    var backButton = UIImageView()
-    let nameLabel = UILabel()
-    let descriptionLabel = UILabel()
+    var playButtonImage = UIImageView().configure {
+        $0.contentMode = .scaleAspectFill
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = CGFloat(28)
+        $0.clipsToBounds = true
+        $0.layer.borderWidth = 6.0
+        $0.layer.borderColor = Colors.primaryLabel.cgColor
+        $0.image = UIImage(named: "play")
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(playPauseButtonTapped))
+        $0.addGestureRecognizer(gestureRecognizer)
+        $0.isUserInteractionEnabled = true
+    }
+    var backButton = UIImageView().configure {
+        $0.image = UIImage(named: "back_button")
+        $0.contentMode = .scaleAspectFill
+        let backButtonGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(backButtonTapped))
+        $0.addGestureRecognizer(backButtonGestureRecognizer)
+        $0.isUserInteractionEnabled = true
+    }
+    let nameLabel = UILabel().configure {
+        $0.textColor = .white
+        $0.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+    }
+    let descriptionLabel = UILabel().configure {
+        $0.textColor = Colors.secondaryLabel
+        $0.font = UIFont.preferredFont(forTextStyle: .footnote)
+    }
     var delegate: HeaderUserInteractionDelegate?
     
     
@@ -45,41 +73,23 @@ class HeaderImageCell: UITableViewCell {
             make.height.equalTo(300)
         }
         
-        headerImageView.contentMode = .scaleAspectFill
-        let imageGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(imageSwiped))
-        headerImageView.addGestureRecognizer(imageGestureRecognizer)
-        headerImageView.isUserInteractionEnabled = true
-
-        
         backButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(8)
             make.leading.equalToSuperview().offset(8)
             make.width.equalTo(30)
             make.height.equalTo(30)
         }
-        
-        backButton.image = UIImage(named: "back_button")
-        backButton.contentMode = .scaleAspectFill
-        let backButtonGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(backButtonTapped))
-        backButton.addGestureRecognizer(backButtonGestureRecognizer)
-        backButton.isUserInteractionEnabled = true
-
-        
+   
         nameLabel.snp.makeConstraints { make in
             make.top.equalTo(headerImageView.snp.bottom).inset(8)
             make.leading.equalToSuperview().inset(16)
         }
         
-        nameLabel.textColor = .white
-        nameLabel.font = UIFont.preferredFont(forTextStyle: .largeTitle)
         
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(nameLabel.snp.bottom).offset(24)
             make.leading.equalTo(nameLabel.snp.leading)
         }
-        
-        descriptionLabel.textColor = Colors.secondaryLabel
-        descriptionLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
         
         playButtonImage.snp.makeConstraints { make in
             make.centerY.equalTo(nameLabel.snp.bottom).offset(4)
@@ -87,22 +97,9 @@ class HeaderImageCell: UITableViewCell {
             make.height.equalTo(55)
             make.trailing.equalToSuperview().inset(24)
         }
-        
-        playButtonImage.contentMode = .scaleAspectFill
-        playButtonImage.backgroundColor = .white
-        playButtonImage.layer.cornerRadius = CGFloat(28)
-        playButtonImage.clipsToBounds = true
-        playButtonImage.layer.borderWidth = 6.0
-        playButtonImage.layer.borderColor = Colors.primaryLabel.cgColor
-        playButtonImage.image = UIImage(named: "play")
-    
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(playPauseButtonTapped))
-        playButtonImage.addGestureRecognizer(gestureRecognizer)
-        playButtonImage.isUserInteractionEnabled = true
     }
     
     @objc func playPauseButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Button tapped")
         if isButtonTapped {
             delegate?.pauseButtonTapped()
         } else {
@@ -112,9 +109,7 @@ class HeaderImageCell: UITableViewCell {
     }
     
     @objc func imageSwiped(_ gesture: UISwipeGestureRecognizer) {
-        print("Image swiped")
         delegate?.imageSwiped()
-        
     }
     
     @objc func backButtonTapped() {

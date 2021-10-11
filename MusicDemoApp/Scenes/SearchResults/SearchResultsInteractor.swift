@@ -8,7 +8,7 @@
 import Foundation
 
 protocol SearchResultsBusinessLogic: AnyObject {
-    func fetchSearcheResults(request: SearchResults.Fetch.Request)
+    func fetchSearchResults(request: SearchResults.Fetch.Request)
 }
 
 protocol SearchResultsDataStore: AnyObject {
@@ -27,7 +27,7 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
     var searchedSongs: [SongData]?
     var searchedArtist: [ArtistsData]?
     
-    func fetchSearcheResults(request: SearchResults.Fetch.Request) {
+    func fetchSearchResults(request: SearchResults.Fetch.Request) {
         worker.getSearchResults(request: request) { result in
             switch result {
             case .success(let response):
@@ -42,6 +42,5 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
             }
         }
     }
-    
     
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 protocol SearchResultsWorkingLogic: AnyObject {
     func getSearchResults(request: SearchResults.Fetch.Request,_ completion: @escaping (Result<Search,Error>) -> Void)
@@ -30,6 +31,4 @@ final class SearchResultsWorker: SearchResultsWorkingLogic {
             }
         }
     }
-    
-    
 }

@@ -21,8 +21,9 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
     var dataStore: PlaylistDataStore?
     
     func routeToSongs(index: Int) {
-        let destVC = MediaPlayerViewController(index: index)
+        let destVC = MediaPlayerViewController()
         destVC.router?.dataStore?.songData = dataStore?.playlistData?[0].relationships?.tracks?.data
+        destVC.router?.dataStore?.initialSongIndex = index
         self.viewController?.navigationController?.present(destVC, animated: true)
     }
 }

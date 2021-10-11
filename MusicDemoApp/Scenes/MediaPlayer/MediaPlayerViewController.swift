@@ -21,38 +21,57 @@ enum PlayerButton {
 
 protocol MediaPlayerDisplayLogic: AnyObject {
     func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel)
-}
-
-protocol PlayerViewDelegate {
-    func buttonTapped(with button: PlayerButton)
+    func displayPlaybackState(viewModel: MediaPlayer.Fetch.PlaybackViewModel)
 }
 
 final class MediaPlayerViewController: BaseViewController {
     
     var interactor: MediaPlayerBusinessLogic?
     var router: (MediaPlayerRoutingLogic & MediaPlayerDataPassing)?
-    var viewModel: MediaPlayer.Fetch.ViewModel?
     
-    var songID: String?
-    var songImageview = UIImageView()
-    var swipeView = UIView()
-    var songNameLabel = UILabel()
-    var descriptionLabel = UILabel()
-    var progressView = ProgressView()
-    var playerView = PlayerView()
+    private lazy var songImageview = UIImageView().configure {
+        $0.backgroundColor = Colors.background
+        $0.contentMode = .scaleAspectFit
+        $0.layer.cornerRadius = CGFloat(150)
+        $0.clipsToBounds = true
+        $0.layer.borderWidth = 3.0
+        $0.layer.borderColor = Colors.primaryLabel.cgColor
+    }
+    private lazy var swipeView = UIView().configure {
+        $0.backgroundColor = Colors.secondaryBackground
+        $0.layer.cornerRadius = CGFloat(5)
+    }
+    private lazy var songNameLabel = UILabel().configure {
+        $0.textColor = .white
+        $0.font = UIFont.preferredFont(forTextStyle: .title1)
+    }
+    private lazy var descriptionLabel = UILabel().configure {
+        $0.textColor = Colors.secondaryLabel
+    }
+    private lazy var contentView = UIView().configure {
+        $0.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.7)
+        $0.layer.cornerRadius = CGFloat(30)
+    }
+    private lazy var volumeView = MPVolumeView().configure {
+        $0.tintColor = Colors.secondaryLabel
+        $0.sizeToFit()
+    }
+    lazy var progressView = MediaPlayerProgressView()
+    lazy var playerView = PlayerView()
     
-    var presentIndex: Int = 0
-    let volumeView = MPVolumeView()
-    let contentView = UIView()
-    var volumetapped: Bool = false
+    private var songID: String?
+    private var presentIndex: Int = 0
+
+    private var volumetapped: Bool = false
+    private var progressTimer: Timer?
     
     // MARK: Object lifecycle
     
-    init(index: Int) {
+    override init() {
         super.init()
-        self.presentIndex = index
         setup()
     }
+    
     // MARK: Setup
     
     private func setup() {
@@ -72,11 +91,11 @@ final class MediaPlayerViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         layoutUI()
-        interactor?.getSongs()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor?.playInitialSong()
     }
  
     private func layoutUI() {
@@ -94,35 +113,23 @@ final class MediaPlayerViewController: BaseViewController {
             make.width.equalTo(40)
             make.height.equalTo(4)
         }
-        
-        swipeView.backgroundColor = Colors.secondaryBackground
-        swipeView.layer.cornerRadius = CGFloat(5)
-        
+    
         songImageview.snp.makeConstraints { make in
             make.top.equalTo(swipeView.snp.bottom).offset(24)
             make.centerX.equalToSuperview()
             make.height.equalTo(300)
             make.height.equalTo(songImageview.snp.width)
         }
-        songImageview.backgroundColor = Colors.background
-        songImageview.contentMode = .scaleAspectFit
-        songImageview.layer.cornerRadius = CGFloat(150)
-        songImageview.clipsToBounds = true
-        songImageview.layer.borderWidth = 3.0
-        songImageview.layer.borderColor = Colors.primaryLabel.cgColor
         
         songNameLabel.snp.makeConstraints { make in
             make.top.equalTo(songImageview.snp.bottom).offset(16)
             make.centerX.equalTo(songImageview.snp.centerX)
         }
-        songNameLabel.textColor = .white
-        songNameLabel.font = UIFont.preferredFont(forTextStyle: .title1)
         
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(songNameLabel.snp.bottom).offset(16)
             make.centerX.equalTo(songNameLabel.snp.centerX)
         }
-        descriptionLabel.textColor = Colors.secondaryLabel
         
         progressView.snp.makeConstraints { make in
             make.top.equalTo(descriptionLabel.snp.bottom).offset(16)
@@ -135,47 +142,12 @@ final class MediaPlayerViewController: BaseViewController {
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(50)
         }
-        playerView.playButton.image = UIImage(named: "pause")
-        
-    }
-    
-    private func setMediaPlayer() {
-        guard var songIds = viewModel?.songs.compactMap({ $0.id }) else { return }
-        let songID = songIds[presentIndex]
-        guard let index = songIds.firstIndex(of: songID) else { return }
-        songIds.removeFirst(index)
-        musicPlayer.setQueue(with: songIds)
-        musicPlayer.play()
-        let artworkURL = viewModel?.songs[self.presentIndex].artworkURL.resizeWidhtAndHeight(width: 3000, height: 3000)
-        Nuke.loadImage(with: artworkURL, into: self.songImageview)
-        songNameLabel.text = musicPlayer.nowPlayingItem?.title
-        descriptionLabel.text = musicPlayer.nowPlayingItem?.artist
-        configureProgressView()
-    }
-    
-    private func configureProgressView() {
-        progressView.progressView.progress = 0.0
-        guard let songDuration = musicPlayer.nowPlayingItem?.playbackDuration else { return }
-        let trackElapsed = musicPlayer.currentPlaybackTime
-        
-        let trackDurationMinutes = Int(songDuration / 60)
-        let trackDurationSeconds = songDuration.truncatingRemainder(dividingBy: 60)
-        let trackDurationInt = Int(trackDurationSeconds)
-        progressView.songDurationLabel.text = "\(trackDurationMinutes):\(trackDurationInt)"
-    
-        let trackElapsedMinutes = Int(trackElapsed / 60)
-        let trackElapsedSeconds = trackElapsed.truncatingRemainder(dividingBy: 60)
-        let trackElapsedInt = Int(trackElapsedSeconds)
-        progressView.durationLabel.text = "\(trackElapsedMinutes):\(trackElapsedInt)"
-        
-        
     }
     
     private func configureVolumeview() {
-        contentView.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.7)
         view.addSubview(contentView)
         contentView.addSubview(volumeView)
-        contentView.layer.cornerRadius = CGFloat(30)
+  
         contentView.snp.makeConstraints { make in
             make.centerX.centerY.equalToSuperview()
             make.leading.trailing.equalToSuperview().inset(24)
@@ -187,8 +159,7 @@ final class MediaPlayerViewController: BaseViewController {
             make.leading.trailing.equalToSuperview().inset(8)
             make.height.equalTo(30)
         }
-        volumeView.tintColor = Colors.secondaryLabel
-        volumeView.sizeToFit()
+
         if volumetapped == true {
             let tapRecognizer = UITapGestureRecognizer()
             view.addGestureRecognizer(tapRecognizer)
@@ -203,43 +174,50 @@ final class MediaPlayerViewController: BaseViewController {
         contentView.removeFromSuperview()
         volumetapped = false
     }
-    
-
 }
 
 //MARK: - Display Logic
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
-    
     func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel) {
-        DispatchQueue.main.async {
-            self.viewModel = viewModel
-            self.setMediaPlayer()
+        if let artworkURL = viewModel.artworkURL {
+            Nuke.loadImage(with: artworkURL, into: songImageview)
+        }
+        
+        songNameLabel.text = viewModel.songName
+        descriptionLabel.text = viewModel.artistName
+    }
+    
+    func displayPlaybackState(viewModel: MediaPlayer.Fetch.PlaybackViewModel) {
+        let isPlaying = viewModel.status == .playing
+        progressView.configure(playbackTime: viewModel.currentTime, songDuration: viewModel.songDuration)
+        
+        playerView.playButton.image = UIImage(named: isPlaying ? "pause" : "play")
+        
+        if isPlaying {
+            progressTimer?.invalidate()
+            progressTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak interactor] _ in
+                interactor?.fetchPlaybackState()
+            })
+        } else {
+            progressTimer?.invalidate()
+            progressTimer = nil
         }
     }
 }
 
 extension MediaPlayerViewController: PlayerViewDelegate {
-
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .replay:
-            setMediaPlayer()
+            break
         case .previous:
-            if presentIndex > 0 {
-                presentIndex -= 1
-            } else {
-                presentIndex = 0
-            }
-            setMediaPlayer()
+            interactor?.playPreviousSong()
         case .next:
-            presentIndex += 1
-            setMediaPlayer()
+            interactor?.playNextSong()
         case .play:
-            musicPlayer.play()
-            playerView.playButton.image = UIImage(named: "pause")
+            interactor?.play()
         case .pause:
-            musicPlayer.pause()
-            playerView.playButton.image = UIImage(named: "play")
+            interactor?.pause()
         case .volume:
             volumetapped = true
             configureVolumeview()

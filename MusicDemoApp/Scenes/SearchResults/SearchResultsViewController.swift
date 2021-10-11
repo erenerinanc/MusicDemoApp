@@ -19,11 +19,15 @@ final class SearchResultsViewController: BaseViewController {
     
     var interactor: SearchResultsBusinessLogic?
     var router: (SearchResultsRoutingLogic & SearchResultsDataPassing)?
-    
-    lazy var tableView = UITableView()
     var songViewModel: SearchResults.Fetch.SongViewModel?
     var artistViewModel: SearchResults.Fetch.ArtistViewModel?
     
+    lazy var tableView = UITableView().configure {
+        $0.indicatorStyle = .white
+        $0.backgroundColor = Colors.background
+        $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
+    }
+
     // MARK: Object lifecycle
     
     init(musicAPI: AppleMusicAPI, storefrontID: String) {
@@ -51,19 +55,18 @@ final class SearchResultsViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         layoutUI()
+     
     }
     
     private func layoutUI() {
         view.addSubview(tableView)
         view.backgroundColor = Colors.background
-        tableView.indicatorStyle = .white
-        tableView.backgroundColor = Colors.background
         tableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(8)
             make.top.bottom.trailing.equalToSuperview()
         }
-        tableView.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
+    
 }
 
 //MARK: - TableView Delegate&DataSource
@@ -74,27 +77,25 @@ extension SearchResultsViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        let headerLabel = UILabel()
-        headerLabel.backgroundColor = Colors.background.withAlphaComponent(0.6)
-        if section == 0 {
-            headerLabel.text = "Songs"
-        } else {
-            headerLabel.text = "Artists"
+        let headerView = UIView().configure { $0.backgroundColor = Colors.background }
+        let headerLabel = UILabel().configure {
+            $0.textColor = .white
+            $0.font = UIFont.preferredFont(forTextStyle: .title3)
+            $0.backgroundColor = Colors.background.withAlphaComponent(0.6)
+            if section == 0 {
+                $0.text = "Songs"
+            } else {
+                $0.text = "Artists"
+            }
+            
         }
-        
-        headerLabel.textColor = .white
-        headerLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         headerView.addSubview(headerLabel)
         headerLabel.snp.makeConstraints { make in
             make.leading.trailing.equalTo(headerView.layoutMarginsGuide)
             make.top.equalToSuperview().offset(16)
             make.bottom.equalToSuperview().inset(8)
         }
-        
-        headerView.backgroundColor = Colors.background
         return headerView
- 
     }
     
 }
@@ -116,8 +117,6 @@ extension SearchResultsViewController: UITableViewDataSource {
         } else {
             guard let model = artistViewModel?.artists[indexPath.row] else { fatalError("Unable to display artists") }
             cell.set(for: model)
-            let imageNames = ["unicorn", "rabbit", "cat", "fox"]
-            cell.musicImageView.image = UIImage(named: imageNames[indexPath.row])
         }
         return cell
     }
@@ -142,8 +141,7 @@ extension SearchResultsViewController: UITableViewDataSource {
 extension SearchResultsViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchQuery = searchController.searchBar.text else { return }
-        print(searchQuery)
-        interactor?.fetchSearcheResults(request: SearchResults.Fetch.Request(searchQuery: searchQuery))
+        interactor?.fetchSearchResults(request: SearchResults.Fetch.Request(searchQuery: searchQuery))
     }
 }
 
@@ -163,6 +161,5 @@ extension SearchResultsViewController: SearchResultsDisplayLogic {
             self.tableView.reloadData()
         }
     }
-    
     
 }

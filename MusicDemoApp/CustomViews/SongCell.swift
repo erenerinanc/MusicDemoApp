@@ -12,35 +12,36 @@ import Nuke
 class SongCell: UITableViewCell {
     static let reuseID = "SongCell"
     
-    let musicImageView = UIImageView()
-    let songNameLabel = UILabel()
-    let subtitleLabel = UILabel()
+    let musicImageView = UIImageView().configure {
+        $0.contentMode = .scaleAspectFill
+        $0.layer.cornerRadius = CGFloat(10)
+        $0.clipsToBounds = true
+    }
+    let songNameLabel = UILabel().configure {
+        $0.textColor = .white
+        $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
+    }
+    let subtitleLabel = UILabel().configure {
+        $0.textColor = Colors.secondaryLabel
+        $0.font = UIFont.preferredFont(forTextStyle: .caption1)
+    }
     let hearthIcon = UIView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configure()
+        layoutCellUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
+    private func layoutCellUI() {
         backgroundColor = Colors.background
         contentView.addSubview(musicImageView)
         contentView.addSubview(songNameLabel)
         contentView.addSubview(subtitleLabel)
         contentView.addSubview(hearthIcon)
-        
-       
-        musicImageView.contentMode = .scaleAspectFill
-        musicImageView.layer.cornerRadius = CGFloat(10)
-        musicImageView.clipsToBounds = true
-        songNameLabel.textColor = .white
-        songNameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        subtitleLabel.textColor = Colors.secondaryLabel
-        subtitleLabel.font = UIFont.preferredFont(forTextStyle: .caption1)
         
         musicImageView.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top).inset(8)

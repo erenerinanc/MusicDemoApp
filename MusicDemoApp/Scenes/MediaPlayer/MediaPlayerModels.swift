@@ -11,23 +11,27 @@ import Foundation
 enum MediaPlayer {
     
     enum Fetch {
-        
         struct Request {
             
         }
         
         struct Response {
-            var songs: [SongData]
+            var song: SongData
         }
         
         struct ViewModel {
-            var songs: [MediaPlayer.Fetch.ViewModel.Song]
+            let artworkURL: URL?
+            let songName: String
+            let artistName: String
+        }
+        
+        struct PlaybackViewModel {
+            let status: PlaybackStatus
+            let currentTime: TimeInterval
+            let songDuration: TimeInterval
             
-            struct Song {
-                var label: String
-                var artworkURL: String
-                var duration: Int
-                var id: String
+            enum PlaybackStatus {
+                case playing, paused
             }
         }
         

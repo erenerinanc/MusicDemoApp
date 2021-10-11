@@ -9,6 +9,7 @@ import Foundation
 
 protocol PlaylistBusinessLogic: AnyObject {
     func fetchCatalogPlaylist(request: Playlist.Fetch.Request)
+    func play()
 }
 
 protocol PlaylistDataStore: AnyObject {
@@ -44,5 +45,9 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
                 print(error.localizedDescription)
             }
         })
+    }
+    
+    func play() {
+        worker?.play()
     }
 }

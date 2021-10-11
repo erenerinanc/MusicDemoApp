@@ -22,8 +22,6 @@ protocol HeaderUserInteractionDelegate {
     func imageSwiped()
 }
 
-public var musicPlayer = MPMusicPlayerController.systemMusicPlayer
-
 final class PlaylistViewController: BaseViewController {
     
     var interactor: PlaylistBusinessLogic?
@@ -33,7 +31,12 @@ final class PlaylistViewController: BaseViewController {
     var storeFrontId: String?
     var musicAPI: AppleMusicAPI?
     
-    var tableView = UITableView()
+    var tableView = UITableView().configure {
+        $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
+        $0.backgroundColor = Colors.background
+        $0.indicatorStyle = .white
+    }
+    
     let headerCell = HeaderImageCell()
     
     //MARK: Object LifeCycle
@@ -69,7 +72,8 @@ final class PlaylistViewController: BaseViewController {
         guard let storeFrontId = storeFrontId else { return }
         guard let globalId = globalId else { return }
         interactor?.fetchCatalogPlaylist(request: Playlist.Fetch.Request(storeFrontID: storeFrontId, globalID: globalId))
-        layoutUI()
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
 
     
@@ -82,15 +86,7 @@ final class PlaylistViewController: BaseViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
         super.viewWillDisappear(animated)
     }
-    
-    
-    private func layoutUI() {
-        view.addSubview(tableView)
-        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
-        tableView.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
-        tableView.backgroundColor = Colors.background
-        tableView.indicatorStyle = .white
-    }
+
 }
 
 //MARK: - Display Logic
@@ -172,15 +168,14 @@ extension PlaylistViewController: HeaderUserInteractionDelegate {
             songIds.append($0.id)
         })
         headerCell.isButtonTapped = true
-        musicPlayer.setQueue(with: songIds)
-        musicPlayer.play()
+        router?.routeToSongs(index: 0)
         headerCell.playButtonImage.image = UIImage(named: "pause")
     }
     
     func pauseButtonTapped() {
         print("Stop playing")
         headerCell.isButtonTapped = false
-        musicPlayer.stop()
+        interactor?.play()
         headerCell.playButtonImage.image = UIImage(named: "play")
     }
     

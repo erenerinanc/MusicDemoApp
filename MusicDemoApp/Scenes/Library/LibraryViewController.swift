@@ -21,8 +21,16 @@ final class LibraryViewController: BaseViewController {
     var playlistViewModel: Library.Fetch.PlaylistViewModel?
     var topSongsViewModel: Library.Fetch.TopSongsViewModel?
     
-    var searchController: UISearchController?
-    private lazy var tableView = UITableView()
+    var searchController = UISearchController().configure {
+        $0.searchResultsUpdater = $0.searchResultsController as? UISearchResultsUpdating
+        $0.obscuresBackgroundDuringPresentation = false
+        $0.searchBar.placeholder = "Song or artist..."
+    }
+    private lazy var tableView = UITableView().configure {
+        $0.backgroundColor = Colors.background
+        $0.indicatorStyle = .white
+        $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
+    }
     private lazy var playlistCell = PlaylistCell()
     
     // MARK: Object lifecycle
@@ -55,7 +63,6 @@ final class LibraryViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         layoutUI()
-        configureSearchController()
         askForPermission()
     }
     
@@ -63,28 +70,7 @@ final class LibraryViewController: BaseViewController {
         super.viewDidAppear(animated)
         navigationController?.navigationBar.sizeToFit()
     }
-    
-    private func layoutUI() {
-        navigationItem.title = "Library"
-        view.addSubview(tableView)
-        view.backgroundColor = Colors.background
-        tableView.backgroundColor = Colors.background
-        tableView.indicatorStyle = .white
-        tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(8)
-            make.top.bottom.trailing.equalToSuperview()
-        }
-        tableView.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
-    }
-    
-    private func configureSearchController() {
-        searchController?.searchResultsUpdater = searchController?.searchResultsController as? UISearchResultsUpdating
-        searchController?.obscuresBackgroundDuringPresentation = false
-        searchController?.searchBar.placeholder = "Song or artist..."
-        
-        navigationItem.searchController = searchController
-    }
-    
+ 
     private func askForPermission() {
         SKCloudServiceController.requestAuthorization { status in
             DispatchQueue.main.async {
@@ -96,6 +82,17 @@ final class LibraryViewController: BaseViewController {
                     self.present(alertVC, animated: true, completion: nil)
                 }
             }
+        }
+    }
+    
+    private func layoutUI() {
+        navigationItem.title = "Library"
+        view.addSubview(tableView)
+        view.backgroundColor = Colors.background
+        navigationItem.searchController = searchController
+        tableView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(8)
+            make.top.bottom.trailing.equalToSuperview()
         }
     }
         
@@ -163,25 +160,25 @@ extension LibraryViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        let headerLabel = UILabel()
-        headerLabel.backgroundColor = Colors.background.withAlphaComponent(0.6)
-        if section == 0 {
-            headerLabel.text = "Playlists"
-        } else {
-            headerLabel.text = "Top Songs"
+        let headerView = UIView().configure { $0.backgroundColor = Colors.background }
+        let headerLabel = UILabel().configure {
+            $0.textColor = .white
+            $0.font = UIFont.preferredFont(forTextStyle: .title3)
+            $0.backgroundColor = Colors.background.withAlphaComponent(0.6)
+            
+            if section == 0 {
+                $0.text = "Playlists"
+            } else {
+                $0.text = "Top Songs"
+            }
+            
         }
-        
-        headerLabel.textColor = .white
-        headerLabel.font = UIFont.preferredFont(forTextStyle: .title3)
         headerView.addSubview(headerLabel)
         headerLabel.snp.makeConstraints { make in
             make.leading.trailing.equalTo(headerView.layoutMarginsGuide)
             make.top.equalToSuperview().offset(16)
             make.bottom.equalToSuperview().inset(8)
         }
-        
-        headerView.backgroundColor = Colors.background
         return headerView
     }
 

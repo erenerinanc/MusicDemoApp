@@ -12,31 +12,33 @@ import SnapKit
 class CarouselCell: UICollectionViewCell {
     static let reuseID = "CarouselCell"
     
-    let imageView = UIImageView()
-    let playlistNameLabel = UILabel()
-    let descriptionLabel = UILabel()
+    let imageView = UIImageView().configure {
+        $0.contentMode = .scaleAspectFill
+        $0.layer.cornerRadius = CGFloat(35)
+        $0.clipsToBounds = true
+    }
+    let playlistNameLabel = UILabel().configure {
+        $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        $0.textColor = .white
+    }
+    let descriptionLabel = UILabel().configure {
+        $0.textColor = Colors.secondaryLabel
+        $0.font = UIFont.preferredFont(forTextStyle: .caption1)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configure()
+        layoutCellUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
+    private func layoutCellUI() {
         contentView.addSubview(imageView)
         contentView.addSubview(playlistNameLabel)
         contentView.addSubview(descriptionLabel)
-        
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = CGFloat(35)
-        imageView.clipsToBounds = true
-        playlistNameLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        playlistNameLabel.textColor = .white
-        descriptionLabel.textColor = Colors.secondaryLabel
-        descriptionLabel.font = UIFont.preferredFont(forTextStyle: .caption1)
         
         imageView.snp.makeConstraints { make in
             make.top.equalToSuperview()

@@ -8,6 +8,10 @@
 import UIKit
 import SnapKit
 
+protocol PlayerViewDelegate {
+    func buttonTapped(with button: PlayerButton)
+}
+
 class PlayerView: UIView {
     let replayButton = UIImageView()
     let firstButton = UIImageView()

@@ -34,8 +34,9 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
     }
     
     func routeToSong(index: Int) {
-        let destVC = MediaPlayerViewController(index: index)
+        let destVC = MediaPlayerViewController()
         destVC.router?.dataStore?.songData = dataStore?.topSongs
+        destVC.router?.dataStore?.initialSongIndex = index
         viewController?.navigationController?.present(destVC, animated: true)
     }
 

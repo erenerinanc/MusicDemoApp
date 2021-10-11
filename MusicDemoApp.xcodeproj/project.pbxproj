@@ -50,7 +50,7 @@
 		1157D0AC26FB28E100D52A3F /* PlaylistCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */; };
 		1157D0AE26FB29FD00D52A3F /* CarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */; };
 		1157D0B326FB2AA900D52A3F /* Configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1157D0B226FB2AA900D52A3F /* Configure.swift */; };
-		1194756C270F121E00CDED2D /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194756B270F121E00CDED2D /* ProgressView.swift */; };
+		1194756C270F121E00CDED2D /* MediaPlayerProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194756B270F121E00CDED2D /* MediaPlayerProgressView.swift */; };
 		1194756E2710498F00CDED2D /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194756D2710498F00CDED2D /* Search.swift */; };
 		1194757027107B0800CDED2D /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194756F27107B0800CDED2D /* String+Ext.swift */; };
 		1194757227108A0F00CDED2D /* ArtistDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1194757127108A0F00CDED2D /* ArtistDetailsViewController.swift */; };
@@ -102,7 +102,7 @@
 		1157D0AB26FB28E100D52A3F /* PlaylistCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistCell.swift; sourceTree = "<group>"; };
 		1157D0AD26FB29FD00D52A3F /* CarouselCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCell.swift; sourceTree = "<group>"; };
 		1157D0B226FB2AA900D52A3F /* Configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configure.swift; sourceTree = "<group>"; };
-		1194756B270F121E00CDED2D /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		1194756B270F121E00CDED2D /* MediaPlayerProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerProgressView.swift; sourceTree = "<group>"; };
 		1194756D2710498F00CDED2D /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		1194756F27107B0800CDED2D /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		1194757127108A0F00CDED2D /* ArtistDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailsViewController.swift; sourceTree = "<group>"; };
@@ -229,7 +229,7 @@
 				1142ADC226F9C827001B1F53 /* MediaPlayerWorker.swift */,
 				1142ADC326F9C827001B1F53 /* MediaPlayerRouter.swift */,
 				1128E930270B128600BF6FCA /* PlayerView.swift */,
-				1194756B270F121E00CDED2D /* ProgressView.swift */,
+				1194756B270F121E00CDED2D /* MediaPlayerProgressView.swift */,
 			);
 			path = MediaPlayer;
 			sourceTree = "<group>";
@@ -376,7 +376,7 @@
 				1194757027107B0800CDED2D /* String+Ext.swift in Sources */,
 				1142ADCD26F9C8BC001B1F53 /* Colors.swift in Sources */,
 				110F696E26FC5C63001BBA32 /* AppleMusicAPI.swift in Sources */,
-				1194756C270F121E00CDED2D /* ProgressView.swift in Sources */,
+				1194756C270F121E00CDED2D /* MediaPlayerProgressView.swift in Sources */,
 				1142ADCA26F9C827001B1F53 /* MediaPlayerRouter.swift in Sources */,
 				1142ADAA26F9C806001B1F53 /* LibraryPresenter.swift in Sources */,
 				1142ADC526F9C827001B1F53 /* MediaPlayerViewController.swift in Sources */,

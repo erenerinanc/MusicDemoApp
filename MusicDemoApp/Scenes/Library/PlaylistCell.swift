@@ -17,25 +17,22 @@ class PlaylistCell: UITableViewCell {
         $0.minimumLineSpacing = 16
     }
     
-    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).configure {
+        $0.showsHorizontalScrollIndicator = false
+        $0.backgroundColor = Colors.background
+        $0.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseID)
+    }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        layoutUI()
+        contentView.addSubview(collectionView)
+        collectionView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    private func layoutUI() {
-        contentView.addSubview(collectionView)
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = Colors.background
-        collectionView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
-        collectionView.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseID)
-    }
     
     
 }
