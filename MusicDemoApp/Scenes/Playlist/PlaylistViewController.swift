@@ -27,11 +27,12 @@ final class PlaylistViewController: BaseViewController {
     var interactor: PlaylistBusinessLogic?
     var router: (PlaylistRoutingLogic & PlaylistDataPassing)?
     var viewModel: Playlist.Fetch.ViewModel?
+    
     var globalId: String?
     var storeFrontId: String?
     var musicAPI: AppleMusicAPI?
     
-    var tableView = UITableView().configure {
+    private lazy var tableView = UITableView().configure {
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
         $0.backgroundColor = Colors.background
         $0.indicatorStyle = .white
@@ -39,17 +40,15 @@ final class PlaylistViewController: BaseViewController {
     
     let headerCell = HeaderImageCell()
     
-    //MARK: Object LifeCycle
+    //MARK: -Object LifeCycle
     
-    init(musicAPI: AppleMusicAPI, storeFrontID: String, globalID: String) {
+    init(musicAPI: AppleMusicAPI) {
         super.init()
         self.musicAPI = musicAPI
-        self.storeFrontId = storeFrontID
-        self.globalId = globalID
         setup(musicAPI: musicAPI)
     }
     
-    // MARK: Setup
+    // MARK: -Setup
     
     private func setup(musicAPI: AppleMusicAPI) {
         let viewController = self
@@ -69,9 +68,7 @@ final class PlaylistViewController: BaseViewController {
     
     override func loadView() {
         super.loadView()
-        guard let storeFrontId = storeFrontId else { return }
-        guard let globalId = globalId else { return }
-        interactor?.fetchCatalogPlaylist(request: Playlist.Fetch.Request(storeFrontID: storeFrontId, globalID: globalId))
+        interactor?.fetchCatalogPlaylist()
         view.addSubview(tableView)
         tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
@@ -89,7 +86,7 @@ final class PlaylistViewController: BaseViewController {
 
 }
 
-//MARK: - Display Logic
+//MARK: -Display Logic
 
 extension PlaylistViewController: PlaylistDisplayLogic {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel) {
@@ -104,7 +101,7 @@ extension PlaylistViewController: PlaylistDisplayLogic {
     }
 }
 
-//MARK: - TableView Delegate & DataSource
+//MARK: -TableView Delegate & DataSource
 
 extension PlaylistViewController: UITableViewDelegate {
     
@@ -158,11 +155,10 @@ extension PlaylistViewController: UITableViewDataSource {
     
 }
 
-//MARK: - Play&Pause Button Delegate
+//MARK: -Play&Pause Button Delegate
 
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
-        print("Play the songs")
         var songIds: [String] = []
         viewModel?.songs.forEach({
             songIds.append($0.id)
@@ -173,14 +169,12 @@ extension PlaylistViewController: HeaderUserInteractionDelegate {
     }
     
     func pauseButtonTapped() {
-        print("Stop playing")
         headerCell.isButtonTapped = false
         interactor?.play()
         headerCell.playButtonImage.image = UIImage(named: "play")
     }
     
     func imageSwiped() {
-        print("Routing back to Library Scene")
         navigationController?.popToRootViewController(animated: true)
     }
 }

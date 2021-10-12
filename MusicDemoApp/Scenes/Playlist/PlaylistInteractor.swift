@@ -8,13 +8,15 @@
 import Foundation
 
 protocol PlaylistBusinessLogic: AnyObject {
-    func fetchCatalogPlaylist(request: Playlist.Fetch.Request)
+    func fetchCatalogPlaylist()
     func play()
 }
 
 protocol PlaylistDataStore: AnyObject {
     var playlistData: [CatalogPlaylistData]? {get}
     var catalogSongs: [SongData]? {get}
+    var storefrontID: String? {get set}
+    var globalID: String? {get set}
 }
 
 final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
@@ -29,8 +31,13 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     var playlistData: [CatalogPlaylistData]?
     var catalogSongs: [SongData]?
     
-    func fetchCatalogPlaylist(request: Playlist.Fetch.Request) {
-        worker?.getCatalogPlaylists(request: request, { result in
+    var storefrontID: String?
+    var globalID: String?
+    
+    func fetchCatalogPlaylist() {
+        guard let storefrontID = storefrontID else { return }
+        guard let globalID = globalID else { return }
+        worker?.getCatalogPlaylists(request: Playlist.Fetch.Request(storeFrontID: storefrontID, globalID: globalID), { result in
             switch result {
             case .success(let response):
                 guard let playlistData = response.data else { return }

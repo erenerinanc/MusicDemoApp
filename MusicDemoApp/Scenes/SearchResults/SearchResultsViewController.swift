@@ -22,20 +22,26 @@ final class SearchResultsViewController: BaseViewController {
     var songViewModel: SearchResults.Fetch.SongViewModel?
     var artistViewModel: SearchResults.Fetch.ArtistViewModel?
     
-    lazy var tableView = UITableView().configure {
+    private lazy var tableView = UITableView().configure {
         $0.indicatorStyle = .white
         $0.backgroundColor = Colors.background
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
 
-    // MARK: Object lifecycle
+    // MARK: -Object lifecycle
     
     init(musicAPI: AppleMusicAPI, storefrontID: String) {
         super.init()
         setup(musicAPI: musicAPI, storefrontID: storefrontID)
     }
     
-    // MARK: Setup
+    override func loadView() {
+        super.loadView()
+        layoutUI()
+     
+    }
+    
+    // MARK: -Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
         let viewController = self
@@ -52,12 +58,6 @@ final class SearchResultsViewController: BaseViewController {
         tableView.dataSource = self
     }
     
-    override func loadView() {
-        super.loadView()
-        layoutUI()
-     
-    }
-    
     private func layoutUI() {
         view.addSubview(tableView)
         view.backgroundColor = Colors.background
@@ -69,7 +69,7 @@ final class SearchResultsViewController: BaseViewController {
     
 }
 
-//MARK: - TableView Delegate&DataSource
+//MARK: -TableView Delegate&DataSource
 
 extension SearchResultsViewController: UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -136,7 +136,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     }
 }
 
-//MARK: - Search Results Updating
+//MARK: -Search Results Updating
 
 extension SearchResultsViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
@@ -145,7 +145,7 @@ extension SearchResultsViewController: UISearchResultsUpdating {
     }
 }
 
-//MARK: - Display Logic
+//MARK: -Display Logic
 
 extension SearchResultsViewController: SearchResultsDisplayLogic {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel) {

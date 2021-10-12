@@ -11,15 +11,20 @@ import Nuke
 
 
 class HeaderImageCell: UITableViewCell {
+    
     static let reuseID = "Header"
-    lazy var headerImageView = UIImageView().configure {
+    var isButtonTapped = false
+    var delegate: HeaderUserInteractionDelegate?
+    
+    //MARK: -Configure UI Views
+    
+    private lazy var headerImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
         let imageGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(imageSwiped))
         $0.addGestureRecognizer(imageGestureRecognizer)
         $0.isUserInteractionEnabled = true
     }
-    var isButtonTapped = false
-    var playButtonImage = UIImageView().configure {
+    lazy var playButtonImage = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.cornerRadius = CGFloat(28)
@@ -31,22 +36,21 @@ class HeaderImageCell: UITableViewCell {
         $0.addGestureRecognizer(gestureRecognizer)
         $0.isUserInteractionEnabled = true
     }
-    var backButton = UIImageView().configure {
+    private lazy var backButton = UIImageView().configure {
         $0.image = UIImage(named: "back_button")
         $0.contentMode = .scaleAspectFill
         let backButtonGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(backButtonTapped))
         $0.addGestureRecognizer(backButtonGestureRecognizer)
         $0.isUserInteractionEnabled = true
     }
-    let nameLabel = UILabel().configure {
+    private lazy var nameLabel = UILabel().configure {
         $0.textColor = .white
         $0.font = UIFont.preferredFont(forTextStyle: .largeTitle)
     }
-    let descriptionLabel = UILabel().configure {
+    private lazy var descriptionLabel = UILabel().configure {
         $0.textColor = Colors.secondaryLabel
         $0.font = UIFont.preferredFont(forTextStyle: .footnote)
     }
-    var delegate: HeaderUserInteractionDelegate?
     
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

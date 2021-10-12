@@ -29,8 +29,10 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
     }
     
     func routeToCatalogPlaylist(globalID: String) {
-        let destVC = PlaylistViewController(musicAPI: musicAPI, storeFrontID: storeFrontID, globalID: globalID)
-        self.viewController?.navigationController?.pushViewController(destVC, animated: true)
+        let destVC = PlaylistViewController(musicAPI: musicAPI)
+        destVC.router?.dataStore?.storefrontID = storeFrontID
+        destVC.router?.dataStore?.globalID = globalID
+        viewController?.navigationController?.pushViewController(destVC, animated: true)
     }
     
     func routeToSong(index: Int) {

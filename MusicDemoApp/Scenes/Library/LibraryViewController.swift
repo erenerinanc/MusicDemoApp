@@ -21,7 +21,9 @@ final class LibraryViewController: BaseViewController {
     var playlistViewModel: Library.Fetch.PlaylistViewModel?
     var topSongsViewModel: Library.Fetch.TopSongsViewModel?
     
-    var searchController = UISearchController().configure {
+    //MARK: -Configure UI Views
+    
+    private lazy var searchController = UISearchController().configure {
         $0.searchResultsUpdater = $0.searchResultsController as? UISearchResultsUpdating
         $0.obscuresBackgroundDuringPresentation = false
         $0.searchBar.placeholder = "Song or artist..."
@@ -33,14 +35,26 @@ final class LibraryViewController: BaseViewController {
     }
     private lazy var playlistCell = PlaylistCell()
     
-    // MARK: Object lifecycle
+    // MARK: -Object lifecycle
     
     init(musicAPI: AppleMusicAPI, storefrontID: String) {
         super.init()
         setup(musicAPI: musicAPI, storefrontID: storefrontID)
     }
     
-    // MARK: Setup
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        layoutUI()
+        interactor?.fetchPlaylists()
+        interactor?.fetchTopCharts()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.navigationBar.sizeToFit()
+    }
+    
+    // MARK: -Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
         let viewController = self
@@ -59,32 +73,7 @@ final class LibraryViewController: BaseViewController {
         playlistCell.collectionView.dataSource = self
         searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID))
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        layoutUI()
-        askForPermission()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationController?.navigationBar.sizeToFit()
-    }
  
-    private func askForPermission() {
-        SKCloudServiceController.requestAuthorization { status in
-            DispatchQueue.main.async {
-                if status == .authorized {
-                    self.interactor?.fetchPlaylists()
-                    self.interactor?.fetchTopCharts()
-                } else {
-                    let alertVC = UIAlertController(title: "Apple Music Permission Required", message: "Hebelek", preferredStyle: .alert)
-                    self.present(alertVC, animated: true, completion: nil)
-                }
-            }
-        }
-    }
-    
     private func layoutUI() {
         navigationItem.title = "Library"
         view.addSubview(tableView)
@@ -97,7 +86,7 @@ final class LibraryViewController: BaseViewController {
     }
         
 }
-//MARK: - Display Logic
+//MARK: -Display Logic
 
 extension LibraryViewController: LibraryDisplayLogic {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel) {
@@ -115,7 +104,7 @@ extension LibraryViewController: LibraryDisplayLogic {
     }
 }
 
-//MARK: - TableView Delegate & Datasource
+//MARK: -TableView Delegate&Datasource
 
 extension LibraryViewController: UITableViewDelegate {
     
@@ -184,7 +173,7 @@ extension LibraryViewController: UITableViewDataSource {
 
 }
 
-//MARK: - CollectionView Delegate & DataSource
+//MARK: -CollectionView Delegate&DataSource
 
 extension LibraryViewController: UICollectionViewDelegateFlowLayout {
     
@@ -211,7 +200,6 @@ extension LibraryViewController: UICollectionViewDataSource {
         cell.set(for: model)
         return cell
     }
-    
     
 }
 

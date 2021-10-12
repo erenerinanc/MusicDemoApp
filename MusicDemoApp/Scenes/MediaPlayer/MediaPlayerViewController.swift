@@ -29,6 +29,13 @@ final class MediaPlayerViewController: BaseViewController {
     var interactor: MediaPlayerBusinessLogic?
     var router: (MediaPlayerRoutingLogic & MediaPlayerDataPassing)?
     
+    private var songID: String?
+    private var presentIndex: Int = 0
+    private var volumetapped: Bool = false
+    private var progressTimer: Timer?
+    
+    //MARK: -Configure UI Views
+    
     private lazy var songImageview = UIImageView().configure {
         $0.backgroundColor = Colors.background
         $0.contentMode = .scaleAspectFit
@@ -56,23 +63,27 @@ final class MediaPlayerViewController: BaseViewController {
         $0.tintColor = Colors.secondaryLabel
         $0.sizeToFit()
     }
-    lazy var progressView = MediaPlayerProgressView()
-    lazy var playerView = PlayerView()
+    private lazy var progressView = MediaPlayerProgressView()
+    private lazy var playerView = PlayerView()
     
-    private var songID: String?
-    private var presentIndex: Int = 0
-
-    private var volumetapped: Bool = false
-    private var progressTimer: Timer?
-    
-    // MARK: Object lifecycle
+    // MARK: -Object lifecycle
     
     override init() {
         super.init()
         setup()
     }
     
-    // MARK: Setup
+    override func loadView() {
+        super.loadView()
+        layoutUI()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        interactor?.playInitialSong()
+    }
+    
+    // MARK: -Setup
     
     private func setup() {
         let viewController = self
@@ -88,15 +99,7 @@ final class MediaPlayerViewController: BaseViewController {
         playerView.delegate = self
     }
     
-    override func loadView() {
-        super.loadView()
-        layoutUI()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        interactor?.playInitialSong()
-    }
+    //MARK: -Layout UI
  
     private func layoutUI() {
         view.backgroundColor = Colors.background
@@ -176,7 +179,8 @@ final class MediaPlayerViewController: BaseViewController {
     }
 }
 
-//MARK: - Display Logic
+//MARK: -Display Logic
+
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel) {
         if let artworkURL = viewModel.artworkURL {
@@ -204,6 +208,8 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
         }
     }
 }
+
+//MARK: -PlayerView Delegate
 
 extension MediaPlayerViewController: PlayerViewDelegate {
     func buttonTapped(with button: PlayerButton) {
