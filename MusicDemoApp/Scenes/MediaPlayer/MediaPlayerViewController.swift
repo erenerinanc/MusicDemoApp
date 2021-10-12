@@ -64,7 +64,7 @@ final class MediaPlayerViewController: BaseViewController {
         $0.sizeToFit()
     }
     private lazy var progressView = MediaPlayerProgressView()
-    private lazy var playerView = PlayerView()
+    private lazy var playerView = MediaPlayerButtonsView()
     
     // MARK: -Object lifecycle
     
@@ -211,7 +211,7 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
 
 //MARK: -PlayerView Delegate
 
-extension MediaPlayerViewController: PlayerViewDelegate {
+extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .replay:

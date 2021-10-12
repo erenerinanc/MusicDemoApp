@@ -71,12 +71,20 @@ class SongCell: UITableViewCell {
         }
     }
     
-    func set(for catalogViewModel: Playlist.Fetch.ViewModel.Song) {
+    func set(for catalogViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist) {
         DispatchQueue.main.async {
             let artworkurl = catalogViewModel.artworkURL.resizeWidhtAndHeight(width: 120, height: 120)
             Nuke.loadImage(with: artworkurl, into: self.musicImageView)
             self.songNameLabel.text = catalogViewModel.name
             self.subtitleLabel.text = catalogViewModel.description
+        }
+    }
+    func set(for catalogSongViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist.Song) {
+        DispatchQueue.main.async {
+            let artworkurl = catalogSongViewModel.songArtworkURL.resizeWidhtAndHeight(width: 120, height: 120)
+            Nuke.loadImage(with: artworkurl, into: self.musicImageView)
+            self.songNameLabel.text = catalogSongViewModel.songName
+            self.subtitleLabel.text = catalogSongViewModel.artistName
         }
     }
     

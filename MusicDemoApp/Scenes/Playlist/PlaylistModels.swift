@@ -19,26 +19,26 @@ enum Playlist {
         
         struct Response {
             var catalogPlaylistData: [CatalogPlaylistData]
-            var catalogSongData: [SongData]
         }
         
         struct ViewModel {
             var catalogPlaylist: [Playlist.Fetch.ViewModel.CatalogPlaylist]
-            var songs: [Playlist.Fetch.ViewModel.Song]
             
             struct CatalogPlaylist {
                 var artworkURL: String
                 var name: String
                 var description: String
+                var songs: [Song]
+                
+                struct Song {
+                    var songName: String
+                    var artistName: String
+                    var songArtworkURL: String
+                    var songId: String
+                }
+
             }
-            
-            struct Song {
-                var songURL: String
-                var name: String
-                var description: String
-                var artworkURL: String
-                var id: String
-            }
+          
         }
         
     }

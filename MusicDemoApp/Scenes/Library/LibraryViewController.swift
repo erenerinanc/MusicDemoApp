@@ -14,7 +14,7 @@ protocol LibraryDisplayLogic: AnyObject {
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel)
 }
 
-final class LibraryViewController: BaseViewController {
+final class LibraryViewController: BaseViewController{
     
     var interactor: LibraryBusinessLogic?
     var router: (LibraryRoutingLogic & LibraryDataPassing)?
@@ -24,7 +24,6 @@ final class LibraryViewController: BaseViewController {
     //MARK: -Configure UI Views
     
     private lazy var searchController = UISearchController().configure {
-        $0.searchResultsUpdater = $0.searchResultsController as? UISearchResultsUpdating
         $0.obscuresBackgroundDuringPresentation = false
         $0.searchBar.placeholder = "Song or artist..."
     }
@@ -33,7 +32,7 @@ final class LibraryViewController: BaseViewController {
         $0.indicatorStyle = .white
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
-    private lazy var playlistCell = PlaylistCell()
+    private lazy var playlistCell = LibraryPlaylistCell()
     
     // MARK: -Object lifecycle
     
@@ -83,6 +82,7 @@ final class LibraryViewController: BaseViewController {
             make.leading.equalToSuperview().inset(8)
             make.top.bottom.trailing.equalToSuperview()
         }
+        searchController.searchResultsUpdater = searchController.searchResultsController as? UISearchResultsUpdating
     }
         
 }
@@ -191,7 +191,7 @@ extension LibraryViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.reuseID, for: indexPath) as? CarouselCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LibraryCarouselCell.reuseID, for: indexPath) as? LibraryCarouselCell else {
             fatalError("Unable to dequeue reusable cell")
         }
         guard let model = playlistViewModel?.playlists[indexPath.row] else {

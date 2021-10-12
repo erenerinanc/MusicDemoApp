@@ -1,5 +1,5 @@
 //
-//  PlaylistCell.swift
+//  LibraryPlaylistCell.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 22.09.2021.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class PlaylistCell: UITableViewCell {
+class LibraryPlaylistCell: UITableViewCell {
     static let reuseID = "PlaylistCell"
     
     lazy var layout = UICollectionViewFlowLayout().configure {
@@ -20,7 +20,7 @@ class PlaylistCell: UITableViewCell {
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).configure {
         $0.showsHorizontalScrollIndicator = false
         $0.backgroundColor = Colors.background
-        $0.register(CarouselCell.self, forCellWithReuseIdentifier: CarouselCell.reuseID)
+        $0.register(LibraryCarouselCell.self, forCellWithReuseIdentifier: LibraryCarouselCell.reuseID)
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

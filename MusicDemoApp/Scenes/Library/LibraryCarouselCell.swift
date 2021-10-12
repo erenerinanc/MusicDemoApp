@@ -1,5 +1,5 @@
 //
-//  CarouselCell.swift
+//  LibraryCarouselCell.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 22.09.2021.
@@ -9,7 +9,7 @@ import UIKit
 import Nuke
 import SnapKit
 
-class CarouselCell: UICollectionViewCell {
+class LibraryCarouselCell: UICollectionViewCell {
     static let reuseID = "CarouselCell"
     
     let imageView = UIImageView().configure {

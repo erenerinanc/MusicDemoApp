@@ -1,5 +1,5 @@
 //
-//  PlayerstackView.swift
+//  MediaPlayerButtonsView.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 4.10.2021.
@@ -8,17 +8,17 @@
 import UIKit
 import SnapKit
 
-protocol PlayerViewDelegate {
+protocol MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton)
 }
 
-class PlayerView: UIView {
+class MediaPlayerButtonsView: UIView {
     let replayButton = UIImageView()
     let firstButton = UIImageView()
     let playButton = UIImageView()
     let lastButton = UIImageView()
     let volumeButton = UIImageView()
-    var delegate: PlayerViewDelegate?
+    var delegate: MediaPlayerButtonsViewDelegate?
     var isNowPlaying = true
     
     override init(frame: CGRect) {

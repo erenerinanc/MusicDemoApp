@@ -38,7 +38,7 @@ final class PlaylistViewController: BaseViewController {
         $0.indicatorStyle = .white
     }
     
-    let headerCell = HeaderImageCell()
+    let headerCell = PlaylistHeaderCell()
     
     //MARK: -Object LifeCycle
     
@@ -132,7 +132,7 @@ extension PlaylistViewController: UITableViewDataSource {
         if section == 0 {
             return 1
         } else {
-            return viewModel?.songs.count ?? 0
+            return viewModel?.catalogPlaylist[0].songs.count ?? 0
         }
         
     }
@@ -142,7 +142,7 @@ extension PlaylistViewController: UITableViewDataSource {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: SongCell.reuseID) as? SongCell else {
                 fatalError("Unable to dequeue reusable cell")
             }
-            guard let model = viewModel?.songs[indexPath.row] else {
+            guard let model = viewModel?.catalogPlaylist[0].songs[indexPath.row] else {
                 fatalError("Unable to display model")
             }
             cell.set(for: model)
@@ -160,8 +160,8 @@ extension PlaylistViewController: UITableViewDataSource {
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
         var songIds: [String] = []
-        viewModel?.songs.forEach({
-            songIds.append($0.id)
+        viewModel?.catalogPlaylist[0].songs.forEach( {
+            songIds.append($0.songId)
         })
         headerCell.isButtonTapped = true
         router?.routeToSongs(index: 0)

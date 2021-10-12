@@ -33,10 +33,13 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
             case .success(let response):
                 guard let searchedSongs = response.results?.songs?.data else { return }
                 guard let searchedArtists = response.results?.artists?.data else { return }
+                
                 self.searchedSongs = searchedSongs
                 self.searchedArtist = searchedArtists
+                
                 self.presenter?.presentSearchedSongs(response: SearchResults.Fetch.SongResponse(songs: searchedSongs))
                 self.presenter?.presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse(artists: searchedArtists))
+                
             case .failure(let error):
                 print(error.localizedDescription)
             }

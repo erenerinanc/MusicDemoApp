@@ -1,5 +1,5 @@
 //
-//  HeaderImageCell.swift
+//  PlaylistHeaderCell.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 4.10.2021.
@@ -10,7 +10,7 @@ import SnapKit
 import Nuke
 
 
-class HeaderImageCell: UITableViewCell {
+class PlaylistHeaderCell: UITableViewCell {
     
     static let reuseID = "Header"
     var isButtonTapped = false

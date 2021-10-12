@@ -16,17 +16,26 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
     weak var viewController: PlaylistDisplayLogic?
     
     func presentCatalogPlaylist(response: Playlist.Fetch.Response) {
+        guard let songData = response.catalogPlaylistData[0].relationships?.tracks?.data else { return }
+        
+        
+        let songs = songData.compactMap { Playlist.Fetch.ViewModel.CatalogPlaylist.Song(songName: $0.attributes?.name ?? "",
+                                                                                        artistName: $0.attributes?.artistName ?? "",
+                                                                                        songArtworkURL: $0.attributes?.artwork?.url ?? "",
+                                                                                        songId: $0.id ?? ""
+        )
+            
+        }
+        var totalSongDuration: Int = 0
+        let _: [()] = songData.compactMap {totalSongDuration += Int($0.attributes?.durationInMillis ?? 0)}
         let catalogPlaylist = response.catalogPlaylistData.compactMap { Playlist.Fetch.ViewModel.CatalogPlaylist(artworkURL: $0.attributes?.artwork?.url ?? "",
                                                                                                                  name: $0.attributes?.name ?? "",
-                                                                                                                 description: "50 Songs 102 hours")
-        }
-        let catalogSongs = response.catalogSongData.compactMap { Playlist.Fetch.ViewModel.Song(songURL: $0.attributes?.previews?[0].url ?? "",
-                                                                                               name: $0.attributes?.name ?? "",
-                                                                                               description: $0.attributes?.artistName ?? "",
-                                                                                               artworkURL: $0.attributes?.artwork?.url ?? "",id: $0.id ?? ""
+                                                                                                                 description: "\(songs.count) Songs \(totalSongDuration / 3600000) Hours",
+                                                                                                                 songs: songs
         )
         }
-        viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist, songs: catalogSongs))
-      
+        
+        viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
+        
     }
 }
