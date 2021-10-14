@@ -26,6 +26,7 @@ final class LibraryViewController: BaseViewController{
     private lazy var searchController = UISearchController().configure {
         $0.obscuresBackgroundDuringPresentation = false
         $0.searchBar.placeholder = "Song or artist..."
+        $0.definesPresentationContext = false
     }
     private lazy var tableView = UITableView().configure {
         $0.backgroundColor = Colors.background
@@ -94,6 +95,8 @@ extension LibraryViewController: LibraryDisplayLogic {
         DispatchQueue.main.async {
             self.playlistCell.collectionView.reloadData()
         }
+        let globalIDs = viewModel.playlists.compactMap {  $0.id }
+        
     }
     
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
@@ -102,6 +105,7 @@ extension LibraryViewController: LibraryDisplayLogic {
             self.tableView.reloadSections([1], with: .automatic)
         }
     }
+
 }
 
 //MARK: -TableView Delegate&Datasource
@@ -114,7 +118,7 @@ extension LibraryViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
-            return CGFloat(276)
+            return CGFloat(266)
         } else {
             return CGFloat(74)
         }

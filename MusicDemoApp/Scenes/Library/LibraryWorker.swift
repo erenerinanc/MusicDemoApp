@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import SwiftUI
 
 protocol LibraryWorkingLogic: AnyObject {
-    func fetchPlaylists(_ completion: @escaping (Result<Playlists, Error>) -> Void)
-    func fetchTopCharts(_ completion: @escaping (Result<TopCharts, Error>) -> Void)
+    func fetchPlaylists(_ completion: @escaping (Result<Playlists,Error>) -> Void)
+    func fetchTopCharts(_ completion: @escaping (Result<TopCharts,Error>) -> Void)
 }
 
 final class LibraryWorker: LibraryWorkingLogic {
@@ -42,5 +43,6 @@ final class LibraryWorker: LibraryWorkingLogic {
             }
         }
     }
+
     
 }

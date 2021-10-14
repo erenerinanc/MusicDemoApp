@@ -13,11 +13,15 @@ enum Library {
     enum Fetch {
         
         struct Request {
-            
+            var globalID: String
         }
         
         struct PlaylistResponse {
             var playlists: [PlaylistData]
+        }
+        
+        struct PlaylistSongsResponse {
+            var catalogPlaylistData: [CatalogPlaylistData]
         }
         
         struct TopSongsResponse {
@@ -30,7 +34,6 @@ enum Library {
             struct Playlist {
                 var artworkURL: String
                 var playlistName: String
-                var songCount: Int
                 var id: String
             }
 

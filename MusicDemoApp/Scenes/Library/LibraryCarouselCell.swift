@@ -21,11 +21,7 @@ class LibraryCarouselCell: UICollectionViewCell {
         $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
         $0.textColor = .white
     }
-    let descriptionLabel = UILabel().configure {
-        $0.textColor = Colors.secondaryLabel
-        $0.font = UIFont.preferredFont(forTextStyle: .caption1)
-    }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutCellUI()
@@ -38,22 +34,16 @@ class LibraryCarouselCell: UICollectionViewCell {
     private func layoutCellUI() {
         contentView.addSubview(imageView)
         contentView.addSubview(playlistNameLabel)
-        contentView.addSubview(descriptionLabel)
         
         imageView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+            make.top.equalToSuperview().inset(8)
             make.leading.trailing.equalToSuperview().offset(8)
-            make.height.equalToSuperview().inset(30)
+            make.height.equalToSuperview().inset(24)
         }
         
         playlistNameLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(8)
             make.leading.trailing.equalToSuperview().inset(8)
-        }
-        
-        descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(playlistNameLabel.snp.bottom).offset(4)
-            make.leading.equalTo(playlistNameLabel.snp.leading)
         }
     
     }
@@ -63,7 +53,7 @@ class LibraryCarouselCell: UICollectionViewCell {
             let artworkurl = viewModel.artworkURL.resizeWidhtAndHeight(width: 300, height: 300)
             Nuke.loadImage(with: artworkurl, into: self.imageView)
             self.playlistNameLabel.text = viewModel.playlistName
-            self.descriptionLabel.text = "\(viewModel.songCount) Songs"
         }
     }
+
 }

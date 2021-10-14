@@ -41,6 +41,13 @@ final class SearchResultsViewController: BaseViewController {
      
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
     // MARK: -Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
@@ -64,6 +71,20 @@ final class SearchResultsViewController: BaseViewController {
         tableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(8)
             make.top.bottom.trailing.equalToSuperview()
+        }
+    }
+    
+    @objc func adjustForKeyboard(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+        
+        let keyboardScreenEndFrame = keyboardValue.cgRectValue
+        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
+        
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            tableView.contentInset = .zero
+        } else {
+            let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height + 30, right: 0)
+            tableView.contentInset = contentInsets
         }
     }
     
@@ -134,7 +155,7 @@ extension SearchResultsViewController: UITableViewDataSource {
             #warning("Implement artist detail")
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
             let destVC = ArtistDetailsViewController(url: urlString)
-            navigationController?.pushViewController(destVC, animated: true)
+            present(destVC, animated: true)
         }
     }
 }
