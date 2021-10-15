@@ -25,7 +25,9 @@ class SongCell: UITableViewCell {
         $0.textColor = Colors.secondaryLabel
         $0.font = UIFont.preferredFont(forTextStyle: .caption1)
     }
-    let hearthIcon = UIView()
+    let nowPlayingView = NowPlayingView().configure {
+        $0.backgroundColor = Colors.background
+    }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -41,7 +43,7 @@ class SongCell: UITableViewCell {
         contentView.addSubview(musicImageView)
         contentView.addSubview(songNameLabel)
         contentView.addSubview(subtitleLabel)
-        contentView.addSubview(hearthIcon)
+        contentView.addSubview(nowPlayingView)
         
         musicImageView.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top).inset(8)
@@ -59,6 +61,12 @@ class SongCell: UITableViewCell {
             make.leading.equalTo(musicImageView.snp.trailing).offset(8)
             make.top.equalTo(songNameLabel.snp.bottom).offset(4)
             
+        }
+        
+        nowPlayingView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(8)
+            make.height.equalTo(10)
+            make.width.equalTo(14)
         }
     }
     

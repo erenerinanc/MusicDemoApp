@@ -12,9 +12,11 @@ import StoreKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    var musicPlayer: SystemMusicPlayer?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow()
+        musicPlayer = SystemMusicPlayer()
         
         let loadingViewController = UIViewController()
         let indicator = UIActivityIndicatorView()
@@ -45,7 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             case .success(let response):
                                 guard let id = response.data?[0].id else { return }
                                 DispatchQueue.main.async {
-                                    let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id)
+                                    guard let musicPlayer = self.musicPlayer else { return }
+                                    let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id, musicPlayer: musicPlayer)
                                     navController.setViewControllers([libraryVC], animated: true)
                                 }
                             case .failure(let error):

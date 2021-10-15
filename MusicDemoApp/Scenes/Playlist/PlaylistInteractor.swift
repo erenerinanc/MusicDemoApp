@@ -9,28 +9,74 @@ import Foundation
 
 protocol PlaylistBusinessLogic: AnyObject {
     func fetchCatalogPlaylist()
-    func play()
+    func playSong(at index: Int) -> Bool
+    func playFirstSong()
+    func pause()
 }
 
 protocol PlaylistDataStore: AnyObject {
-    var playlistData: [CatalogPlaylistData]? {get}
-    var storefrontID: String? {get set}
-    var globalID: String? {get set}
+    var playlistData: [CatalogPlaylistData]? { get }
+    var storefrontID: String? { get set }
+    var globalID: String? { get set }
 }
 
-final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
+protocol PlaylistMusicPlayer: AnyObject {
+    func play()
+    func pause()
+    func playSong(at index: Int)
     
-    init(musicAPI: AppleMusicAPI) {
-        self.worker = PlaylistWorker(musicAPI: musicAPI)
+    var songs: [SongData] { get set }
+    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
+    var playerStateDidChange: Notification.Name { get }
+}
+
+extension SystemMusicPlayer: PlaylistMusicPlayer { }
+
+final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
+    var mediaPlayerInteractor: MediaPlayerInteractor?
+    
+    init(worker: PlaylistWorkingLogic, musicPlayer: PlaylistMusicPlayer) {
+        self.worker = worker
+        self.musicPlayer = musicPlayer
     }
     
     var presenter: PlaylistPresentationLogic?
+    let musicPlayer: PlaylistMusicPlayer
     var worker: PlaylistWorkingLogic?
     
     var playlistData: [CatalogPlaylistData]?
     
     var storefrontID: String?
     var globalID: String?
+    
+    func playFirstSong() {
+        guard
+            let playlistData = playlistData,
+            let songs = playlistData[0].relationships?.tracks?.data
+        else {
+            return
+        }
+        
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: 0)
+    }
+    
+    func playSong(at index: Int) -> Bool {
+        guard
+            let playlistData = playlistData,
+            let songs = playlistData[0].relationships?.tracks?.data
+        else {
+            return false
+        }
+        
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: index)
+        return true
+    }
+    
+    func pause() {
+        musicPlayer.pause()
+    }
     
     func fetchCatalogPlaylist() {
         guard let storefrontID = storefrontID else { return }
@@ -49,7 +95,4 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
         })
     }
     
-    func play() {
-        worker?.play()
-    }
 }

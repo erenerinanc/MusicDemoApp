@@ -8,7 +8,8 @@
 import Foundation
 
 protocol PlaylistRoutingLogic: AnyObject {
-    func routeToSongs(index: Int)
+    func routeToMediaPlayer()
+    func pauseSong()
 }
 
 protocol PlaylistDataPassing: AnyObject {
@@ -19,11 +20,19 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
     
     weak var viewController: PlaylistViewController?
     var dataStore: PlaylistDataStore?
+    var musicPlayer: SystemMusicPlayer
     
-    func routeToSongs(index: Int) {
-        let destVC = MediaPlayerViewController()
-        destVC.router?.dataStore?.songData = dataStore?.playlistData?[0].relationships?.tracks?.data
-        destVC.router?.dataStore?.initialSongIndex = index
+    init(musicPlayer: SystemMusicPlayer){
+        self.musicPlayer = musicPlayer
+    }
+    
+    func routeToMediaPlayer() {
+        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         self.viewController?.navigationController?.present(destVC, animated: true)
+    }
+    
+    func pauseSong() {
+        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
+        destVC.interactor?.pause()
     }
 }

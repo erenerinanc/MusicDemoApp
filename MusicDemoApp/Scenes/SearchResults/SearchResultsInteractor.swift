@@ -9,6 +9,7 @@ import Foundation
 
 protocol SearchResultsBusinessLogic: AnyObject {
     func fetchSearchResults(request: SearchResults.Fetch.Request)
+    func playSong(at index: Int) -> Bool
 }
 
 protocol SearchResultsDataStore: AnyObject {
@@ -16,16 +17,37 @@ protocol SearchResultsDataStore: AnyObject {
     var searchedArtist: [ArtistsData]? {get}
 }
 
+protocol SearchResultsMusicPlayer: AnyObject {
+    func playSong(at index: Int)
+    var songs: [SongData] { get set }
+    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
+    static var playerStateDidChange: Notification.Name { get }
+}
+
+extension SystemMusicPlayer: SearchResultsMusicPlayer { }
+
 final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDataStore {
     
-    init(musicAPI: AppleMusicAPI, storeFrontID: String) {
-        self.worker = SearchResultsWorker(musicAPI: musicAPI, storeFrontID: storeFrontID)
+    init(worker: SearchResultsWorkingLogic, musicPlayer: SearchResultsMusicPlayer) {
+        self.worker = worker
+        self.musicPlayer = musicPlayer
     }
     
+    let worker: SearchResultsWorkingLogic
+    let musicPlayer: SearchResultsMusicPlayer
     var presenter: SearchResultsPresentationLogic?
-    var worker: SearchResultsWorkingLogic
+    
     var searchedSongs: [SongData]?
     var searchedArtist: [ArtistsData]?
+    
+    func playSong(at index: Int) -> Bool {
+        guard let songs = searchedSongs else { return false }
+        
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: index)
+        return true
+    }
+    
     
     func fetchSearchResults(request: SearchResults.Fetch.Request) {
         worker.getSearchResults(request: request) { result in

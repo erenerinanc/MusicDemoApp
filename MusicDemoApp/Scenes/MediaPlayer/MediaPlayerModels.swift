@@ -16,23 +16,7 @@ enum MediaPlayer {
         }
         
         struct Response {
-            var song: SongData
-        }
-        
-        struct ViewModel {
-            let artworkURL: URL?
-            let songName: String
-            let artistName: String
-        }
-        
-        struct PlaybackViewModel {
-            let status: PlaybackStatus
-            let currentTime: TimeInterval
-            let songDuration: TimeInterval
-            
-            enum PlaybackStatus {
-                case playing, paused
-            }
+    
         }
         
     }

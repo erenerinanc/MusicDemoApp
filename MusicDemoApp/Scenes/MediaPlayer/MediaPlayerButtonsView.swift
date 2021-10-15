@@ -13,7 +13,7 @@ protocol MediaPlayerButtonsViewDelegate {
 }
 
 class MediaPlayerButtonsView: UIView {
-    let replayButton = UIImageView()
+    let shuffleButton = UIImageView()
     let firstButton = UIImageView()
     let playButton = UIImageView()
     let lastButton = UIImageView()
@@ -25,7 +25,6 @@ class MediaPlayerButtonsView: UIView {
         super.init(frame: frame)
         configurePlayerView()
         configureButtonActions()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -33,20 +32,20 @@ class MediaPlayerButtonsView: UIView {
     }
     
     private func configurePlayerView() {
-        let items = [replayButton,firstButton,playButton,lastButton,volumeButton]
+        let items = [shuffleButton,firstButton,playButton,lastButton,volumeButton]
         items.forEach { addSubview($0) }
         backgroundColor = Colors.background
 
-        replayButton.snp.makeConstraints { make in
+        shuffleButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(16)
             make.centerY.equalToSuperview()
             make.width.equalTo(25)
-            make.height.equalTo(replayButton.snp.width)
+            make.height.equalTo(shuffleButton.snp.width)
         }
         
         firstButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(replayButton.snp.trailing).offset(32)
+            make.leading.equalTo(shuffleButton.snp.trailing).offset(32)
             make.width.equalTo(30)
             make.height.equalTo(firstButton.snp.width)
         }
@@ -72,7 +71,7 @@ class MediaPlayerButtonsView: UIView {
             make.height.equalTo(25)
         }
         
-        replayButton.image = UIImage(named: "repeat")
+        shuffleButton.image = UIImage(named: "shuffle")
         firstButton.image = UIImage(named: "first")
         playButton.image = UIImage(named: "play")
         lastButton.image = UIImage(named: "last")
@@ -89,8 +88,8 @@ class MediaPlayerButtonsView: UIView {
     
     private func configureButtonActions() {
         let gestureRecognizerForReplayButton = UITapGestureRecognizer(target: self, action: #selector(replayButtonTapped))
-        replayButton.addGestureRecognizer(gestureRecognizerForReplayButton)
-        replayButton.isUserInteractionEnabled = true
+        shuffleButton.addGestureRecognizer(gestureRecognizerForReplayButton)
+        shuffleButton.isUserInteractionEnabled = true
         
         let gestureRecognizerForFirstButton = UITapGestureRecognizer(target: self, action: #selector(firstButtonTapped))
         firstButton.addGestureRecognizer(gestureRecognizerForFirstButton)
@@ -110,17 +109,14 @@ class MediaPlayerButtonsView: UIView {
     }
     
     @objc func replayButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Replay tapped")
-        delegate?.buttonTapped(with: .replay)
+        delegate?.buttonTapped(with: .shuffle)
     }
     
     @objc func firstButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Previous tapped")
         delegate?.buttonTapped(with: .previous)
     }
     
     @objc func playPauseButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Play tapped")
         guard let delegate = delegate else { return }
         if isNowPlaying {
             delegate.buttonTapped(with: .pause)
@@ -133,12 +129,10 @@ class MediaPlayerButtonsView: UIView {
     }
     
     @objc func lastButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Next Tapped")
         delegate?.buttonTapped(with: .next)
     }
     
     @objc func volumeButtonTapped(_ gesture: UITapGestureRecognizer) {
-        print("Volume tapped")
         delegate?.buttonTapped(with: .volume)
     }
     

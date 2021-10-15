@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import MediaPlayer
 
 extension APIRequest {
     static func getTopCharts(with storeFrontID: String) -> APIRequest {
@@ -77,6 +78,18 @@ struct SongArtwork: Codable {
     let width, height: Int?
     let url, bgColor, textColor1, textColor2: String?
     let textColor3, textColor4: String?
+}
+
+extension SongArtwork {
+    func makeResizedURL(width: Int, height: Int) -> URL? {
+        guard let url = self.url else { return nil }
+        
+        let resizedString = url
+            .replacingOccurrences(of: "{w}", with: String(width))
+            .replacingOccurrences(of: "{h}", with: String(height))
+        
+        return URL(string: resizedString)
+    }
 }
 
 // MARK: - SongPlayParams

@@ -9,12 +9,10 @@ import Foundation
 
 protocol PlaylistWorkingLogic: AnyObject {
     func getCatalogPlaylists(request: Playlist.Fetch.Request,_ completion: @escaping (Result<CatalogPlaylist,Error>) -> Void)
-    func play()
 }
 
 final class PlaylistWorker: PlaylistWorkingLogic {
-    let musicAPI: AppleMusicAPI
-    
+    let musicAPI: AppleMusicAPI    
     init(musicAPI: AppleMusicAPI) {
         self.musicAPI = musicAPI
     }
@@ -29,10 +27,6 @@ final class PlaylistWorker: PlaylistWorkingLogic {
                 print(error.localizedDescription)
             }
         }
-        
-    }
-    
-    func play() {
         
     }
         

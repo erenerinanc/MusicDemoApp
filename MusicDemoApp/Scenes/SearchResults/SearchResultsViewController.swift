@@ -30,9 +30,9 @@ final class SearchResultsViewController: BaseViewController {
 
     // MARK: -Object lifecycle
     
-    init(musicAPI: AppleMusicAPI, storefrontID: String) {
+    init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         super.init()
-        setup(musicAPI: musicAPI, storefrontID: storefrontID)
+        setup(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer)
     }
     
     override func loadView() {
@@ -50,11 +50,12 @@ final class SearchResultsViewController: BaseViewController {
     
     // MARK: -Setup
     
-    private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
+    private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         let viewController = self
-        let interactor = SearchResultsInteractor(musicAPI: musicAPI, storeFrontID: storefrontID)
+        let worker = SearchResultsWorker(musicAPI: musicAPI, storeFrontID: storefrontID)
+        let interactor = SearchResultsInteractor(worker: worker, musicPlayer: musicPlayer)
         let presenter = SearchResultsPresenter()
-        let router = SearchResultsRouter()
+        let router = SearchResultsRouter(musicPlayer: musicPlayer)
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -150,12 +151,12 @@ extension SearchResultsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            router?.routeToSong(index: indexPath.row)
+            if interactor?.playSong(at: indexPath.row) ?? false {
+                router?.routeToMediaPlayer()
+            }
         } else {
-            #warning("Implement artist detail")
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
-            let destVC = ArtistDetailsViewController(url: urlString)
-            present(destVC, animated: true)
+            router?.routeToArtistDetail(with: urlString)
         }
     }
 }

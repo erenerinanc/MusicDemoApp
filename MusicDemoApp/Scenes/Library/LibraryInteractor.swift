@@ -10,24 +10,50 @@ import Foundation
 protocol LibraryBusinessLogic: AnyObject {
     func fetchPlaylists()
     func fetchTopCharts()
+    func playSong(at index: Int) -> Bool
+    func pause()
 }
 
 protocol LibraryDataStore: AnyObject {
-    var playlists: [PlaylistData]? {get}
-    var topSongs: [SongData]? {get}
+    var playlists: [PlaylistData]? { get }
+    var topSongs: [SongData]? { get }
 }
 
+protocol LibraryMusicPlayer: AnyObject {
+    func play()
+    func pause()
+    func playSong(at index: Int)
+    
+    var songs: [SongData] { get set }
+    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
+    static var playerStateDidChange: Notification.Name { get }
+}
+
+extension SystemMusicPlayer: LibraryMusicPlayer { }
+
 final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
-    init(musicAPI: AppleMusicAPI, storeFrontID: String) {
-        self.worker = LibraryWorker(musicAPI: musicAPI, storeFrontID: storeFrontID)
+    init(worker: LibraryWorkingLogic, musicPlayer: LibraryMusicPlayer) {
+        self.worker = worker
+        self.musicPlayer = musicPlayer
     }
     
     var presenter: LibraryPresentationLogic?
     let worker: LibraryWorkingLogic
-    var storeFrontID: String = ""
-    
+    let musicPlayer: LibraryMusicPlayer
+   
     var playlists: [PlaylistData]?
     var topSongs: [SongData]?
+    
+    func playSong(at index: Int) -> Bool {
+        guard let songs = topSongs else { return false }
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: index)
+        return true
+    }
+    
+    func pause() {
+        musicPlayer.pause()
+    }
 
     func fetchPlaylists() {
         print("Gonna fetch playlists...")

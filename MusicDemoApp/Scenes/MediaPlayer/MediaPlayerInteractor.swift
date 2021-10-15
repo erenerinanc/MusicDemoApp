@@ -8,76 +8,83 @@
 import Foundation
 
 protocol MediaPlayerBusinessLogic: AnyObject {
-    func playInitialSong()
     func playNextSong()
     func playPreviousSong()
     func pause()
     func play()
+    func shuffleSongs()
     func fetchPlaybackState()
+    func fetchSongDetails()
 }
 
 protocol MediaPlayerDataStore: AnyObject {
-    var songData: [SongData]? { get set }
-    var initialSongIndex: Int? { get set }
+}
+
+protocol MediaPlayerMusicPlayer: AnyObject {
+    func play()
+    func pause()
+    func playNextSong()
+    func playPreviousSong()
+    func playSong(at songIndex: Int)
+    func shuffle()
+    var songs: [SongData] { get set }
+    var playbackState: SystemMusicPlayer.PlaybackState? { get }
+    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
+    
+    var playerStateDidChange: Notification.Name { get }
+}
+
+extension SystemMusicPlayer: MediaPlayerMusicPlayer {
+    var playerStateDidChange: Notification.Name { SystemMusicPlayer.playerStateDidChange }
 }
 
 final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStore {
     
     var presenter: MediaPlayerPresentationLogic?
-    var worker: MediaPlayerWorkingLogic = MediaPlayerWorker()
+    var musicPlayer: MediaPlayerMusicPlayer
     
-    var songData: [SongData]?
-    var initialSongIndex: Int?
-    
-    private var playingSongIndex: Int = -1
-    
-    init() {
-        worker.delegate = self
+    init(musicPlayer: MediaPlayerMusicPlayer) {
+        self.musicPlayer = musicPlayer
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(playerStateDidChange(_:)),
+                                               name: musicPlayer.playerStateDidChange,
+                                               object: musicPlayer)
     }
     
-    func playInitialSong() {
-        guard let songData = songData else { return }
-        playingSongIndex = initialSongIndex ?? 0
-        worker.playSong(at: playingSongIndex, from: songData)
+    @objc private func playerStateDidChange(_ notification: Notification) {
+        fetchSongDetails()
+        fetchPlaybackState()
     }
-
+    
     func playNextSong() {
-        guard let songData = songData, songData.indices.contains(playingSongIndex + 1) else { return }
-        worker.playNextSong()
+        musicPlayer.playNextSong()
     }
     
     func playPreviousSong() {
-        guard let songData = songData, songData.indices.contains(playingSongIndex - 1) else { return }
-        worker.playPreviousSong()
+        musicPlayer.playPreviousSong()
     }
     
     func fetchPlaybackState() {
-        let playbackState = worker.playbackState
-        presenter?.presentPlaybackState(viewModel: playbackState)
+        guard let playbackState = musicPlayer.playbackState else { return }
+        presenter?.presentPlaybackState(playbackState: playbackState)
+    }
+    
+    func fetchSongDetails() {
+        guard let songInfo = musicPlayer.playingSongInformation else { return }
+        presenter?.presentSongDetails(songInfo: songInfo)
     }
 
     func play() {
-        guard worker.playbackState.status != .playing else { return }
-        worker.play()
+        guard musicPlayer.playbackState?.status != .playing else { return }
+        musicPlayer.play()
     }
     
+    func shuffleSongs() {
+        musicPlayer.shuffle()
+    }
     func pause() {
-        guard worker.playbackState.status != .paused else { return }
-        worker.pause()
+        guard musicPlayer.playbackState?.status != .paused else { return }
+        musicPlayer.pause()
     }
 }
 
-extension MediaPlayerInteractor: MediaPlayerWorkerDelegate {
-    func mediaPlayerWorkerCurrentPlayingItemDidChange(_ songID: String?) {
-        guard
-            let songData = songData,
-            let song = songData.first(where: { $0.id == songID })
-        else { return }
-        
-        presenter?.presentSongDetails(response: MediaPlayer.Fetch.Response(song: song))
-    }
-    
-    func mediaPlayerWorkerPlaybackStateDidChange(_ state: MediaPlayer.Fetch.PlaybackViewModel, songID: String?) {
-        presenter?.presentPlaybackState(viewModel: state)
-    }
-}

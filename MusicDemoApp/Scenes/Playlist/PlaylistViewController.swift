@@ -42,19 +42,22 @@ final class PlaylistViewController: BaseViewController {
     
     //MARK: -Object LifeCycle
     
-    init(musicAPI: AppleMusicAPI) {
+    init(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
         super.init()
         self.musicAPI = musicAPI
-        setup(musicAPI: musicAPI)
+        setup(musicAPI: musicAPI, musicPlayer: musicPlayer)
     }
     
     // MARK: -Setup
     
-    private func setup(musicAPI: AppleMusicAPI) {
+    private func setup(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
         let viewController = self
-        let interactor = PlaylistInteractor(musicAPI: musicAPI)
+        
+        let worker = PlaylistWorker(musicAPI: musicAPI)
+        let interactor = PlaylistInteractor(worker: worker, musicPlayer: musicPlayer)
         let presenter = PlaylistPresenter()
-        let router = PlaylistRouter()
+        let router = PlaylistRouter(musicPlayer: musicPlayer)
+        
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -107,9 +110,11 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            headerCell.playButtonImage.image = UIImage(named: "pause")
-            headerCell.isButtonTapped = true
-            router?.routeToSongs(index: indexPath.row)
+            headerCell.playButtonImageView.image = UIImage(named: "pause")
+            headerCell.isPlayTapped = true
+            if interactor?.playSong(at: indexPath.row) ?? false {
+                router?.routeToMediaPlayer()
+            }
         }
     }
 
@@ -155,23 +160,15 @@ extension PlaylistViewController: UITableViewDataSource {
     
 }
 
-//MARK: -Play&Pause Button Delegate
+//MARK: -HeaderCell Delegate
 
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
-        var songIds: [String] = []
-        viewModel?.catalogPlaylist[0].songs.forEach( {
-            songIds.append($0.songId)
-        })
-        headerCell.isButtonTapped = true
-        router?.routeToSongs(index: 0)
-        headerCell.playButtonImage.image = UIImage(named: "pause")
+        interactor?.playFirstSong()
     }
     
     func pauseButtonTapped() {
-        headerCell.isButtonTapped = false
-        interactor?.play()
-        headerCell.playButtonImage.image = UIImage(named: "play")
+        interactor?.pause()
     }
     
     func imageSwiped() {

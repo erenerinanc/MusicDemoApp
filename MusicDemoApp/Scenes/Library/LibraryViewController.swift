@@ -37,14 +37,18 @@ final class LibraryViewController: BaseViewController{
     
     // MARK: -Object lifecycle
     
-    init(musicAPI: AppleMusicAPI, storefrontID: String) {
+    init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         super.init()
-        setup(musicAPI: musicAPI, storefrontID: storefrontID)
+        setup(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer)
+    }
+    
+    override func loadView() {
+        super.loadView()
+        layoutUI()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        layoutUI()
         interactor?.fetchPlaylists()
         interactor?.fetchTopCharts()
     }
@@ -56,11 +60,13 @@ final class LibraryViewController: BaseViewController{
     
     // MARK: -Setup
     
-    private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
+    private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         let viewController = self
-        let interactor = LibraryInteractor(musicAPI: musicAPI,storeFrontID: storefrontID)
+        let worker = LibraryWorker(musicAPI: musicAPI, storeFrontID: storefrontID)
+        let interactor = LibraryInteractor(worker: worker, musicPlayer: musicPlayer)
         let presenter = LibraryPresenter()
-        let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI)
+        let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI, musicPlayer: musicPlayer)
+        
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -71,7 +77,7 @@ final class LibraryViewController: BaseViewController{
         tableView.dataSource = self
         playlistCell.collectionView.delegate = self
         playlistCell.collectionView.dataSource = self
-        searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID))
+        searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer))
     }
  
     private func layoutUI() {
@@ -95,8 +101,6 @@ extension LibraryViewController: LibraryDisplayLogic {
         DispatchQueue.main.async {
             self.playlistCell.collectionView.reloadData()
         }
-        let globalIDs = viewModel.playlists.compactMap {  $0.id }
-        
     }
     
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
@@ -125,7 +129,9 @@ extension LibraryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        router?.routeToSong(index: indexPath.row)
+        if interactor?.playSong(at: indexPath.row) ?? false {
+            router?.routeToMediaPlayer()
+        }
     }
 }
 

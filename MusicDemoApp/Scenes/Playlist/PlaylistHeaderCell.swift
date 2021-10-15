@@ -13,7 +13,7 @@ import Nuke
 class PlaylistHeaderCell: UITableViewCell {
     
     static let reuseID = "Header"
-    var isButtonTapped = false
+    var isPlayTapped = false
     var delegate: HeaderUserInteractionDelegate?
     
     //MARK: -Configure UI Views
@@ -24,7 +24,7 @@ class PlaylistHeaderCell: UITableViewCell {
         $0.addGestureRecognizer(imageGestureRecognizer)
         $0.isUserInteractionEnabled = true
     }
-    lazy var playButtonImage = UIImageView().configure {
+    lazy var playButtonImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.cornerRadius = CGFloat(28)
@@ -69,7 +69,7 @@ class PlaylistHeaderCell: UITableViewCell {
         contentView.addSubview(backButton)
         contentView.addSubview(nameLabel)
         contentView.addSubview(descriptionLabel)
-        contentView.addSubview(playButtonImage)
+        contentView.addSubview(playButtonImageView)
         
         headerImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -95,7 +95,7 @@ class PlaylistHeaderCell: UITableViewCell {
             make.leading.equalTo(nameLabel.snp.leading)
         }
         
-        playButtonImage.snp.makeConstraints { make in
+        playButtonImageView.snp.makeConstraints { make in
             make.centerY.equalTo(nameLabel.snp.bottom).offset(4)
             make.width.equalTo(55)
             make.height.equalTo(55)
@@ -104,10 +104,14 @@ class PlaylistHeaderCell: UITableViewCell {
     }
     
     @objc func playPauseButtonTapped(_ gesture: UITapGestureRecognizer) {
-        if isButtonTapped {
+        if isPlayTapped {
             delegate?.pauseButtonTapped()
+            isPlayTapped = false
+            playButtonImageView.image = UIImage(named: "play")
         } else {
             delegate?.playButtonTapped()
+            isPlayTapped = true
+            playButtonImageView.image = UIImage(named: "pause")
         }
         
     }

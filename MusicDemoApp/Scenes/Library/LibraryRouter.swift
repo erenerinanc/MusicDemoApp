@@ -9,7 +9,7 @@ import Foundation
 
 protocol LibraryRoutingLogic: AnyObject {
     func routeToCatalogPlaylist(globalID: String)
-    func routeToSong(index: Int)
+    func routeToMediaPlayer()
 }
 
 protocol LibraryDataPassing: AnyObject {
@@ -22,23 +22,23 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
     var dataStore: LibraryDataStore?
     var musicAPI: AppleMusicAPI
     var storeFrontID: String
+    var musicPlayer: SystemMusicPlayer
     
-    init(storeFrontID: String, musicAPI: AppleMusicAPI) {
+    init(storeFrontID: String, musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
         self.musicAPI = musicAPI
         self.storeFrontID = storeFrontID
+        self.musicPlayer = musicPlayer
     }
     
     func routeToCatalogPlaylist(globalID: String) {
-        let destVC = PlaylistViewController(musicAPI: musicAPI)
+        let destVC = PlaylistViewController(musicAPI: musicAPI, musicPlayer: musicPlayer)
         destVC.router?.dataStore?.storefrontID = storeFrontID
         destVC.router?.dataStore?.globalID = globalID
         viewController?.navigationController?.pushViewController(destVC, animated: true)
     }
     
-    func routeToSong(index: Int) {
-        let destVC = MediaPlayerViewController()
-        destVC.router?.dataStore?.songData = dataStore?.topSongs
-        destVC.router?.dataStore?.initialSongIndex = index
+    func routeToMediaPlayer() {
+        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         viewController?.navigationController?.present(destVC, animated: true)
     }
 

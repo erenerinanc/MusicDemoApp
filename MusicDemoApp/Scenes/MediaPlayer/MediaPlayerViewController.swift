@@ -11,7 +11,7 @@ import MediaPlayer
 import Nuke
 
 enum PlayerButton {
-    case replay
+    case shuffle
     case previous
     case next
     case play
@@ -20,8 +20,8 @@ enum PlayerButton {
 }
 
 protocol MediaPlayerDisplayLogic: AnyObject {
-    func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel)
-    func displayPlaybackState(viewModel: MediaPlayer.Fetch.PlaybackViewModel)
+    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
 }
 
 final class MediaPlayerViewController: BaseViewController {
@@ -29,8 +29,6 @@ final class MediaPlayerViewController: BaseViewController {
     var interactor: MediaPlayerBusinessLogic?
     var router: (MediaPlayerRoutingLogic & MediaPlayerDataPassing)?
     
-    private var songID: String?
-    private var presentIndex: Int = 0
     private var volumetapped: Bool = false
     private var progressTimer: Timer?
     
@@ -52,7 +50,7 @@ final class MediaPlayerViewController: BaseViewController {
         $0.textColor = .white
         $0.font = UIFont.preferredFont(forTextStyle: .title1)
     }
-    private lazy var descriptionLabel = UILabel().configure {
+    private lazy var artistNameLabel = UILabel().configure {
         $0.textColor = Colors.secondaryLabel
     }
     private lazy var contentView = UIView().configure {
@@ -60,6 +58,7 @@ final class MediaPlayerViewController: BaseViewController {
         $0.layer.cornerRadius = CGFloat(30)
     }
     private lazy var volumeView = MPVolumeView().configure {
+        $0.showsVolumeSlider = true
         $0.tintColor = Colors.secondaryLabel
         $0.sizeToFit()
     }
@@ -68,26 +67,27 @@ final class MediaPlayerViewController: BaseViewController {
     
     // MARK: -Object lifecycle
     
-    override init() {
+    init(musicPlayer: SystemMusicPlayer) {
         super.init()
-        setup()
+        setup(musicPlayer: musicPlayer)
     }
-    
+
     override func loadView() {
         super.loadView()
         layoutUI()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        interactor?.playInitialSong()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        interactor?.fetchSongDetails()
+        interactor?.fetchPlaybackState()
     }
     
     // MARK: -Setup
     
-    private func setup() {
+    private func setup(musicPlayer: SystemMusicPlayer) {
         let viewController = self
-        let interactor = MediaPlayerInteractor()
+        let interactor = MediaPlayerInteractor(musicPlayer: musicPlayer)
         let presenter = MediaPlayerPresenter()
         let router = MediaPlayerRouter()
         viewController.interactor = interactor
@@ -98,7 +98,7 @@ final class MediaPlayerViewController: BaseViewController {
         router.dataStore = interactor
         playerView.delegate = self
     }
-    
+
     //MARK: -Layout UI
  
     private func layoutUI() {
@@ -106,7 +106,7 @@ final class MediaPlayerViewController: BaseViewController {
         view.addSubview(swipeView)
         view.addSubview(songImageview)
         view.addSubview(songNameLabel)
-        view.addSubview(descriptionLabel)
+        view.addSubview(artistNameLabel)
         view.addSubview(progressView)
         view.addSubview(playerView)
         
@@ -129,13 +129,13 @@ final class MediaPlayerViewController: BaseViewController {
             make.centerX.equalTo(songImageview.snp.centerX)
         }
         
-        descriptionLabel.snp.makeConstraints { make in
+        artistNameLabel.snp.makeConstraints { make in
             make.top.equalTo(songNameLabel.snp.bottom).offset(16)
             make.centerX.equalTo(songNameLabel.snp.centerX)
         }
         
         progressView.snp.makeConstraints { make in
-            make.top.equalTo(descriptionLabel.snp.bottom).offset(16)
+            make.top.equalTo(artistNameLabel.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(30)
         }
@@ -182,21 +182,19 @@ final class MediaPlayerViewController: BaseViewController {
 //MARK: -Display Logic
 
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
-    func displaySongDetail(viewModel: MediaPlayer.Fetch.ViewModel) {
-        if let artworkURL = viewModel.artworkURL {
-            Nuke.loadImage(with: artworkURL, into: songImageview)
-        }
-        
-        songNameLabel.text = viewModel.songName
-        descriptionLabel.text = viewModel.artistName
+    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
+        songImageview.image = songInfo.artworkImage
+//        Nuke.loadImage(with: songInfo.artworkURL, into: self.songImageview)
+        self.songNameLabel.text = songInfo.songName
+        self.artistNameLabel.text = songInfo.artistName
     }
     
-    func displayPlaybackState(viewModel: MediaPlayer.Fetch.PlaybackViewModel) {
-        let isPlaying = viewModel.status == .playing
-        progressView.configure(playbackTime: viewModel.currentTime, songDuration: viewModel.songDuration)
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
+        let isPlaying = playbackState.status == .playing
         
+        progressView.configure(playbackTime: playbackState.currentTime, songDuration: playbackState.songDuration)
         playerView.playButton.image = UIImage(named: isPlaying ? "pause" : "play")
-        
+    
         if isPlaying {
             progressTimer?.invalidate()
             progressTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak interactor] _ in
@@ -214,8 +212,8 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
 extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
-        case .replay:
-            break
+        case .shuffle:
+            interactor?.shuffleSongs()
         case .previous:
             interactor?.playPreviousSong()
         case .next:
