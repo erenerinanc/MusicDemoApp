@@ -48,10 +48,17 @@ class LibraryCarouselCell: UICollectionViewCell {
     
     }
     
+    private func resizeWidthAndHeight(for urlString: String, width: Int, height: Int) -> String {
+        return urlString
+            .replacingOccurrences(of: "{w}", with: String(width))
+            .replacingOccurrences(of: "{h}", with: String(height))
+    
+    }
+    
     func set(for viewModel: Library.Fetch.PlaylistViewModel.Playlist) {
         DispatchQueue.main.async {
-            let artworkurl = viewModel.artworkURL.resizeWidhtAndHeight(width: 300, height: 300)
-            Nuke.loadImage(with: artworkurl, into: self.imageView)
+            let resizedURL = self.resizeWidthAndHeight(for: viewModel.artworkURL, width: 300, height: 300)
+            Nuke.loadImage(with: resizedURL, into: self.imageView)
             self.playlistNameLabel.text = viewModel.playlistName
         }
     }

@@ -48,9 +48,10 @@ class SystemMusicPlayer {
     var playingSongInformation: PlayingSongInformation? {
         guard let playingItem = musicPlayer.nowPlayingItem else { return nil }
         
-        let artworkImage = playingItem.artwork?.image(at: CGSize(width: 1000, height: 1000))
+        guard let artwork = playingSong?.attributes?.artwork else { return nil }
+        guard let artworkURL = artwork.makeResizedURL(width: 1000, height: 1000) else { return nil }
         
-        return PlayingSongInformation(artworkImage: artworkImage,
+        return PlayingSongInformation(artworkURL: artworkURL,
                                       songName: playingItem.title ?? "Unnamed Song",
                                       artistName: playingItem.artist ?? "Unknown Artist")
     }
@@ -90,7 +91,7 @@ class SystemMusicPlayer {
     
     func playSong(at songIndex: Int) {
         var songs = songs
-        self.currentIndexInSongsArray = songIndex
+        currentIndexInSongsArray = songIndex
         songs.removeFirst(songIndex)
 
         musicPlayer.setQueue(with: songs.compactMap(\.id))
@@ -142,7 +143,7 @@ extension SystemMusicPlayer {
 
 extension SystemMusicPlayer {
     struct PlayingSongInformation: Equatable {
-        let artworkImage: UIImage?
+        let artworkURL: URL
         let songName: String
         let artistName: String
     }

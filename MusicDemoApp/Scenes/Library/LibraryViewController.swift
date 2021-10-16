@@ -25,7 +25,6 @@ final class LibraryViewController: BaseViewController{
     
     private lazy var searchController = UISearchController().configure {
         $0.obscuresBackgroundDuringPresentation = false
-        $0.searchBar.placeholder = "Song or artist..."
         $0.definesPresentationContext = false
     }
     private lazy var tableView = UITableView().configure {
@@ -90,6 +89,7 @@ final class LibraryViewController: BaseViewController{
             make.top.bottom.trailing.equalToSuperview()
         }
         searchController.searchResultsUpdater = searchController.searchResultsController as? UISearchResultsUpdating
+        searchController.searchBar.placeholder = "Song or artist..."
     }
         
 }

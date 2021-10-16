@@ -27,6 +27,7 @@ protocol MediaPlayerMusicPlayer: AnyObject {
     func playPreviousSong()
     func playSong(at songIndex: Int)
     func shuffle()
+    
     var songs: [SongData] { get set }
     var playbackState: SystemMusicPlayer.PlaybackState? { get }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }

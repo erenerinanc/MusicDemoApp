@@ -30,8 +30,7 @@ final class SearchResultsPresenter: SearchResultsPresentationLogic {
     func presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse) {
         let artists = response.artists.compactMap { SearchResults.Fetch.ArtistViewModel.Artist(id: $0.id ?? "",
                                                                                          name: $0.attributes?.name ?? "",
-                                                                                         url: $0.attributes?.url ?? "",
-                                                                                         genreName: $0.attributes?.genreNames?[0] ?? "")
+                                                                                         url: $0.attributes?.url ?? "")
         }
         viewController?.displaySearchResults(for: SearchResults.Fetch.ArtistViewModel(artists: artists))
     }

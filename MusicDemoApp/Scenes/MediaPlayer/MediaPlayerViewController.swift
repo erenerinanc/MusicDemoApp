@@ -183,8 +183,7 @@ final class MediaPlayerViewController: BaseViewController {
 
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        songImageview.image = songInfo.artworkImage
-//        Nuke.loadImage(with: songInfo.artworkURL, into: self.songImageview)
+        Nuke.loadImage(with: songInfo.artworkURL, into: self.songImageview)
         self.songNameLabel.text = songInfo.songName
         self.artistNameLabel.text = songInfo.artistName
     }

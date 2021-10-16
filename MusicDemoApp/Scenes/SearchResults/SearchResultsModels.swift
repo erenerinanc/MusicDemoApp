@@ -46,7 +46,6 @@ enum SearchResults {
                 var id: String
                 var name: String
                 var url: String
-                var genreName: String
             }
         }
         

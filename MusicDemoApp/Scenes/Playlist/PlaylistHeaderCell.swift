@@ -124,10 +124,16 @@ class PlaylistHeaderCell: UITableViewCell {
         delegate?.imageSwiped()
     }
     
+    private func resizeWidthAndHeight(for urlString: String, width: Int, height: Int) -> String {
+        return urlString
+            .replacingOccurrences(of: "{w}", with: String(width))
+            .replacingOccurrences(of: "{h}", with: String(height))
+    }
+    
     func set(for viewModel: Playlist.Fetch.ViewModel.CatalogPlaylist) {
         DispatchQueue.main.async {
-            let artworkURL = viewModel.artworkURL.resizeWidhtAndHeight(width: 3000, height: 3000)
-            Nuke.loadImage(with: artworkURL, into: self.headerImageView)
+            let resizedURL = self.resizeWidthAndHeight(for: viewModel.artworkURL, width: 3000, height: 3000)
+            Nuke.loadImage(with: resizedURL, into: self.headerImageView)
             self.nameLabel.text = viewModel.name
             self.descriptionLabel.text = viewModel.description
         }
