@@ -18,9 +18,9 @@ final class LibraryPresenter: LibraryPresentationLogic {
     
     func presentPlaylists(response: Library.Fetch.PlaylistResponse) {
         let playlists = response.playlists.compactMap {  Library.Fetch.PlaylistViewModel.Playlist(artworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                          playlistName: $0.attributes?.name ?? "",
-                                                                                                  id: $0.attributes?.playParams?.globalID ?? ""
-            )
+                                                                                                  playlistName: $0.attributes?.name ?? "",
+                                                                                                  globalID: $0.attributes?.playParams?.globalID ?? ""
+                                                                                                  )
         }
         viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
     }
@@ -28,8 +28,7 @@ final class LibraryPresenter: LibraryPresentationLogic {
     func presentTopSongs(response: Library.Fetch.TopSongsResponse) {
         let topSongs = response.topSongs.compactMap { Library.Fetch.TopSongsViewModel.TopSongs(artistName: $0.attributes?.artistName ?? "",
                                                                                                songName: $0.attributes?.name ?? "",
-                                                                                               artworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                               id: $0.id ?? ""
+                                                                                               artworkURL: $0.attributes?.artwork?.url ?? ""
                                                                                                )
         }
         viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))

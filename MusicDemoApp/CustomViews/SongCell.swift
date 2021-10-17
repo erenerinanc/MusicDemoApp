@@ -64,9 +64,9 @@ class SongCell: UITableViewCell {
         }
         
         nowPlayingView.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(8)
-            make.height.equalTo(10)
-            make.width.equalTo(14)
+            make.centerY.equalToSuperview()
+            make.height.equalTo(20)
+            make.trailing.equalToSuperview().inset(24)
         }
     }
     

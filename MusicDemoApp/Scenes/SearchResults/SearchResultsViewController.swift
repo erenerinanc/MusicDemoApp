@@ -6,9 +6,8 @@
 //
 
 import UIKit
-import Cryptor
 import SnapKit
-import SafariServices
+
 
 protocol SearchResultsDisplayLogic: AnyObject {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel)
@@ -28,7 +27,7 @@ final class SearchResultsViewController: BaseViewController {
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
 
-    // MARK: -Object lifecycle
+    // MARK: - Object lifecycle
     
     init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         super.init()
@@ -38,17 +37,15 @@ final class SearchResultsViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         layoutUI()
+        configureKeyboard()
      
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
-    // MARK: -Setup
+    // MARK: - Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         let viewController = self
@@ -75,6 +72,12 @@ final class SearchResultsViewController: BaseViewController {
         }
     }
     
+    private func configureKeyboard() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+        
     @objc func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         
@@ -91,7 +94,7 @@ final class SearchResultsViewController: BaseViewController {
     
 }
 
-//MARK: -TableView Delegate&DataSource
+//MARK: - TableView Delegate&DataSource
 
 extension SearchResultsViewController: UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -161,7 +164,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     }
 }
 
-//MARK: -Search Results Updating
+//MARK: - Search Results Updating
 
 extension SearchResultsViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
@@ -170,7 +173,7 @@ extension SearchResultsViewController: UISearchResultsUpdating {
     }
 }
 
-//MARK: -Display Logic
+//MARK: - Display Logic
 
 extension SearchResultsViewController: SearchResultsDisplayLogic {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel) {

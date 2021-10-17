@@ -43,17 +43,6 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
    
     var playlists: [PlaylistData]?
     var topSongs: [SongData]?
-    
-    func playSong(at index: Int) -> Bool {
-        guard let songs = topSongs else { return false }
-        musicPlayer.songs = songs
-        musicPlayer.playSong(at: index)
-        return true
-    }
-    
-    func pause() {
-        musicPlayer.pause()
-    }
 
     func fetchPlaylists() {
         print("Gonna fetch playlists...")
@@ -82,5 +71,16 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    func playSong(at index: Int) -> Bool {
+        guard let songs = topSongs else { return false }
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: index)
+        return true
+    }
+    
+    func pause() {
+        musicPlayer.pause()
     }
 }

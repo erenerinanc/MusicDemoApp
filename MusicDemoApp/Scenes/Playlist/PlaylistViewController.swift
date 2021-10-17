@@ -13,6 +13,7 @@ import SwiftUI
 
 protocol PlaylistDisplayLogic: AnyObject {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel)
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
     
 }
 
@@ -27,8 +28,7 @@ final class PlaylistViewController: BaseViewController {
     var interactor: PlaylistBusinessLogic?
     var router: (PlaylistRoutingLogic & PlaylistDataPassing)?
     var viewModel: Playlist.Fetch.ViewModel?
-    
-    var globalId: String?
+
     var storeFrontId: String?
     var musicAPI: AppleMusicAPI?
     
@@ -40,24 +40,23 @@ final class PlaylistViewController: BaseViewController {
     
     let headerCell = PlaylistHeaderCell()
     
-    //MARK: -Object LifeCycle
+    //MARK: - Object LifeCycle
     
     init(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
         super.init()
         self.musicAPI = musicAPI
         setup(musicAPI: musicAPI, musicPlayer: musicPlayer)
     }
+
     
-    // MARK: -Setup
+    // MARK: - Setup
     
     private func setup(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
         let viewController = self
-        
         let worker = PlaylistWorker(musicAPI: musicAPI)
         let interactor = PlaylistInteractor(worker: worker, musicPlayer: musicPlayer)
         let presenter = PlaylistPresenter()
         let router = PlaylistRouter(musicPlayer: musicPlayer)
-        
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -71,12 +70,15 @@ final class PlaylistViewController: BaseViewController {
     
     override func loadView() {
         super.loadView()
+        layoutUI()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         interactor?.fetchCatalogPlaylist()
-        view.addSubview(tableView)
-        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
+        interactor?.fetchPlaybackState()
     }
 
-    
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
         super.viewWillAppear(animated)
@@ -86,10 +88,15 @@ final class PlaylistViewController: BaseViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
         super.viewWillDisappear(animated)
     }
+    
+    private func layoutUI() {
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
+    }
 
 }
 
-//MARK: -Display Logic
+//MARK: - Display Logic
 
 extension PlaylistViewController: PlaylistDisplayLogic {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel) {
@@ -102,9 +109,15 @@ extension PlaylistViewController: PlaylistDisplayLogic {
             }
         }
     }
+    
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
+        let isPlaying = playbackState.status == .playing
+        
+        headerCell.playButtonImageView.image = UIImage(named: isPlaying ? "pause" : "play")
+    }
 }
 
-//MARK: -TableView Delegate & DataSource
+//MARK: - TableView Delegate & DataSource
 
 extension PlaylistViewController: UITableViewDelegate {
     
@@ -160,11 +173,11 @@ extension PlaylistViewController: UITableViewDataSource {
     
 }
 
-//MARK: -HeaderCell Delegate
+//MARK: - HeaderCell Delegate
 
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
-        interactor?.playFirstSong()
+        interactor?.play()
     }
     
     func pauseButtonTapped() {

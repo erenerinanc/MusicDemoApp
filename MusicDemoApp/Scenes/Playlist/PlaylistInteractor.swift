@@ -10,8 +10,9 @@ import Foundation
 protocol PlaylistBusinessLogic: AnyObject {
     func fetchCatalogPlaylist()
     func playSong(at index: Int) -> Bool
-    func playFirstSong()
     func pause()
+    func play()
+    func fetchPlaybackState()
 }
 
 protocol PlaylistDataStore: AnyObject {
@@ -27,7 +28,9 @@ protocol PlaylistMusicPlayer: AnyObject {
     
     var songs: [SongData] { get set }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
+    var playbackState: SystemMusicPlayer.PlaybackState? { get }
     var playerStateDidChange: Notification.Name { get }
+    #warning("Needs to know which playlist is currently playing")
 }
 
 extension SystemMusicPlayer: PlaylistMusicPlayer { }
@@ -38,6 +41,10 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     init(worker: PlaylistWorkingLogic, musicPlayer: PlaylistMusicPlayer) {
         self.worker = worker
         self.musicPlayer = musicPlayer
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(playerStateDidChange(_:)),
+                                               name: musicPlayer.playerStateDidChange,
+                                               object: musicPlayer)
     }
     
     var presenter: PlaylistPresentationLogic?
@@ -49,18 +56,6 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     var storefrontID: String?
     var globalID: String?
     
-    func playFirstSong() {
-        guard
-            let playlistData = playlistData,
-            let songs = playlistData[0].relationships?.tracks?.data
-        else {
-            return
-        }
-        
-        musicPlayer.songs = songs
-        musicPlayer.playSong(at: 0)
-    }
-    
     func playSong(at index: Int) -> Bool {
         guard
             let playlistData = playlistData,
@@ -68,10 +63,19 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
         else {
             return false
         }
-        
         musicPlayer.songs = songs
         musicPlayer.playSong(at: index)
+    
         return true
+    }
+    
+    func play() {
+        guard musicPlayer.playingSongInformation != nil else {
+            playSong(at: 0)
+            return
+        }
+        musicPlayer.play()
+        
     }
     
     func pause() {
@@ -93,6 +97,15 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
                 print(error.localizedDescription)
             }
         })
+    }
+    
+    @objc func playerStateDidChange(_ notification: Notification) {
+        fetchPlaybackState()
+    }
+    
+    func fetchPlaybackState() {
+        guard let playbackState = musicPlayer.playbackState else { return }
+        presenter?.presentPlaybackState(playbackState: playbackState)
     }
     
 }

@@ -9,6 +9,7 @@ import Foundation
 
 protocol PlaylistPresentationLogic: AnyObject {
     func presentCatalogPlaylist(response: Playlist.Fetch.Response)
+    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
 }
 
 final class PlaylistPresenter: PlaylistPresentationLogic {
@@ -21,13 +22,11 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
         
         let songs = songData.compactMap { Playlist.Fetch.ViewModel.CatalogPlaylist.Song(songName: $0.attributes?.name ?? "",
                                                                                         artistName: $0.attributes?.artistName ?? "",
-                                                                                        songArtworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                        songId: $0.id ?? ""
-        )
-            
+                                                                                        songArtworkURL: $0.attributes?.artwork?.url ?? ""
+                                                                                        )
         }
         var totalSongDuration: Int = 0
-        let _: [()] = songData.compactMap {totalSongDuration += Int($0.attributes?.durationInMillis ?? 0)}
+        songData.compactMap {totalSongDuration += Int($0.attributes?.durationInMillis ?? 0)}
         let catalogPlaylist = response.catalogPlaylistData.compactMap { Playlist.Fetch.ViewModel.CatalogPlaylist(artworkURL: $0.attributes?.artwork?.url ?? "",
                                                                                                                  name: $0.attributes?.name ?? "",
                                                                                                                  description: "\(songs.count) Songs \(totalSongDuration / 3600000) Hours",
@@ -37,5 +36,9 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
         
         viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
         
+    }
+    
+    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
+        viewController?.displayPlaybackState(playbackState: playbackState)
     }
 }

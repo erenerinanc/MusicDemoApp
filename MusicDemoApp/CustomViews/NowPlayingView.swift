@@ -9,11 +9,18 @@ import UIKit
 import SnapKit
 
 class NowPlayingView: UIView {
-    var xCoordinate: Double = 0
-    let column = UIView().configure {
+    let column1 = UIView().configure {
         $0.backgroundColor = .white
     }
-    
+    let column2 = UIView().configure {
+        $0.backgroundColor = .white
+    }
+    let column3 = UIView().configure {
+        $0.backgroundColor = .white
+    }
+    let column4 = UIView().configure {
+        $0.backgroundColor = .white
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         layoutUI()
@@ -24,26 +31,40 @@ class NowPlayingView: UIView {
     }
     
     private func layoutUI() {
-        for _ in 0...3 {
-            addSubview(column)
-            column.frame = CGRect(x: xCoordinate, y: 0, width: 2, height: 10)
-            xCoordinate += 2
+        addSubview(column1)
+        addSubview(column2)
+        addSubview(column3)
+        addSubview(column4)
+        
+        column1.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.width.equalTo(2)
+            make.height.equalTo(10)
         }
         
-        UIView.animate(withDuration: 0.2, delay: 0.2, usingSpringWithDamping: 0, initialSpringVelocity: 0, options: []) {
-            var height = self.column.frame.height
-            if height == 0 {
-                while height <= 10 {
-                    height += 2
-                }
-            }
-            
-            if height == 10 {
-                while height >= 0 {
-                    height -= 2
-                }
-            }
+        column2.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalToSuperview().inset(4)
+            make.width.equalTo(2)
+            make.height.equalTo(10)
         }
-
+        
+        column3.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalToSuperview().inset(8)
+            make.width.equalTo(2)
+            make.height.equalTo(10)
+        }
+        
+        column4.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.equalToSuperview().inset(12)
+            make.width.equalTo(2)
+            make.height.equalTo(10)
+        }
+     
     }
+    
+    #warning("Do animations")
 }

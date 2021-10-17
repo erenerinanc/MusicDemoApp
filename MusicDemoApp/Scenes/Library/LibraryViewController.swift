@@ -7,7 +7,7 @@
 
 import UIKit
 import SnapKit
-import StoreKit
+
 
 protocol LibraryDisplayLogic: AnyObject {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel)
@@ -21,12 +21,9 @@ final class LibraryViewController: BaseViewController{
     var playlistViewModel: Library.Fetch.PlaylistViewModel?
     var topSongsViewModel: Library.Fetch.TopSongsViewModel?
     
-    //MARK: -Configure UI Views
+    //MARK: - Configure UI
     
-    private lazy var searchController = UISearchController().configure {
-        $0.obscuresBackgroundDuringPresentation = false
-        $0.definesPresentationContext = false
-    }
+    private lazy var searchController = UISearchController()
     private lazy var tableView = UITableView().configure {
         $0.backgroundColor = Colors.background
         $0.indicatorStyle = .white
@@ -34,7 +31,7 @@ final class LibraryViewController: BaseViewController{
     }
     private lazy var playlistCell = LibraryPlaylistCell()
     
-    // MARK: -Object lifecycle
+    // MARK: - Object lifecycle
     
     init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         super.init()
@@ -57,7 +54,7 @@ final class LibraryViewController: BaseViewController{
         navigationController?.navigationBar.sizeToFit()
     }
     
-    // MARK: -Setup
+    // MARK: - Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         let viewController = self
@@ -65,7 +62,6 @@ final class LibraryViewController: BaseViewController{
         let interactor = LibraryInteractor(worker: worker, musicPlayer: musicPlayer)
         let presenter = LibraryPresenter()
         let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI, musicPlayer: musicPlayer)
-        
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -93,7 +89,7 @@ final class LibraryViewController: BaseViewController{
     }
         
 }
-//MARK: -Display Logic
+//MARK: - Display Logic
 
 extension LibraryViewController: LibraryDisplayLogic {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel) {
@@ -188,7 +184,7 @@ extension LibraryViewController: UITableViewDataSource {
 extension LibraryViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let globalID = playlistViewModel?.playlists[indexPath.item].id else { return }
+        guard let globalID = playlistViewModel?.playlists[indexPath.item].globalID else { return }
         router?.routeToCatalogPlaylist(globalID: globalID)
     }
     

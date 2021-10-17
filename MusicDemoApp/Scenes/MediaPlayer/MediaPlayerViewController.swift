@@ -32,7 +32,7 @@ final class MediaPlayerViewController: BaseViewController {
     private var volumetapped: Bool = false
     private var progressTimer: Timer?
     
-    //MARK: -Configure UI Views
+    //MARK: - Configure UI
     
     private lazy var songImageview = UIImageView().configure {
         $0.backgroundColor = Colors.background
@@ -65,7 +65,7 @@ final class MediaPlayerViewController: BaseViewController {
     private lazy var progressView = MediaPlayerProgressView()
     private lazy var playerView = MediaPlayerButtonsView()
     
-    // MARK: -Object lifecycle
+    // MARK: - Object lifecycle
     
     init(musicPlayer: SystemMusicPlayer) {
         super.init()
@@ -83,7 +83,7 @@ final class MediaPlayerViewController: BaseViewController {
         interactor?.fetchPlaybackState()
     }
     
-    // MARK: -Setup
+    // MARK: - Setup
     
     private func setup(musicPlayer: SystemMusicPlayer) {
         let viewController = self
@@ -99,7 +99,7 @@ final class MediaPlayerViewController: BaseViewController {
         playerView.delegate = self
     }
 
-    //MARK: -Layout UI
+    //MARK: - Layout UI
  
     private func layoutUI() {
         view.backgroundColor = Colors.background
@@ -179,7 +179,7 @@ final class MediaPlayerViewController: BaseViewController {
     }
 }
 
-//MARK: -Display Logic
+//MARK: - Display Logic
 
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
@@ -206,7 +206,7 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     }
 }
 
-//MARK: -PlayerView Delegate
+//MARK: - PlayerView Delegate
 
 extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {

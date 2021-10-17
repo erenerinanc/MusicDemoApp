@@ -16,7 +16,7 @@ class PlaylistHeaderCell: UITableViewCell {
     var isPlayTapped = false
     var delegate: HeaderUserInteractionDelegate?
     
-    //MARK: -Configure UI Views
+    //MARK: - Configure UI
     
     private lazy var headerImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
@@ -52,6 +52,7 @@ class PlaylistHeaderCell: UITableViewCell {
         $0.font = UIFont.preferredFont(forTextStyle: .footnote)
     }
     
+    //MARK: - Object Lifecycle
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

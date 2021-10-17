@@ -34,7 +34,7 @@ enum Library {
             struct Playlist {
                 var artworkURL: String
                 var playlistName: String
-                var id: String
+                var globalID: String
             }
 
         }
@@ -46,7 +46,6 @@ enum Library {
                 var artistName: String
                 var songName: String
                 var artworkURL: String
-                var id: String
             }
         }
         

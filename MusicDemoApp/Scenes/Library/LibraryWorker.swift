@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 protocol LibraryWorkingLogic: AnyObject {
     func fetchPlaylists(_ completion: @escaping (Result<Playlists,Error>) -> Void)

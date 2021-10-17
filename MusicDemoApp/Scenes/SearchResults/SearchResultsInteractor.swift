@@ -20,6 +20,8 @@ protocol SearchResultsDataStore: AnyObject {
 protocol SearchResultsMusicPlayer: AnyObject {
     func playSong(at index: Int)
     var songs: [SongData] { get set }
+    
+    //these will be used to fetch changes on the playing song and display on the cell and on mini media player
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
     static var playerStateDidChange: Notification.Name { get }
 }
@@ -34,19 +36,11 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
     }
     
     let worker: SearchResultsWorkingLogic
-    let musicPlayer: SearchResultsMusicPlayer
     var presenter: SearchResultsPresentationLogic?
+    let musicPlayer: SearchResultsMusicPlayer
     
     var searchedSongs: [SongData]?
     var searchedArtist: [ArtistsData]?
-    
-    func playSong(at index: Int) -> Bool {
-        guard let songs = searchedSongs else { return false }
-        
-        musicPlayer.songs = songs
-        musicPlayer.playSong(at: index)
-        return true
-    }
     
     
     func fetchSearchResults(request: SearchResults.Fetch.Request) {
@@ -66,6 +60,14 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    func playSong(at index: Int) -> Bool {
+        guard let songs = searchedSongs else { return false }
+        
+        musicPlayer.songs = songs
+        musicPlayer.playSong(at: index)
+        return true
     }
     
 }

@@ -53,13 +53,13 @@ class SystemMusicPlayer {
         
         return PlayingSongInformation(artworkURL: artworkURL,
                                       songName: playingItem.title ?? "Unnamed Song",
-                                      artistName: playingItem.artist ?? "Unknown Artist")
+                                      artistName: playingItem.artist ?? "Unknown Artist",
+                                      id: playingItem.playbackStoreID)
     }
     
     var currentIndexInSongsArray = 0
     
-    //MARK: -Object Lifecycle
-    
+    //MARK: - Object Lifecycle
     init() {
         musicPlayer.beginGeneratingPlaybackNotifications()
         NotificationCenter.default.addObserver(self,
@@ -93,9 +93,8 @@ class SystemMusicPlayer {
         var songs = songs
         currentIndexInSongsArray = songIndex
         songs.removeFirst(songIndex)
-
         musicPlayer.setQueue(with: songs.compactMap(\.id))
-        musicPlayer.play()
+        play()
     }
     
     func pause() {
@@ -109,7 +108,7 @@ class SystemMusicPlayer {
     func playNextSong() {
         self.currentIndexInSongsArray += 1
         musicPlayer.skipToNextItem()
-        musicPlayer.play()
+        play()
     }
     
     func playPreviousSong() {
@@ -146,5 +145,6 @@ extension SystemMusicPlayer {
         let artworkURL: URL
         let songName: String
         let artistName: String
+        let id: String
     }
 }

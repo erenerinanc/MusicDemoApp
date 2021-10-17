@@ -17,20 +17,16 @@ final class SearchResultsPresenter: SearchResultsPresentationLogic {
     weak var viewController: SearchResultsDisplayLogic?
     
     func presentSearchedSongs(response: SearchResults.Fetch.SongResponse) {
-        let songs = response.songs.compactMap {  SearchResults.Fetch.SongViewModel.Song(id: $0.id ?? "",
-                                                                                    name: $0.attributes?.name ?? "",
-                                                                                    artistName: $0.attributes?.artistName ?? "",
-                                                                                    artworkURL: $0.attributes?.artwork?.url ?? "",
-                                                                                    duration: $0.attributes?.durationInMillis ?? 0,
-                                                                                    albumName: $0.attributes?.albumName ?? "")
+        let songs = response.songs.compactMap {  SearchResults.Fetch.SongViewModel.Song(name: $0.attributes?.name ?? "",
+                                                                                        artistName: $0.attributes?.artistName ?? "",
+                                                                                        artworkURL: $0.attributes?.artwork?.url ?? "")
         }
         viewController?.displaySearchResults(for: SearchResults.Fetch.SongViewModel(songs: songs))
     }
     
     func presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse) {
-        let artists = response.artists.compactMap { SearchResults.Fetch.ArtistViewModel.Artist(id: $0.id ?? "",
-                                                                                         name: $0.attributes?.name ?? "",
-                                                                                         url: $0.attributes?.url ?? "")
+        let artists = response.artists.compactMap { SearchResults.Fetch.ArtistViewModel.Artist(name: $0.attributes?.name ?? "",
+                                                                                               url: $0.attributes?.url ?? "")
         }
         viewController?.displaySearchResults(for: SearchResults.Fetch.ArtistViewModel(artists: artists))
     }
