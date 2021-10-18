@@ -9,6 +9,11 @@ import UIKit
 import SnapKit
 import Nuke
 
+protocol HeaderUserInteractionDelegate {
+    func playButtonTapped()
+    func pauseButtonTapped()
+    func imageSwiped()
+}
 
 class PlaylistHeaderCell: UITableViewCell {
     

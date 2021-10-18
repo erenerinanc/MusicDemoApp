@@ -50,8 +50,9 @@ class SystemMusicPlayer {
         
         guard let artwork = playingSong?.attributes?.artwork else { return nil }
         guard let artworkURL = artwork.makeResizedURL(width: 1000, height: 1000) else { return nil }
-        
-        return PlayingSongInformation(artworkURL: artworkURL,
+        guard let artworkSmall = artwork.makeResizedURL(width: 120, height: 120) else { return nil }
+        return PlayingSongInformation(artworkURLBig: artworkURL,
+                                      artworkURLSmall: artworkSmall,
                                       songName: playingItem.title ?? "Unnamed Song",
                                       artistName: playingItem.artist ?? "Unknown Artist",
                                       id: playingItem.playbackStoreID)
@@ -142,7 +143,8 @@ extension SystemMusicPlayer {
 
 extension SystemMusicPlayer {
     struct PlayingSongInformation: Equatable {
-        let artworkURL: URL
+        let artworkURLBig: URL
+        let artworkURLSmall: URL
         let songName: String
         let artistName: String
         let id: String

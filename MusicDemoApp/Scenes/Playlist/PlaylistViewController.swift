@@ -17,12 +17,6 @@ protocol PlaylistDisplayLogic: AnyObject {
     
 }
 
-protocol HeaderUserInteractionDelegate {
-    func playButtonTapped()
-    func pauseButtonTapped()
-    func imageSwiped()
-}
-
 final class PlaylistViewController: BaseViewController {
     
     var interactor: PlaylistBusinessLogic?

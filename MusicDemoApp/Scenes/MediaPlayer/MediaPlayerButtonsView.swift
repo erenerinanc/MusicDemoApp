@@ -15,7 +15,14 @@ protocol MediaPlayerButtonsViewDelegate {
 class MediaPlayerButtonsView: UIView {
     let shuffleButton = UIImageView()
     let firstButton = UIImageView()
-    let playButton = UIImageView()
+    let playButton = UIImageView().configure {
+        $0.contentMode = .scaleAspectFill
+        $0.backgroundColor = .white
+        $0.layer.cornerRadius = CGFloat(28)
+        $0.clipsToBounds = true
+        $0.layer.borderWidth = 6.0
+        $0.layer.borderColor = Colors.primaryLabel.cgColor
+    }
     let lastButton = UIImageView()
     let volumeButton = UIImageView()
     var delegate: MediaPlayerButtonsViewDelegate?
@@ -76,13 +83,6 @@ class MediaPlayerButtonsView: UIView {
         playButton.image = UIImage(named: "play")
         lastButton.image = UIImage(named: "last")
         volumeButton.image = UIImage(named: "audio_on")
-        
-        playButton.contentMode = .scaleAspectFill
-        playButton.backgroundColor = .white
-        playButton.layer.cornerRadius = CGFloat(28)
-        playButton.clipsToBounds = true
-        playButton.layer.borderWidth = 6.0
-        playButton.layer.borderColor = Colors.primaryLabel.cgColor
       
     }
     

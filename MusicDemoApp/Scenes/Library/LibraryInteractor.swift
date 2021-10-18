@@ -10,8 +10,13 @@ import Foundation
 protocol LibraryBusinessLogic: AnyObject {
     func fetchPlaylists()
     func fetchTopCharts()
+    func fetchPlaybackState()
+    func fetchSongDetails()
+    
     func playSong(at index: Int) -> Bool
+    func play()
     func pause()
+    func playNextSong()
 }
 
 protocol LibraryDataStore: AnyObject {
@@ -23,10 +28,12 @@ protocol LibraryMusicPlayer: AnyObject {
     func play()
     func pause()
     func playSong(at index: Int)
+    func playNextSong()
     
     var songs: [SongData] { get set }
+    var playbackState: SystemMusicPlayer.PlaybackState? { get }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
-    static var playerStateDidChange: Notification.Name { get }
+    var playerStateDidChange: Notification.Name { get }
 }
 
 extension SystemMusicPlayer: LibraryMusicPlayer { }
@@ -35,6 +42,10 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
     init(worker: LibraryWorkingLogic, musicPlayer: LibraryMusicPlayer) {
         self.worker = worker
         self.musicPlayer = musicPlayer
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(playerStateDidChange(_:)),
+                                               name: musicPlayer.playerStateDidChange,
+                                               object: musicPlayer)
     }
     
     var presenter: LibraryPresentationLogic?
@@ -80,7 +91,30 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
         return true
     }
     
+    func play() {
+        musicPlayer.play()
+    }
+    
     func pause() {
         musicPlayer.pause()
+    }
+    
+    func playNextSong() {
+        musicPlayer.playNextSong()
+    }
+    
+    @objc func playerStateDidChange(_ notification: Notification) {
+        fetchPlaybackState()
+        fetchSongDetails()
+    }
+    
+    func fetchPlaybackState() {
+        guard let playbackState = musicPlayer.playbackState else { return }
+        presenter?.presentPlaybackState(playbackState: playbackState)
+    }
+    
+    func fetchSongDetails() {
+        guard let songInfo = musicPlayer.playingSongInformation else { return }
+        presenter?.presentSongDetail(songInfo: songInfo)
     }
 }
