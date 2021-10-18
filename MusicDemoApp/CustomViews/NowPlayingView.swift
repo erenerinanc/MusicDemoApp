@@ -66,5 +66,26 @@ class NowPlayingView: UIView {
      
     }
     
-    #warning("Do animations")
+    func animate() {
+        var yValue = CGFloat(0)
+        column1.transform = CGAffineTransform(scaleX: 1, y: yValue)
+        column2.transform = CGAffineTransform(scaleX: 1, y: yValue)
+        column3.transform = CGAffineTransform(scaleX: 1, y: yValue)
+        column4.transform = CGAffineTransform(scaleX: 1, y: yValue)
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: []) {
+                self.column2.transform = CGAffineTransform(scaleX: 1, y: 1)
+            }
+            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: []) {
+                self.column2.transform = CGAffineTransform(scaleX: 0, y: 1)
+            }
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: []) {
+                self.column3.transform = CGAffineTransform(scaleX: 0, y: 1)
+            }
+            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.1, initialSpringVelocity: 0, options: []) {
+                self.column4.transform = CGAffineTransform(scaleX: 0, y: 1)
+            }
+        }
+    }
 }

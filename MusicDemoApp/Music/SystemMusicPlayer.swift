@@ -50,9 +50,9 @@ class SystemMusicPlayer {
         
         guard let artwork = playingSong?.attributes?.artwork else { return nil }
         guard let artworkURL = artwork.makeResizedURL(width: 1000, height: 1000) else { return nil }
-        guard let artworkSmall = artwork.makeResizedURL(width: 120, height: 120) else { return nil }
-        return PlayingSongInformation(artworkURLBig: artworkURL,
-                                      artworkURLSmall: artworkSmall,
+        guard let iconArtworkURL = artwork.makeResizedURL(width: 120, height: 120) else { return nil }
+        return PlayingSongInformation(artworkURL: artworkURL,
+                                      iconArtworkURL: iconArtworkURL,
                                       songName: playingItem.title ?? "Unnamed Song",
                                       artistName: playingItem.artist ?? "Unknown Artist",
                                       id: playingItem.playbackStoreID)
@@ -125,7 +125,12 @@ class SystemMusicPlayer {
     func shuffle() {
         let songs = songs.shuffled()
         musicPlayer.setQueue(with: songs.compactMap(\.id))
-        play()
+    }
+    
+    func queue() {
+        let songs = songs
+        musicPlayer.setQueue(with: songs.compactMap(\.id))
+        playNextSong()
     }
 }
 
@@ -143,8 +148,8 @@ extension SystemMusicPlayer {
 
 extension SystemMusicPlayer {
     struct PlayingSongInformation: Equatable {
-        let artworkURLBig: URL
-        let artworkURLSmall: URL
+        let artworkURL: URL
+        let iconArtworkURL: URL
         let songName: String
         let artistName: String
         let id: String

@@ -32,11 +32,7 @@ final class LibraryViewController: BaseViewController{
         $0.indicatorStyle = .white
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
     }
-    private lazy var miniPlayer = MiniPlayerViewController().configure {
-        $0.view.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.95)
-        $0.view.clipsToBounds = true
-        $0.view.layer.zPosition = 2
-    }
+
     private lazy var playlistCell = LibraryPlaylistCell()
     
     // MARK: - Object lifecycle
@@ -82,22 +78,14 @@ final class LibraryViewController: BaseViewController{
         tableView.dataSource = self
         playlistCell.collectionView.delegate = self
         playlistCell.collectionView.dataSource = self
-        miniPlayer.delegate = self
         searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer))
     }
  
     private func layoutUI() {
         navigationItem.title = "Library"
         view.addSubview(tableView)
-        addChild(miniPlayer)
-        view.addSubview(miniPlayer.view)
         view.backgroundColor = Colors.background
         navigationItem.searchController = searchController
-        miniPlayer.view.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom)
-            make.height.equalTo(74)
-            make.leading.trailing.equalToSuperview()
-        }
         tableView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(8)
             make.top.trailing.equalToSuperview()
@@ -127,14 +115,15 @@ extension LibraryViewController: LibraryDisplayLogic {
     }
     
     func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-        let isPlaying = playbackState.status == .playing
-        
-        miniPlayer.playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
+//        let isPlaying = playbackState.status == .playing
+//        playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
     }
     
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        Nuke.loadImage(with: songInfo.artworkURLSmall, into: miniPlayer.songImageView)
-        miniPlayer.songNameLabel.text = songInfo.songName
+//        let songName = songInfo.songName
+//        guard let songNames = topSongsViewModel?.topSongs.compactMap(\.songName) else { return }
+//        let index = songNames.firstIndex(of: songName)
+        
     }
 
 }
@@ -238,23 +227,4 @@ extension LibraryViewController: UICollectionViewDataSource {
     
 }
 
-//MARK: - MiniPlayer Delegate
-
-extension LibraryViewController: MiniPlayerDelegate {
-    func playButtonTapped() {
-        interactor?.play()
-    }
-    
-    func pauseButtonTapped() {
-        interactor?.pause()
-    }
-    
-    func nextSongTapped() {
-        interactor?.playNextSong()
-    }
-    
-    func openMediaPlayer() {
-        router?.routeToMediaPlayer()
-    }
-}
 

@@ -32,11 +32,7 @@ final class PlaylistViewController: BaseViewController {
         $0.backgroundColor = Colors.background
         $0.indicatorStyle = .white
     }
-    private lazy var miniPlayer = MiniPlayerViewController().configure {
-        $0.view.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.95)
-        $0.view.clipsToBounds = true
-        $0.view.layer.zPosition = 2
-    }
+
     let headerCell = PlaylistHeaderCell()
     
     //MARK: - Object LifeCycle
@@ -65,7 +61,6 @@ final class PlaylistViewController: BaseViewController {
         tableView.delegate = self
         tableView.dataSource = self
         headerCell.delegate = self
-        miniPlayer.delegate = self
     }
     
     override func loadView() {
@@ -75,6 +70,8 @@ final class PlaylistViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        modalPresentationStyle = .custom
+        
         interactor?.fetchCatalogPlaylist()
         interactor?.fetchPlaybackState()
         interactor?.fetchSongDetails()
@@ -92,14 +89,7 @@ final class PlaylistViewController: BaseViewController {
     
     private func layoutUI() {
         view.addSubview(tableView)
-        addChild(miniPlayer)
-        view.addSubview(miniPlayer.view)
         tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
-        miniPlayer.view.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom)
-            make.height.equalTo(74)
-            make.leading.trailing.equalToSuperview()
-        }
     }
 
 }
@@ -122,12 +112,11 @@ extension PlaylistViewController: PlaylistDisplayLogic {
         let isPlaying = playbackState.status == .playing
         
         headerCell.playButtonImageView.image = UIImage(named: isPlaying ? "pause" : "play")
-        miniPlayer.playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
+
     }
     
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        Nuke.loadImage(with: songInfo.artworkURLSmall, into: miniPlayer.songImageView)
-        miniPlayer.songNameLabel.text = songInfo.songName
+       
     }
 }
 
@@ -201,20 +190,4 @@ extension PlaylistViewController: HeaderUserInteractionDelegate {
     }
 }
 
-//MARK: - MiniPlayer Delegate
 
-extension PlaylistViewController: MiniPlayerDelegate {
-    func nextSongTapped() {
-        interactor?.playNextSong()
-    }
-    
-    func openMediaPlayer() {
-        router?.routeToMediaPlayer()
-    }
-    
-    
-    
-   
-    
-    
-}

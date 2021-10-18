@@ -27,6 +27,7 @@ class MediaPlayerButtonsView: UIView {
     let volumeButton = UIImageView()
     var delegate: MediaPlayerButtonsViewDelegate?
     var isNowPlaying = true
+    var isShuffled = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -87,7 +88,7 @@ class MediaPlayerButtonsView: UIView {
     }
     
     private func configureButtonActions() {
-        let gestureRecognizerForReplayButton = UITapGestureRecognizer(target: self, action: #selector(replayButtonTapped))
+        let gestureRecognizerForReplayButton = UITapGestureRecognizer(target: self, action: #selector(shuffleButtonTapped))
         shuffleButton.addGestureRecognizer(gestureRecognizerForReplayButton)
         shuffleButton.isUserInteractionEnabled = true
         
@@ -108,8 +109,13 @@ class MediaPlayerButtonsView: UIView {
         volumeButton.isUserInteractionEnabled = true
     }
     
-    @objc func replayButtonTapped(_ gesture: UITapGestureRecognizer) {
-        delegate?.buttonTapped(with: .shuffle)
+    @objc func shuffleButtonTapped(_ gesture: UITapGestureRecognizer) {
+        if isShuffled {
+            delegate?.buttonTapped(with: .queue)
+        } else {
+            delegate?.buttonTapped(with: .shuffle)
+            shuffleButton.image = UIImage(named: "random")
+        }
     }
     
     @objc func firstButtonTapped(_ gesture: UITapGestureRecognizer) {

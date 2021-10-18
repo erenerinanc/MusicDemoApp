@@ -7,17 +7,20 @@
 
 import UIKit
 import SnapKit
+import Nuke
 
-protocol MiniPlayerDelegate {
-    func playButtonTapped()
-    func pauseButtonTapped()
-    func nextSongTapped()
-    func openMediaPlayer()
+
+protocol MiniPlayerDisplayLogic: AnyObject {
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
+    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
 }
 
-class MiniPlayerViewController: UIViewController {
-    var delegate: MiniPlayerDelegate?
+class MiniPlayerViewController: BaseViewController {
+    var interactor: MiniPlayerBusinessLogic?
+    var router: (MiniPlayerRoutingLogic & MiniPlayerDataPassing)?
     var isPlayTapped: Bool = false
+    
+    //MARK: - Configure UI
     
     lazy var songImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
@@ -28,6 +31,7 @@ class MiniPlayerViewController: UIViewController {
         $0.textColor = .white
         $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
         $0.text = "Not playing"
+        $0.adjustsFontSizeToFitWidth = true
     }
     lazy var playPauseImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
@@ -44,6 +48,13 @@ class MiniPlayerViewController: UIViewController {
         $0.isUserInteractionEnabled = true
     }
     
+    //MARK: - Object Lifecycle
+    
+    init(musicPlayer: SystemMusicPlayer) {
+        super.init()
+        setup(musicPlayer: musicPlayer)
+    }
+    
     override func loadView() {
         super.loadView()
         layoutUI()
@@ -51,6 +62,23 @@ class MiniPlayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor?.fetchPlaybackState()
+        interactor?.fetchSongDetail()
+    }
+    
+    //MARK: - Setup
+    
+    private func setup(musicPlayer: SystemMusicPlayer) {
+        let viewController = self
+        let interactor = MiniPlayerInteractor(musicPlayer: musicPlayer)
+        let presenter = MiniPlayerPresenter()
+        let router = MiniPlayerRouter(musicPlayer: musicPlayer)
+        viewController.interactor = interactor
+        viewController.router = router
+        interactor.presenter = presenter
+        presenter.viewController = viewController
+        router.viewController = viewController
+        router.dataStore = interactor
     }
     
     private func layoutUI() {
@@ -77,6 +105,7 @@ class MiniPlayerViewController: UIViewController {
         playPauseImageView.snp.makeConstraints { make in
             make.centerY.equalTo(view.snp.centerY)
             make.width.height.equalTo(25)
+            make.leading.equalTo(songNameLabel.snp.trailing).offset(4)
             make.trailing.equalToSuperview().inset(72)
         }
         
@@ -91,21 +120,35 @@ class MiniPlayerViewController: UIViewController {
         if isPlayTapped {
             print("Pause tapped")
             playPauseImageView.image = UIImage(named: "miniplay")
-            delegate?.pauseButtonTapped()
+            interactor?.play()
             isPlayTapped = false
         } else {
             print("Play tapped")
             playPauseImageView.image = UIImage(named: "minipause")
-            delegate?.playButtonTapped()
+            interactor?.pause()
             isPlayTapped = true
         }
     }
     
     @objc func nextSongButtonTapped(_ gesture: UITapGestureRecognizer) {
-        delegate?.nextSongTapped()
+        interactor?.playNextSong()
     }
     
     @objc func viewTapped(_ gesture: UITapGestureRecognizer) {
-        delegate?.openMediaPlayer()
+        router?.routeToMediaPlayer()
+    }
+}
+
+//MARK: - Display Logic
+
+extension MiniPlayerViewController: MiniPlayerDisplayLogic {
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
+        let isPlaying = playbackState.status == .playing
+        playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
+    }
+    
+    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
+        Nuke.loadImage(with: songInfo.iconArtworkURL, into: songImageView)
+        songNameLabel.text = songInfo.songName
     }
 }

@@ -12,6 +12,7 @@ import Nuke
 
 enum PlayerButton {
     case shuffle
+    case queue
     case previous
     case next
     case play
@@ -49,6 +50,8 @@ final class MediaPlayerViewController: BaseViewController {
     private lazy var songNameLabel = UILabel().configure {
         $0.textColor = .white
         $0.font = UIFont.preferredFont(forTextStyle: .title1)
+        $0.adjustsFontSizeToFitWidth = true
+        $0.textAlignment = .center
     }
     private lazy var artistNameLabel = UILabel().configure {
         $0.textColor = Colors.secondaryLabel
@@ -77,11 +80,12 @@ final class MediaPlayerViewController: BaseViewController {
         layoutUI()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         interactor?.fetchSongDetails()
         interactor?.fetchPlaybackState()
     }
+
     
     // MARK: - Setup
     
@@ -127,6 +131,8 @@ final class MediaPlayerViewController: BaseViewController {
         songNameLabel.snp.makeConstraints { make in
             make.top.equalTo(songImageview.snp.bottom).offset(16)
             make.centerX.equalTo(songImageview.snp.centerX)
+            make.leading.trailing.equalToSuperview().inset(8)
+    
         }
         
         artistNameLabel.snp.makeConstraints { make in
@@ -146,6 +152,7 @@ final class MediaPlayerViewController: BaseViewController {
             make.height.equalTo(50)
         }
     }
+    
     
     private func configureVolumeview() {
         view.addSubview(contentView)
@@ -171,6 +178,7 @@ final class MediaPlayerViewController: BaseViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.dismissVolumeView()
         }
+        
     }
     
     @objc func dismissVolumeView() {
@@ -183,7 +191,7 @@ final class MediaPlayerViewController: BaseViewController {
 
 extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        Nuke.loadImage(with: songInfo.artworkURLBig, into: self.songImageview)
+        Nuke.loadImage(with: songInfo.artworkURL, into: self.songImageview)
         self.songNameLabel.text = songInfo.songName
         self.artistNameLabel.text = songInfo.artistName
     }
@@ -213,6 +221,8 @@ extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
         switch button {
         case .shuffle:
             interactor?.shuffleSongs()
+        case .queue:
+            interactor?.queueSongs()
         case .previous:
             interactor?.playPreviousSong()
         case .next:

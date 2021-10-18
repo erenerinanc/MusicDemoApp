@@ -23,14 +23,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         loadingViewController.view.addSubview(indicator)
         indicator.snp.makeConstraints { $0.center.equalToSuperview() }
         
-        let navController = UINavigationController(rootViewController: loadingViewController)
-        navController.navigationBar.tintColor = .white
-
-        navController.navigationBar.barTintColor = Colors.background
-        navController.navigationBar.barStyle = .blackTranslucent
-        navController.navigationBar.prefersLargeTitles = true
-
-        window?.rootViewController = navController
+        guard let musicPlayer = musicPlayer else {
+            return false
+        }
+        
+        let appContainer = ApplicationContainer(musicPlayer: musicPlayer, rootViewController: loadingViewController)
+        
+        window?.rootViewController = appContainer
         window?.makeKeyAndVisible()
         print("Application started")
         let developerToken = JWT.shared.generateToken()
@@ -49,7 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                 DispatchQueue.main.async {
                                     guard let musicPlayer = self.musicPlayer else { return }
                                     let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id, musicPlayer: musicPlayer)
-                                    navController.setViewControllers([libraryVC], animated: true)
+                                    appContainer.navController.setViewControllers([libraryVC], animated: true)
                                 }
                             case .failure(let error):
                                 print(error.localizedDescription)

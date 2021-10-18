@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol LibraryRoutingLogic: AnyObject {
     func routeToCatalogPlaylist(globalID: String)
@@ -16,7 +17,7 @@ protocol LibraryDataPassing: AnyObject {
     var dataStore: LibraryDataStore? { get }
 }
 
-final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing {
+final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing{
     
     weak var viewController: LibraryViewController?
     var dataStore: LibraryDataStore?

@@ -63,6 +63,7 @@ class SongCell: UITableViewCell {
             
         }
         
+        nowPlayingView.isHidden = true
         nowPlayingView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.height.equalTo(20)
@@ -77,45 +78,35 @@ class SongCell: UITableViewCell {
     }
     
     func set(for viewModel: Library.Fetch.TopSongsViewModel.TopSongs) {
-        DispatchQueue.main.async {
-            let resizedURL = self.resizeWidhtAndHeight(for: viewModel.artworkURL, width: 120, height: 120)
-            Nuke.loadImage(with: resizedURL, into: self.musicImageView)
-            self.songNameLabel.text = viewModel.songName
-            self.subtitleLabel.text = viewModel.artistName
-        }
+        let resizedURL = resizeWidhtAndHeight(for: viewModel.artworkURL, width: 120, height: 120)
+        Nuke.loadImage(with: resizedURL, into: musicImageView)
+        songNameLabel.text = viewModel.songName
+        subtitleLabel.text = viewModel.artistName
     }
     
     func set(for catalogViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist) {
-        DispatchQueue.main.async {
-            let resizedURL = self.resizeWidhtAndHeight(for: catalogViewModel.artworkURL, width: 120, height: 120)
-            Nuke.loadImage(with: resizedURL, into: self.musicImageView)
-            self.songNameLabel.text = catalogViewModel.name
-            self.subtitleLabel.text = catalogViewModel.description
-        }
+        let resizedURL = resizeWidhtAndHeight(for: catalogViewModel.artworkURL, width: 120, height: 120)
+        Nuke.loadImage(with: resizedURL, into: musicImageView)
+        songNameLabel.text = catalogViewModel.name
+        subtitleLabel.text = catalogViewModel.description
     }
     func set(for catalogSongViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist.Song) {
-        DispatchQueue.main.async {
-            let resizedURL = self.resizeWidhtAndHeight(for: catalogSongViewModel.songArtworkURL, width: 120, height: 120)
-            Nuke.loadImage(with: resizedURL, into: self.musicImageView)
-            self.songNameLabel.text = catalogSongViewModel.songName
-            self.subtitleLabel.text = catalogSongViewModel.artistName
-        }
+        let resizedURL = resizeWidhtAndHeight(for: catalogSongViewModel.songArtworkURL, width: 120, height: 120)
+        Nuke.loadImage(with: resizedURL, into: musicImageView)
+        songNameLabel.text = catalogSongViewModel.songName
+        subtitleLabel.text = catalogSongViewModel.artistName
     }
     
     func set(for searchedSongViewModel: SearchResults.Fetch.SongViewModel.Song) {
-        DispatchQueue.main.async {
-            let resizedURL = self.resizeWidhtAndHeight(for: searchedSongViewModel.artworkURL, width: 120, height: 120)
-            Nuke.loadImage(with: resizedURL, into: self.musicImageView)
-            self.songNameLabel.text = searchedSongViewModel.name
-            self.subtitleLabel.text = "Song ・ \(searchedSongViewModel.artistName)"
-        }
+        let resizedURL = resizeWidhtAndHeight(for: searchedSongViewModel.artworkURL, width: 120, height: 120)
+        Nuke.loadImage(with: resizedURL, into: musicImageView)
+        songNameLabel.text = searchedSongViewModel.name
+        subtitleLabel.text = "Song ・ \(searchedSongViewModel.artistName)"
     }
     
     func set(for searchedArtistViewModel: SearchResults.Fetch.ArtistViewModel.Artist) {
-        DispatchQueue.main.async {
-            self.songNameLabel.text = searchedArtistViewModel.name
-            self.subtitleLabel.text = "Artist"
-        }
+        songNameLabel.text = searchedArtistViewModel.name
+        subtitleLabel.text = "Artist"
     }
 
 }
