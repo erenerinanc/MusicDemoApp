@@ -12,6 +12,7 @@ protocol MiniPlayerDelegate {
     func playButtonTapped()
     func pauseButtonTapped()
     func nextSongTapped()
+    func openMediaPlayer()
 }
 
 class MiniPlayerViewController: UIViewController {
@@ -54,6 +55,8 @@ class MiniPlayerViewController: UIViewController {
     
     private func layoutUI() {
         view.backgroundColor = Colors.secondaryBackground
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
+        view.addGestureRecognizer(gestureRecognizer)
         view.addSubview(songImageView)
         view.addSubview(songNameLabel)
         view.addSubview(playPauseImageView)
@@ -100,5 +103,9 @@ class MiniPlayerViewController: UIViewController {
     
     @objc func nextSongButtonTapped(_ gesture: UITapGestureRecognizer) {
         delegate?.nextSongTapped()
+    }
+    
+    @objc func viewTapped(_ gesture: UITapGestureRecognizer) {
+        delegate?.openMediaPlayer()
     }
 }

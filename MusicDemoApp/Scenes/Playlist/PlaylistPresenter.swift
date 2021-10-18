@@ -10,6 +10,7 @@ import Foundation
 protocol PlaylistPresentationLogic: AnyObject {
     func presentCatalogPlaylist(response: Playlist.Fetch.Response)
     func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
+    func presentSongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
 }
 
 final class PlaylistPresenter: PlaylistPresentationLogic {
@@ -40,5 +41,9 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
     
     func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
         viewController?.displayPlaybackState(playbackState: playbackState)
+    }
+    
+    func presentSongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
+        viewController?.displaySongDetail(songInfo: songInfo)
     }
 }

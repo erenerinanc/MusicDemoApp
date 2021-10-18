@@ -156,9 +156,7 @@ extension LibraryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if interactor?.playSong(at: indexPath.row) ?? false {
-            router?.routeToMediaPlayer()
-        }
+        interactor?.playSong(at: indexPath.row)
     }
 }
 
@@ -253,6 +251,10 @@ extension LibraryViewController: MiniPlayerDelegate {
     
     func nextSongTapped() {
         interactor?.playNextSong()
+    }
+    
+    func openMediaPlayer() {
+        router?.routeToMediaPlayer()
     }
 }
 

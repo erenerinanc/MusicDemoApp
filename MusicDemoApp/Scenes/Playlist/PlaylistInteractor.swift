@@ -10,9 +10,11 @@ import Foundation
 protocol PlaylistBusinessLogic: AnyObject {
     func fetchCatalogPlaylist()
     func playSong(at index: Int) -> Bool
+    func playNextSong()
     func pause()
     func play()
     func fetchPlaybackState()
+    func fetchSongDetails()
 }
 
 protocol PlaylistDataStore: AnyObject {
@@ -25,6 +27,7 @@ protocol PlaylistMusicPlayer: AnyObject {
     func play()
     func pause()
     func playSong(at index: Int)
+    func playNextSong()
     
     var songs: [SongData] { get set }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
@@ -101,11 +104,21 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     
     @objc func playerStateDidChange(_ notification: Notification) {
         fetchPlaybackState()
+        fetchSongDetails()
     }
     
     func fetchPlaybackState() {
         guard let playbackState = musicPlayer.playbackState else { return }
         presenter?.presentPlaybackState(playbackState: playbackState)
+    }
+    
+    func fetchSongDetails() {
+        guard let songInfo = musicPlayer.playingSongInformation else { return }
+        presenter?.presentSongDetail(songInfo: songInfo)
+    }
+    
+    func playNextSong() {
+        musicPlayer.playNextSong()
     }
     
 }
