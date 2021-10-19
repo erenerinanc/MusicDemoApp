@@ -12,6 +12,7 @@ import SnapKit
 protocol SearchResultsDisplayLogic: AnyObject {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel)
     func displaySearchResults(for viewModel: SearchResults.Fetch.ArtistViewModel)
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class SearchResultsViewController: BaseViewController {
@@ -20,6 +21,7 @@ final class SearchResultsViewController: BaseViewController {
     var router: (SearchResultsRoutingLogic & SearchResultsDataPassing)?
     var songViewModel: SearchResults.Fetch.SongViewModel?
     var artistViewModel: SearchResults.Fetch.ArtistViewModel?
+    var nowPlayingSongID: String?
     
     private lazy var tableView = UITableView().configure {
         $0.indicatorStyle = .white
@@ -38,11 +40,11 @@ final class SearchResultsViewController: BaseViewController {
         super.loadView()
         layoutUI()
         configureKeyboard()
-     
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        interactor?.fetchNowPlayingSong()
     }
     
     // MARK: - Setup
@@ -138,7 +140,7 @@ extension SearchResultsViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: SongCell.reuseID) as? SongCell else { fatalError("Unable to dequeue reusable cell") }
         if indexPath.section == 0 {
             guard let model = songViewModel?.songs[indexPath.row] else { fatalError("Unable to display songs") }
-            cell.set(for: model)
+            cell.set(for: model, isPlaying: nowPlayingSongID == model.id)
         } else {
             guard let model = artistViewModel?.artists[indexPath.row] else { fatalError("Unable to display artists") }
             let images = ["unicorn", "rabbit", "cat", "fox"]
@@ -154,9 +156,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            if interactor?.playSong(at: indexPath.row) ?? false {
-                router?.routeToMediaPlayer()
-            }
+            interactor?.playSong(at: indexPath.row)
         } else {
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
             router?.routeToArtistDetail(with: urlString)
@@ -177,17 +177,36 @@ extension SearchResultsViewController: UISearchResultsUpdating {
 
 extension SearchResultsViewController: SearchResultsDisplayLogic {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel) {
-        DispatchQueue.main.async {
-            self.songViewModel = viewModel
-            self.tableView.reloadData()
-        }
+        songViewModel = viewModel
+        tableView.reloadData()
     }
     
     func displaySearchResults(for viewModel: SearchResults.Fetch.ArtistViewModel) {
-        DispatchQueue.main.async {
-            self.artistViewModel = viewModel
-            self.tableView.reloadData()
+        artistViewModel = viewModel
+        tableView.reloadData()
+    }
+    
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
         }
+        
+        if isPlaying {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+        
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = songViewModel?.songs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 0))
+            }
+        }
+        
+        tableView.reloadRows(at: rowsToReload, with: .none)
     }
     
 }

@@ -29,24 +29,22 @@ class PlaylistHeaderCell: UITableViewCell {
         $0.addGestureRecognizer(imageGestureRecognizer)
         $0.isUserInteractionEnabled = true
     }
-    lazy var playButtonImageView = UIImageView().configure {
+    lazy var playPauseButton = UIButton(type: .system).configure {
         $0.contentMode = .scaleAspectFill
         $0.backgroundColor = .white
         $0.layer.cornerRadius = CGFloat(28)
         $0.clipsToBounds = true
         $0.layer.borderWidth = 6.0
         $0.layer.borderColor = Colors.primaryLabel.cgColor
-        $0.image = UIImage(named: "play")
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(playPauseButtonTapped))
-        $0.addGestureRecognizer(gestureRecognizer)
-        $0.isUserInteractionEnabled = true
+        $0.tintColor = Colors.primaryLabel
+        $0.setImage(UIImage(named: "play"), for: .normal)
+        $0.addTarget(self, action: #selector(playPauseButtonTapped(_:)), for: .touchUpInside)
     }
-    private lazy var backButton = UIImageView().configure {
-        $0.image = UIImage(named: "back_button")
+    private lazy var routeBackButton = UIButton(type: .system).configure {
+        $0.tintColor = .white
+        $0.setImage(UIImage(named: "back"), for: .normal)
         $0.contentMode = .scaleAspectFill
-        let backButtonGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(backButtonTapped))
-        $0.addGestureRecognizer(backButtonGestureRecognizer)
-        $0.isUserInteractionEnabled = true
+        $0.addTarget(self, action: #selector(backButtonTapped(_:)), for: .touchUpInside)
     }
     private lazy var nameLabel = UILabel().configure {
         $0.textColor = .white
@@ -72,10 +70,10 @@ class PlaylistHeaderCell: UITableViewCell {
     private func layoutUI() {
         contentView.backgroundColor = Colors.background
         contentView.addSubview(headerImageView)
-        contentView.addSubview(backButton)
+        contentView.addSubview(routeBackButton)
         contentView.addSubview(nameLabel)
         contentView.addSubview(descriptionLabel)
-        contentView.addSubview(playButtonImageView)
+        contentView.addSubview(playPauseButton)
         
         headerImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
@@ -83,7 +81,7 @@ class PlaylistHeaderCell: UITableViewCell {
             make.height.equalTo(300)
         }
         
-        backButton.snp.makeConstraints { make in
+        routeBackButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(8)
             make.leading.equalToSuperview().offset(8)
             make.width.equalTo(30)
@@ -101,7 +99,7 @@ class PlaylistHeaderCell: UITableViewCell {
             make.leading.equalTo(nameLabel.snp.leading)
         }
         
-        playButtonImageView.snp.makeConstraints { make in
+        playPauseButton.snp.makeConstraints { make in
             make.centerY.equalTo(nameLabel.snp.bottom).offset(4)
             make.width.equalTo(55)
             make.height.equalTo(55)
@@ -109,15 +107,15 @@ class PlaylistHeaderCell: UITableViewCell {
         }
     }
     
-    @objc func playPauseButtonTapped(_ gesture: UITapGestureRecognizer) {
+    @objc func playPauseButtonTapped(_ sender: UIButton) {
         if isPlayTapped {
             delegate?.pauseButtonTapped()
             isPlayTapped = false
-            playButtonImageView.image = UIImage(named: "play")
+            playPauseButton.setImage(UIImage(named: "play"), for: .normal)
         } else {
             delegate?.playButtonTapped()
             isPlayTapped = true
-            playButtonImageView.image = UIImage(named: "pause")
+            playPauseButton.setImage(UIImage(named: "pause"), for: .normal)
         }
         
     }
@@ -126,7 +124,7 @@ class PlaylistHeaderCell: UITableViewCell {
         delegate?.imageSwiped()
     }
     
-    @objc func backButtonTapped() {
+    @objc func backButtonTapped(_ sender: UIButton) {
         delegate?.imageSwiped()
     }
     

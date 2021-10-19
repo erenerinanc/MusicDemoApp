@@ -32,6 +32,7 @@ enum SearchResults {
                 var name: String
                 var artistName: String
                 var artworkURL: String
+                var id: String
             }
         }
         

@@ -101,18 +101,30 @@ class SongCell: UITableViewCell {
         songNameLabel.text = catalogViewModel.name
         subtitleLabel.text = catalogViewModel.description
     }
-    func set(for catalogSongViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist.Song) {
+    func set(for catalogSongViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist.Song, isPlaying: Bool) {
         let resizedURL = resizeWidhtAndHeight(for: catalogSongViewModel.songArtworkURL, width: 120, height: 120)
         Nuke.loadImage(with: resizedURL, into: musicImageView)
         songNameLabel.text = catalogSongViewModel.songName
         subtitleLabel.text = catalogSongViewModel.artistName
+        
+        if isPlaying {
+            nowPlayingShade.isHidden = false
+        } else {
+            nowPlayingShade.isHidden = true
+        }
     }
     
-    func set(for searchedSongViewModel: SearchResults.Fetch.SongViewModel.Song) {
+    func set(for searchedSongViewModel: SearchResults.Fetch.SongViewModel.Song, isPlaying: Bool) {
         let resizedURL = resizeWidhtAndHeight(for: searchedSongViewModel.artworkURL, width: 120, height: 120)
         Nuke.loadImage(with: resizedURL, into: musicImageView)
         songNameLabel.text = searchedSongViewModel.name
         subtitleLabel.text = "Song ・ \(searchedSongViewModel.artistName)"
+        
+        if isPlaying {
+            nowPlayingShade.isHidden = false
+        } else {
+            nowPlayingShade.isHidden = true
+        }
     }
     
     func set(for searchedArtistViewModel: SearchResults.Fetch.ArtistViewModel.Artist) {

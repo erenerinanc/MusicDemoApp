@@ -10,6 +10,7 @@ import Foundation
 protocol SearchResultsPresentationLogic: AnyObject {
     func presentSearchedSongs(response: SearchResults.Fetch.SongResponse)
     func presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse)
+    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation)
 }
 
 final class SearchResultsPresenter: SearchResultsPresentationLogic {
@@ -19,7 +20,8 @@ final class SearchResultsPresenter: SearchResultsPresentationLogic {
     func presentSearchedSongs(response: SearchResults.Fetch.SongResponse) {
         let songs = response.songs.compactMap {  SearchResults.Fetch.SongViewModel.Song(name: $0.attributes?.name ?? "",
                                                                                         artistName: $0.attributes?.artistName ?? "",
-                                                                                        artworkURL: $0.attributes?.artwork?.url ?? "")
+                                                                                        artworkURL: $0.attributes?.artwork?.url ?? "",
+                                                                                        id: $0.id ?? "")
         }
         viewController?.displaySearchResults(for: SearchResults.Fetch.SongViewModel(songs: songs))
     }
@@ -29,6 +31,10 @@ final class SearchResultsPresenter: SearchResultsPresentationLogic {
                                                                                                url: $0.attributes?.url ?? "")
         }
         viewController?.displaySearchResults(for: SearchResults.Fetch.ArtistViewModel(artists: artists))
+    }
+    
+    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) {
+        viewController?.displayNowPlayingSong(songInfo, isPlaying: playbackState.status == .playing)
     }
     
     

@@ -9,12 +9,11 @@ import Foundation
 
 protocol PlaylistBusinessLogic: AnyObject {
     func fetchCatalogPlaylist()
-    func playSong(at index: Int) -> Bool
+    func playSong(at index: Int)
     func playNextSong()
     func pause()
     func play()
-    func fetchPlaybackState()
-    func fetchSongDetails()
+    func fetchNowPlayingSong()
 }
 
 protocol PlaylistDataStore: AnyObject {
@@ -59,17 +58,14 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     var storefrontID: String?
     var globalID: String?
     
-    func playSong(at index: Int) -> Bool {
+    func playSong(at index: Int) {
         guard
             let playlistData = playlistData,
             let songs = playlistData[0].relationships?.tracks?.data
-        else {
-            return false
-        }
+        else { return }
         musicPlayer.songs = songs
         musicPlayer.playSong(at: index)
-    
-        return true
+
     }
     
     func play() {
@@ -83,6 +79,10 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     
     func pause() {
         musicPlayer.pause()
+    }
+    
+    func playNextSong() {
+        musicPlayer.playNextSong()
     }
     
     func fetchCatalogPlaylist() {
@@ -103,22 +103,14 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     }
     
     @objc func playerStateDidChange(_ notification: Notification) {
-        fetchPlaybackState()
-        fetchSongDetails()
+        fetchNowPlayingSong()
     }
     
-    func fetchPlaybackState() {
+    func fetchNowPlayingSong() {
         guard let playbackState = musicPlayer.playbackState else { return }
-        presenter?.presentPlaybackState(playbackState: playbackState)
-    }
-    
-    func fetchSongDetails() {
         guard let songInfo = musicPlayer.playingSongInformation else { return }
-        presenter?.presentSongDetail(songInfo: songInfo)
+        presenter?.presentNowplayingSong(playbackState: playbackState, songInfo: songInfo)
     }
-    
-    func playNextSong() {
-        musicPlayer.playNextSong()
-    }
+
     
 }

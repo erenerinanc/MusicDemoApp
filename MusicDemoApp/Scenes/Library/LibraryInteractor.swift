@@ -12,7 +12,7 @@ protocol LibraryBusinessLogic: AnyObject {
     func fetchTopCharts()
     func fetchNowPlayingSong()
     
-    func playSong(at index: Int) -> Bool
+    func playSong(at index: Int)
     func play()
     func pause()
     func playNextSong()
@@ -83,11 +83,10 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
         }
     }
     
-    func playSong(at index: Int) -> Bool {
-        guard let songs = topSongs else { return false }
+    func playSong(at index: Int) {
+        guard let songs = topSongs else { return }
         musicPlayer.songs = songs
         musicPlayer.playSong(at: index)
-        return true
     }
     
     func play() {

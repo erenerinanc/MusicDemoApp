@@ -14,8 +14,7 @@ import SwiftUI
 protocol PlaylistDisplayLogic: AnyObject {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel)
     func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
-    
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class PlaylistViewController: BaseViewController {
@@ -26,6 +25,7 @@ final class PlaylistViewController: BaseViewController {
 
     var storeFrontId: String?
     var musicAPI: AppleMusicAPI?
+    var nowPlayingSongID: String?
     
     private lazy var tableView = UITableView().configure {
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
@@ -73,8 +73,7 @@ final class PlaylistViewController: BaseViewController {
         modalPresentationStyle = .custom
         
         interactor?.fetchCatalogPlaylist()
-        interactor?.fetchPlaybackState()
-        interactor?.fetchSongDetails()
+        interactor?.fetchNowPlayingSong()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -110,14 +109,31 @@ extension PlaylistViewController: PlaylistDisplayLogic {
     
     func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
         let isPlaying = playbackState.status == .playing
-        
-        headerCell.playButtonImageView.image = UIImage(named: isPlaying ? "pause" : "play")
+        headerCell.playPauseButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
+    }
 
-    }
-    
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-       
-    }
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
+        }
+        
+        if isPlaying {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+        
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = viewModel?.catalogPlaylist[0].songs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 1))
+            }
+        }
+        
+        tableView.reloadRows(at: rowsToReload, with: .none)
+    } 
 }
 
 //MARK: - TableView Delegate & DataSource
@@ -126,7 +142,7 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            headerCell.playButtonImageView.image = UIImage(named: "pause")
+            headerCell.playPauseButton.setImage(UIImage(named: "pause"), for: .normal)
             headerCell.isPlayTapped = true
             interactor?.playSong(at: indexPath.row)
         }
@@ -164,7 +180,7 @@ extension PlaylistViewController: UITableViewDataSource {
             guard let model = viewModel?.catalogPlaylist[0].songs[indexPath.row] else {
                 fatalError("Unable to display model")
             }
-            cell.set(for: model)
+            cell.set(for: model, isPlaying: nowPlayingSongID == model.id)
             return cell
         } else {
             return headerCell

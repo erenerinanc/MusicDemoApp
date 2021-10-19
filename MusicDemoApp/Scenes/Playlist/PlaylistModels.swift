@@ -34,6 +34,7 @@ enum Playlist {
                     var songName: String
                     var artistName: String
                     var songArtworkURL: String
+                    var id: String
                 }
 
             }

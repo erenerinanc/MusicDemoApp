@@ -9,7 +9,8 @@ import Foundation
 
 protocol SearchResultsBusinessLogic: AnyObject {
     func fetchSearchResults(request: SearchResults.Fetch.Request)
-    func playSong(at index: Int) -> Bool
+    func playSong(at index: Int)
+    func fetchNowPlayingSong()
 }
 
 protocol SearchResultsDataStore: AnyObject {
@@ -20,10 +21,9 @@ protocol SearchResultsDataStore: AnyObject {
 protocol SearchResultsMusicPlayer: AnyObject {
     func playSong(at index: Int)
     var songs: [SongData] { get set }
-    
-    //these will be used to fetch changes on the playing song and display on the cell and on mini media player
+    var playbackState: SystemMusicPlayer.PlaybackState? { get }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
-    static var playerStateDidChange: Notification.Name { get }
+    var playerStateDidChange: Notification.Name { get }
 }
 
 extension SystemMusicPlayer: SearchResultsMusicPlayer { }
@@ -33,6 +33,11 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
     init(worker: SearchResultsWorkingLogic, musicPlayer: SearchResultsMusicPlayer) {
         self.worker = worker
         self.musicPlayer = musicPlayer
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(playerStateDidChange(_:)),
+                                               name: musicPlayer.playerStateDidChange,
+                                               object: musicPlayer)
     }
     
     let worker: SearchResultsWorkingLogic
@@ -53,21 +58,32 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
                 self.searchedSongs = searchedSongs
                 self.searchedArtist = searchedArtists
                 
-                self.presenter?.presentSearchedSongs(response: SearchResults.Fetch.SongResponse(songs: searchedSongs))
-                self.presenter?.presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse(artists: searchedArtists))
-                
+                DispatchQueue.main.async {
+                    self.presenter?.presentSearchedSongs(response: SearchResults.Fetch.SongResponse(songs: searchedSongs))
+                    self.presenter?.presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse(artists: searchedArtists))
+                }
+
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
     }
     
-    func playSong(at index: Int) -> Bool {
-        guard let songs = searchedSongs else { return false }
-        
+    @objc func playerStateDidChange(_ notification: Notification) {
+        fetchNowPlayingSong()
+    }
+    
+    func fetchNowPlayingSong() {
+        guard let songInfo = musicPlayer.playingSongInformation else { return }
+        guard let playbackState = musicPlayer.playbackState else { return }
+        presenter?.presentNowPlayingSong(playbackState: playbackState, songInfo: songInfo)
+    }
+    
+    func playSong(at index: Int) {
+        guard let songs = searchedSongs else { return }
         musicPlayer.songs = songs
         musicPlayer.playSong(at: index)
-        return true
     }
+
     
 }
