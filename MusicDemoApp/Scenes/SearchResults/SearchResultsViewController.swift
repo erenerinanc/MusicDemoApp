@@ -143,9 +143,7 @@ extension SearchResultsViewController: UITableViewDataSource {
             cell.set(for: model, isPlaying: nowPlayingSongID == model.id)
         } else {
             guard let model = artistViewModel?.artists[indexPath.row] else { fatalError("Unable to display artists") }
-            let images = ["unicorn", "rabbit", "cat", "fox"]
             cell.set(for: model)
-            cell.musicImageView.image = UIImage(named: images[indexPath.row])
         }
         return cell
     }

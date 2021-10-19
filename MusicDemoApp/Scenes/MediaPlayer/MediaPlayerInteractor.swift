@@ -12,6 +12,7 @@ protocol MediaPlayerBusinessLogic: AnyObject {
     func playPreviousSong()
     func pause()
     func play()
+    
     func fetchPlaybackState()
     func fetchSongDetails()
 }
@@ -22,6 +23,8 @@ protocol MediaPlayerDataStore: AnyObject {
 protocol MediaPlayerMusicPlayer: AnyObject {
     func play()
     func pause()
+    #warning("Add shuffle")
+
     func playNextSong()
     func playPreviousSong()
     func playSong(at songIndex: Int)
@@ -33,9 +36,7 @@ protocol MediaPlayerMusicPlayer: AnyObject {
     var playerStateDidChange: Notification.Name { get }
 }
 
-extension SystemMusicPlayer: MediaPlayerMusicPlayer {
-    var playerStateDidChange: Notification.Name { SystemMusicPlayer.playerStateDidChange }
-}
+extension SystemMusicPlayer: MediaPlayerMusicPlayer { }
 
 final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStore {
     
@@ -55,14 +56,6 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
         fetchPlaybackState()
     }
     
-    func playNextSong() {
-        musicPlayer.playNextSong()
-    }
-    
-    func playPreviousSong() {
-        musicPlayer.playPreviousSong()
-    }
-    
     func fetchPlaybackState() {
         guard let playbackState = musicPlayer.playbackState else { return }
         presenter?.presentPlaybackState(playbackState: playbackState)
@@ -71,6 +64,16 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
     func fetchSongDetails() {
         guard let songInfo = musicPlayer.playingSongInformation else { return }
         presenter?.presentSongDetails(songInfo: songInfo)
+    }
+    
+    //MARK: - Music Actions
+    
+    func playNextSong() {
+        musicPlayer.playNextSong()
+    }
+    
+    func playPreviousSong() {
+        musicPlayer.playPreviousSong()
     }
 
     func play() {
@@ -82,5 +85,6 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
         guard musicPlayer.playbackState?.status != .paused else { return }
         musicPlayer.pause()
     }
+    
 }
 

@@ -13,6 +13,7 @@ protocol MiniPlayerBusinessLogic: AnyObject {
     func play()
     func pause()
     func playNextSong()
+
 }
 
 protocol MiniPlayerDataStore: AnyObject {

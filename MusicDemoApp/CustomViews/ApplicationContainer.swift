@@ -25,7 +25,7 @@ class ApplicationContainer: BaseViewController {
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(playerStateDidChange(_:)),
-                                               name: SystemMusicPlayer.playerStateDidChange,
+                                               name: musicPlayer.playerStateDidChange,
                                                object: nil)
         
         updateMiniPlayerAppearance()

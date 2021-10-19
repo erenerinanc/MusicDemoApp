@@ -128,6 +128,8 @@ class SongCell: UITableViewCell {
     }
     
     func set(for searchedArtistViewModel: SearchResults.Fetch.ArtistViewModel.Artist) {
+        musicImageView.image = UIImage(named: "music")
+        musicImageView.tintColor = Colors.secondaryLabel
         songNameLabel.text = searchedArtistViewModel.name
         subtitleLabel.text = "Artist"
     }

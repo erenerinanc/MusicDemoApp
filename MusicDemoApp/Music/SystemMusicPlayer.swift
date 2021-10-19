@@ -1,5 +1,5 @@
 //
-//  MusicInteractpr.swift
+//  SystemMusicPlayer.swift
 //  MusicDemoApp
 //
 //  Created by Eren Erinanç on 14.10.2021.
@@ -10,7 +10,7 @@ import MediaPlayer
 
 
 class SystemMusicPlayer {
-    static let playerStateDidChange = Notification.Name("SystemMusicPlayer.playerStateDidChange")
+    var playerStateDidChange = Notification.Name("SystemMusicPlayer.playerStateDidChange")
     
     private var musicPlayer: MPMusicPlayerController & MPSystemMusicPlayerController {
         MPMusicPlayerController.systemMusicPlayer
@@ -87,7 +87,7 @@ class SystemMusicPlayer {
     }
     
     private func notifyChanges() {
-        NotificationCenter.default.post(name: SystemMusicPlayer.playerStateDidChange, object: self)
+        NotificationCenter.default.post(name: playerStateDidChange, object: self)
     }
     
     func playSong(at songIndex: Int) {

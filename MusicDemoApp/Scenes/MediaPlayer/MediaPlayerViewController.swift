@@ -30,6 +30,7 @@ final class MediaPlayerViewController: BaseViewController {
     
     private var volumetapped: Bool = false
     private var progressTimer: Timer?
+    var isPlaying: Bool = false
     
     //MARK: - Configure UI
     
@@ -65,7 +66,7 @@ final class MediaPlayerViewController: BaseViewController {
     }
     private lazy var progressView = MediaPlayerProgressView()
     private lazy var playerView = MediaPlayerActionBar()
-    var isPlaying: Bool = false
+
     
     // MARK: - Object lifecycle
     
