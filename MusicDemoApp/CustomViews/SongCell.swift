@@ -25,9 +25,11 @@ class SongCell: UITableViewCell {
         $0.textColor = Colors.secondaryLabel
         $0.font = UIFont.preferredFont(forTextStyle: .caption1)
     }
-    let nowPlayingView = NowPlayingView().configure {
-        $0.backgroundColor = Colors.background
+    
+    let nowPlayingShade = UIView().configure {
+        $0.backgroundColor = .black.withAlphaComponent(0.3)
     }
+    let nowPlayingView = NowPlayingView()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -63,11 +65,14 @@ class SongCell: UITableViewCell {
             
         }
         
-        nowPlayingView.isHidden = true
+        nowPlayingShade.isHidden = true
+        musicImageView.addSubview(nowPlayingShade)
+        nowPlayingShade.snp.makeConstraints { $0.directionalEdges.equalTo(musicImageView) }
+        
+        nowPlayingShade.addSubview(nowPlayingView)
         nowPlayingView.snp.makeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.height.equalTo(20)
-            make.trailing.equalToSuperview().inset(24)
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(8)
         }
     }
     
@@ -77,11 +82,17 @@ class SongCell: UITableViewCell {
             .replacingOccurrences(of: "{h}", with: String(height))
     }
     
-    func set(for viewModel: Library.Fetch.TopSongsViewModel.TopSongs) {
+    func set(for viewModel: Library.Fetch.TopSongsViewModel.TopSongs, isPlaying: Bool) {
         let resizedURL = resizeWidhtAndHeight(for: viewModel.artworkURL, width: 120, height: 120)
         Nuke.loadImage(with: resizedURL, into: musicImageView)
         songNameLabel.text = viewModel.songName
         subtitleLabel.text = viewModel.artistName
+        
+        if isPlaying {
+            nowPlayingShade.isHidden = false
+        } else {
+            nowPlayingShade.isHidden = true
+        }
     }
     
     func set(for catalogViewModel: Playlist.Fetch.ViewModel.CatalogPlaylist) {

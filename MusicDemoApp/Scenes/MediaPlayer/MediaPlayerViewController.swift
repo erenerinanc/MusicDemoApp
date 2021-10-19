@@ -12,11 +12,9 @@ import Nuke
 
 enum PlayerButton {
     case shuffle
-    case queue
     case previous
     case next
-    case play
-    case pause
+    case playPause
     case volume
 }
 
@@ -66,7 +64,8 @@ final class MediaPlayerViewController: BaseViewController {
         $0.sizeToFit()
     }
     private lazy var progressView = MediaPlayerProgressView()
-    private lazy var playerView = MediaPlayerButtonsView()
+    private lazy var playerView = MediaPlayerActionBar()
+    var isPlaying: Bool = false
     
     // MARK: - Object lifecycle
     
@@ -198,9 +197,10 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
     
     func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
         let isPlaying = playbackState.status == .playing
+        self.isPlaying = isPlaying
         
         progressView.configure(playbackTime: playbackState.currentTime, songDuration: playbackState.songDuration)
-        playerView.playButton.image = UIImage(named: isPlaying ? "pause" : "play")
+        playerView.playButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
     
         if isPlaying {
             progressTimer?.invalidate()
@@ -211,6 +211,7 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
             progressTimer?.invalidate()
             progressTimer = nil
         }
+
     }
 }
 
@@ -220,17 +221,17 @@ extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .shuffle:
-            interactor?.shuffleSongs()
-        case .queue:
-            interactor?.queueSongs()
+            break
         case .previous:
             interactor?.playPreviousSong()
         case .next:
             interactor?.playNextSong()
-        case .play:
-            interactor?.play()
-        case .pause:
-            interactor?.pause()
+        case .playPause:
+            if isPlaying {
+                interactor?.pause()
+            } else {
+                interactor?.play()
+            }
         case .volume:
             volumetapped = true
             configureVolumeview()

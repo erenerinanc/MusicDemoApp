@@ -10,8 +10,7 @@ import Foundation
 protocol LibraryBusinessLogic: AnyObject {
     func fetchPlaylists()
     func fetchTopCharts()
-    func fetchPlaybackState()
-    func fetchSongDetails()
+    func fetchNowPlayingSong()
     
     func playSong(at index: Int) -> Bool
     func play()
@@ -104,17 +103,13 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
     }
     
     @objc func playerStateDidChange(_ notification: Notification) {
-        fetchPlaybackState()
-        fetchSongDetails()
+        fetchNowPlayingSong()
     }
     
-    func fetchPlaybackState() {
+    func fetchNowPlayingSong() {
         guard let playbackState = musicPlayer.playbackState else { return }
-        presenter?.presentPlaybackState(playbackState: playbackState)
-    }
-    
-    func fetchSongDetails() {
         guard let songInfo = musicPlayer.playingSongInformation else { return }
-        presenter?.presentSongDetail(songInfo: songInfo)
+        presenter?.presentNowPlayingSong(playbackState: playbackState, songInfo: songInfo)
     }
+
 }

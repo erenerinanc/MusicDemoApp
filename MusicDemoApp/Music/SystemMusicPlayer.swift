@@ -122,16 +122,6 @@ class SystemMusicPlayer {
         playSong(at: currentIndexInSongsArray)
     }
     
-    func shuffle() {
-        let songs = songs.shuffled()
-        musicPlayer.setQueue(with: songs.compactMap(\.id))
-    }
-    
-    func queue() {
-        let songs = songs
-        musicPlayer.setQueue(with: songs.compactMap(\.id))
-        playNextSong()
-    }
 }
 
 extension SystemMusicPlayer {

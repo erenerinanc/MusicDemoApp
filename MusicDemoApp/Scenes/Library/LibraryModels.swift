@@ -46,6 +46,7 @@ enum Library {
                 var artistName: String
                 var songName: String
                 var artworkURL: String
+                var id: String
             }
         }
         

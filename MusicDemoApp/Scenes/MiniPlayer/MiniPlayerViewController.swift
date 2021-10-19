@@ -18,7 +18,7 @@ protocol MiniPlayerDisplayLogic: AnyObject {
 class MiniPlayerViewController: BaseViewController {
     var interactor: MiniPlayerBusinessLogic?
     var router: (MiniPlayerRoutingLogic & MiniPlayerDataPassing)?
-    var isPlayTapped: Bool = false
+    var isPlaying: Bool = false
     
     //MARK: - Configure UI
     
@@ -33,19 +33,20 @@ class MiniPlayerViewController: BaseViewController {
         $0.text = "Not playing"
         $0.adjustsFontSizeToFitWidth = true
     }
-    lazy var playPauseImageView = UIImageView().configure {
+    lazy var playPauseButton = UIButton(type: .system).configure {
         $0.contentMode = .scaleAspectFill
-        $0.image = UIImage(named: "miniplay")
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(playPauseButtonTapped))
-        $0.addGestureRecognizer(gestureRecognizer)
-        $0.isUserInteractionEnabled = true
+        $0.setImage(UIImage(named: "miniplay"), for: .normal)
+        $0.addTarget(self, action: #selector(playPauseButtonTapped), for: .touchUpInside)
+        $0.tintColor = Colors.secondaryLabel
     }
-    lazy var nextSongImageView = UIImageView().configure {
+    lazy var skipNextButton = UIButton(type: .system).configure {
         $0.contentMode = .scaleAspectFill
-        $0.image = UIImage(named: "last")
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(nextSongButtonTapped))
-        $0.addGestureRecognizer(gestureRecognizer)
-        $0.isUserInteractionEnabled = true
+        $0.setImage(UIImage(named: "next"), for: .normal)
+        $0.addTarget(self, action: #selector(nextSongButtonTapped), for: .touchUpInside)
+        $0.tintColor = Colors.secondaryLabel
+    }
+    lazy var actionBar = UIView().configure {
+        $0.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.95)
     }
     
     //MARK: - Object Lifecycle
@@ -85,10 +86,17 @@ class MiniPlayerViewController: BaseViewController {
         view.backgroundColor = Colors.secondaryBackground
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         view.addGestureRecognizer(gestureRecognizer)
-        view.addSubview(songImageView)
         view.addSubview(songNameLabel)
-        view.addSubview(playPauseImageView)
-        view.addSubview(nextSongImageView)
+        view.addSubview(songImageView)
+        view.addSubview(actionBar)
+        actionBar.addSubview(playPauseButton)
+        actionBar.addSubview(skipNextButton)
+
+        
+        songNameLabel.snp.makeConstraints { make in
+            make.leading.equalTo(songImageView.snp.trailing).offset(8)
+            make.centerY.equalTo(view.snp.centerY)
+        }
         
         songImageView.snp.makeConstraints { make in
             make.centerY.equalTo(view.snp.centerY)
@@ -97,45 +105,58 @@ class MiniPlayerViewController: BaseViewController {
             make.width.equalTo(60)
         }
         
-        songNameLabel.snp.makeConstraints { make in
-            make.leading.equalTo(songImageView.snp.trailing).offset(8)
+        actionBar.snp.makeConstraints { make in
             make.centerY.equalTo(view.snp.centerY)
+            make.trailing.equalTo(view.snp.trailing)
+            make.top.bottom.equalToSuperview()
         }
         
-        playPauseImageView.snp.makeConstraints { make in
-            make.centerY.equalTo(view.snp.centerY)
-            make.width.height.equalTo(25)
-            make.leading.equalTo(songNameLabel.snp.trailing).offset(4)
-            make.trailing.equalToSuperview().inset(72)
+        playPauseButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(26)
+            make.leading.equalToSuperview().inset(20)
+            make.trailing.equalToSuperview().inset(84)
         }
-        
-        nextSongImageView.snp.makeConstraints { make in
-            make.centerY.equalTo(view.snp.centerY)
+
+        skipNextButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().inset(24)
-            make.width.height.equalTo(28)
+            make.width.height.equalTo(30)
         }
     }
     
-    @objc func playPauseButtonTapped(_ gesture: UITapGestureRecognizer) {
-        if isPlayTapped {
-            print("Pause tapped")
-            playPauseImageView.image = UIImage(named: "miniplay")
-            interactor?.play()
-            isPlayTapped = false
-        } else {
-            print("Play tapped")
-            playPauseImageView.image = UIImage(named: "minipause")
+    @objc func playPauseButtonTapped() {
+        if isPlaying {
             interactor?.pause()
-            isPlayTapped = true
+        } else {
+            interactor?.play()
         }
     }
     
-    @objc func nextSongButtonTapped(_ gesture: UITapGestureRecognizer) {
+    @objc func nextSongButtonTapped() {
         interactor?.playNextSong()
     }
     
     @objc func viewTapped(_ gesture: UITapGestureRecognizer) {
         router?.routeToMediaPlayer()
+    }
+    
+    func animateLabel() {
+
+        UIView.animate(withDuration: 8.0, delay: 0.0, options: [.repeat, .curveEaseInOut], animations: {
+            self.songNameLabel.transform = CGAffineTransform(translationX: self.songNameLabel.bounds.origin.x + 200, y: self.songNameLabel.bounds.origin.y)
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 8.0, delay: 0.0, options: [.repeat, .curveEaseInOut]) {
+            self.songNameLabel.transform = CGAffineTransform(translationX: self.songNameLabel.bounds.origin.x - 300, y: self.songNameLabel.bounds.origin.y)
+        }
+
+    }
+    
+    func stopAnimating() {
+        UIView.animate(withDuration: 0.0, delay: 0, options: []) {
+            self.songNameLabel.transform = .identity
+        }
     }
 }
 
@@ -144,7 +165,14 @@ class MiniPlayerViewController: BaseViewController {
 extension MiniPlayerViewController: MiniPlayerDisplayLogic {
     func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
         let isPlaying = playbackState.status == .playing
-        playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
+        self.isPlaying = isPlaying
+        playPauseButton.setImage(UIImage(named: isPlaying ? "minipause" : "miniplay"), for: .normal)
+        
+        if isPlaying {
+            animateLabel()
+        } else {
+            stopAnimating()
+        }
     }
     
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {

@@ -13,8 +13,7 @@ import Nuke
 protocol LibraryDisplayLogic: AnyObject {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel)
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel)
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class LibraryViewController: BaseViewController{
@@ -36,6 +35,7 @@ final class LibraryViewController: BaseViewController{
     private lazy var playlistCell = LibraryPlaylistCell()
     
     // MARK: - Object lifecycle
+    private var nowPlayingSongID: String?
     
     init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
         super.init()
@@ -51,8 +51,7 @@ final class LibraryViewController: BaseViewController{
         super.viewDidLoad()
         interactor?.fetchPlaylists()
         interactor?.fetchTopCharts()
-        interactor?.fetchPlaybackState()
-        interactor?.fetchSongDetails()
+        interactor?.fetchNowPlayingSong()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -114,18 +113,28 @@ extension LibraryViewController: LibraryDisplayLogic {
         }
     }
     
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-//        let isPlaying = playbackState.status == .playing
-//        playPauseImageView.image = UIImage(named: isPlaying ? "minipause" : "miniplay")
-    }
-    
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-//        let songName = songInfo.songName
-//        guard let songNames = topSongsViewModel?.topSongs.compactMap(\.songName) else { return }
-//        let index = songNames.firstIndex(of: songName)
+    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
+        }
         
+        if isPlaying {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+        
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = topSongsViewModel?.topSongs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 1))
+            }
+        }
+        
+        tableView.reloadRows(at: rowsToReload, with: .none)
     }
-
 }
 
 //MARK: -TableView Delegate&Datasource
@@ -167,7 +176,8 @@ extension LibraryViewController: UITableViewDataSource {
             guard let model = topSongsViewModel?.topSongs[indexPath.row] else {
                 fatalError("Cannot display model")
             }
-            cell.set(for: model)
+            
+            cell.set(for: model, isPlaying: nowPlayingSongID == model.id)
             return cell
         }
     }

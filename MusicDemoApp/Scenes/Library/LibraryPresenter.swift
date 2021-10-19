@@ -10,8 +10,7 @@ import Foundation
 protocol LibraryPresentationLogic: AnyObject {
     func presentPlaylists(response: Library.Fetch.PlaylistResponse)
     func presentTopSongs(response: Library.Fetch.TopSongsResponse)
-    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
-    func presentSongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
+    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation)
 }
 
 final class LibraryPresenter: LibraryPresentationLogic {
@@ -30,18 +29,15 @@ final class LibraryPresenter: LibraryPresentationLogic {
     func presentTopSongs(response: Library.Fetch.TopSongsResponse) {
         let topSongs = response.topSongs.compactMap { Library.Fetch.TopSongsViewModel.TopSongs(artistName: $0.attributes?.artistName ?? "",
                                                                                                songName: $0.attributes?.name ?? "",
-                                                                                               artworkURL: $0.attributes?.artwork?.url ?? ""
+                                                                                               artworkURL: $0.attributes?.artwork?.url ?? "",
+                                                                                               id: $0.id ?? ""
                                                                                                )
         }
         viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))
     }
     
-    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-        viewController?.displayPlaybackState(playbackState: playbackState)
-    }
-    
-    func presentSongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        viewController?.displaySongDetail(songInfo: songInfo)
+    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) {
+        viewController?.displayNowPlayingSong(songInfo, isPlaying: playbackState.status == .playing)
     }
     
 }
