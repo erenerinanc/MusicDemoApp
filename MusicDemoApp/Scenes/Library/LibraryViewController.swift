@@ -45,6 +45,7 @@ final class LibraryViewController: BaseViewController{
     override func loadView() {
         super.loadView()
         layoutUI()
+        showLoadingView()
     }
     
     override func viewDidLoad() {
@@ -100,16 +101,14 @@ final class LibraryViewController: BaseViewController{
 extension LibraryViewController: LibraryDisplayLogic {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel) {
         self.playlistViewModel = viewModel
-        DispatchQueue.main.async {
-            self.playlistCell.collectionView.reloadData()
-        }
+        dismissLoadingView()
+        playlistCell.collectionView.reloadData()
     }
     
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
         self.topSongsViewModel = viewModel
-        DispatchQueue.main.async {
-            self.tableView.reloadSections([1], with: .automatic)
-        }
+        dismissLoadingView()
+        tableView.reloadSections([1], with: .automatic)
     }
     
     func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {

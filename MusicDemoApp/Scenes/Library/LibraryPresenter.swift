@@ -23,7 +23,10 @@ final class LibraryPresenter: LibraryPresentationLogic {
                                                                                                   globalID: $0.attributes?.playParams?.globalID ?? ""
                                                                                                   )
         }
-        viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
+        
+        DispatchQueue.main.async {
+            self.viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
+        }
     }
     
     func presentTopSongs(response: Library.Fetch.TopSongsResponse) {
@@ -33,7 +36,10 @@ final class LibraryPresenter: LibraryPresentationLogic {
                                                                                                id: $0.id ?? ""
                                                                                                )
         }
-        viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))
+        
+        DispatchQueue.main.async {
+            self.viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))
+        }
     }
     
     func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) {

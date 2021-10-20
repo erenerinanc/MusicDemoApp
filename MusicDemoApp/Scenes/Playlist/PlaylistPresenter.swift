@@ -35,7 +35,9 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
         )
         }
         
-        viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
+        DispatchQueue.main.async {
+            self.viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
+        }
         
     }
     

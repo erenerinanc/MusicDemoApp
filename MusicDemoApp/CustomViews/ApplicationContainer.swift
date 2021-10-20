@@ -65,5 +65,6 @@ class ApplicationContainer: BaseViewController {
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(74)
         }
+        miniPlayer.didMove(toParent: self)
     }
 }

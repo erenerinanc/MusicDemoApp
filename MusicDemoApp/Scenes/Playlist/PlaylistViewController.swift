@@ -65,6 +65,7 @@ final class PlaylistViewController: BaseViewController {
     override func loadView() {
         super.loadView()
         layoutUI()
+        showLoadingView()
     }
     
     override func viewDidLoad() {
@@ -97,13 +98,12 @@ final class PlaylistViewController: BaseViewController {
 
 extension PlaylistViewController: PlaylistDisplayLogic {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel) {
-        DispatchQueue.main.async {
-            self.viewModel = viewModel
-            guard let model = self.viewModel?.catalogPlaylist[0] else { return }
-            self.headerCell.set(for: model)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.tableView.reloadSections(IndexSet(integer: 1), with: .fade)
-            }
+        self.viewModel = viewModel
+        dismissLoadingView()
+        guard let model = self.viewModel?.catalogPlaylist[0] else { return }
+        headerCell.set(for: model)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.tableView.reloadSections(IndexSet(integer: 1), with: .fade)
         }
     }
 
