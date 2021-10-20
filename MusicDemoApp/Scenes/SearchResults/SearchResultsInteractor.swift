@@ -9,8 +9,6 @@ import Foundation
 
 protocol SearchResultsBusinessLogic: AnyObject {
     func fetchSearchResults(request: SearchResults.Fetch.Request)
-    func playSong(at index: Int)
-    func fetchNowPlayingSong()
 }
 
 protocol SearchResultsDataStore: AnyObject {
@@ -30,19 +28,12 @@ extension SystemMusicPlayer: SearchResultsMusicPlayer { }
 
 final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDataStore {
     
-    init(worker: SearchResultsWorkingLogic, musicPlayer: SearchResultsMusicPlayer) {
+    init(worker: SearchResultsWorkingLogic) {
         self.worker = worker
-        self.musicPlayer = musicPlayer
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(playerStateDidChange(_:)),
-                                               name: musicPlayer.playerStateDidChange,
-                                               object: musicPlayer)
     }
     
     let worker: SearchResultsWorkingLogic
     var presenter: SearchResultsPresentationLogic?
-    let musicPlayer: SearchResultsMusicPlayer
     
     var searchedSongs: [SongData]?
     var searchedArtist: [ArtistsData]?
@@ -68,22 +59,5 @@ final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDa
             }
         }
     }
-    
-    @objc func playerStateDidChange(_ notification: Notification) {
-        fetchNowPlayingSong()
-    }
-    
-    func fetchNowPlayingSong() {
-        guard let songInfo = musicPlayer.playingSongInformation else { return }
-        guard let playbackState = musicPlayer.playbackState else { return }
-        presenter?.presentNowPlayingSong(playbackState: playbackState, songInfo: songInfo)
-    }
-    
-    func playSong(at index: Int) {
-        guard let songs = searchedSongs else { return }
-        musicPlayer.songs = songs
-        musicPlayer.playSong(at: index)
-    }
-
     
 }

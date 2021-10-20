@@ -13,7 +13,6 @@ import Nuke
 protocol LibraryDisplayLogic: AnyObject {
     func displayPlaylists(for viewModel: Library.Fetch.PlaylistViewModel)
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel)
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class LibraryViewController: BaseViewController{
@@ -37,9 +36,9 @@ final class LibraryViewController: BaseViewController{
     // MARK: - Object lifecycle
     private var nowPlayingSongID: String?
     
-    init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
+    init(musicAPI: AppleMusicAPI, storefrontID: String, worker: LibraryWorkingLogic) {
         super.init()
-        setup(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer)
+        setup(musicAPI: musicAPI, storefrontID: storefrontID, worker: worker)
     }
     
     override func loadView() {
@@ -52,7 +51,7 @@ final class LibraryViewController: BaseViewController{
         super.viewDidLoad()
         interactor?.fetchPlaylists()
         interactor?.fetchTopCharts()
-        interactor?.fetchNowPlayingSong()
+        fetchNowPlayingSong()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -62,12 +61,11 @@ final class LibraryViewController: BaseViewController{
     
     // MARK: - Setup
     
-    private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
+    private func setup(musicAPI: AppleMusicAPI, storefrontID: String, worker: LibraryWorkingLogic) {
         let viewController = self
-        let worker = LibraryWorker(musicAPI: musicAPI, storeFrontID: storefrontID)
-        let interactor = LibraryInteractor(worker: worker, musicPlayer: musicPlayer)
+        let interactor = LibraryInteractor(worker: worker)
         let presenter = LibraryPresenter()
-        let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI, musicPlayer: musicPlayer)
+        let router = LibraryRouter(storeFrontID: storefrontID, musicAPI: musicAPI)
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -78,7 +76,37 @@ final class LibraryViewController: BaseViewController{
         tableView.dataSource = self
         playlistCell.collectionView.delegate = self
         playlistCell.collectionView.dataSource = self
-        searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer))
+        searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID))
+
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(
+                self, selector: #selector(fetchNowPlayingSong), name: musicPlayer.playerStateDidChange, object: musicPlayer)
+        }
+    }
+
+    @objc func fetchNowPlayingSong() {
+        guard let song = appMusicPlayer?.playingSongInformation else { return }
+        guard let playbackState = appMusicPlayer?.playbackState else { return }
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
+        }
+
+        if playbackState.status == .playing {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = topSongsViewModel?.topSongs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 1))
+            }
+        }
+
+        tableView.reloadRows(at: rowsToReload, with: .none)
     }
  
     private func layoutUI() {
@@ -107,31 +135,9 @@ extension LibraryViewController: LibraryDisplayLogic {
     
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel) {
         self.topSongsViewModel = viewModel
+        appMusicPlayer?.songs = viewModel.topSongsData
         dismissLoadingView()
         tableView.reloadSections([1], with: .automatic)
-    }
-    
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
-        var songIDsToReload: [String] = []
-        if let oldNowPlayingID = self.nowPlayingSongID {
-            songIDsToReload.append(oldNowPlayingID)
-        }
-        
-        if isPlaying {
-            songIDsToReload.append(song.id)
-            self.nowPlayingSongID = song.id
-        } else {
-            self.nowPlayingSongID = nil
-        }
-        
-        var rowsToReload: [IndexPath] = []
-        for songID in songIDsToReload {
-            if let songIndex = topSongsViewModel?.topSongs.firstIndex(where: { $0.id == songID }) {
-                rowsToReload.append(IndexPath(row: songIndex, section: 1))
-            }
-        }
-        
-        tableView.reloadRows(at: rowsToReload, with: .none)
     }
 }
 
@@ -152,7 +158,7 @@ extension LibraryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        interactor?.playSong(at: indexPath.row)
+        appMusicPlayer?.playSong(at: indexPath.row)
     }
 }
 

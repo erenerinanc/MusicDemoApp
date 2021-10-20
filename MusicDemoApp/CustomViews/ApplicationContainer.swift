@@ -7,6 +7,12 @@
 
 import UIKit
 
+extension UIViewController {
+    var appMusicPlayer: SystemMusicPlayer? {
+        return (parent?.parent as? ApplicationContainer)?.musicPlayer
+    }
+}
+
 class ApplicationContainer: BaseViewController {
     let musicPlayer: SystemMusicPlayer
     let navController: UINavigationController

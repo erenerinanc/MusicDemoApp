@@ -29,8 +29,12 @@ struct APIRequest {
     let parameters: [String:String]
 }
 
-final class AppleMusicAPI {
-    let urlSession: URLSession
+protocol AppleMusicAPI {
+    func fetch<T:Decodable>(request: APIRequest, model: T.Type, completion: @escaping (Result<T,APIError>) -> Void)
+}
+
+final class AppleMusicFeed: AppleMusicAPI {
+    var urlSession: URLSession
     
     init(developerToken: String, userToken: String) {
         let sessionConfig = URLSessionConfiguration.default
@@ -50,13 +54,17 @@ final class AppleMusicAPI {
         urlRequest.httpMethod = "GET"
         urlSession.dataTask(with: urlRequest) { data, response, error in
             guard let data = data else {
-                completion(.failure(.invalidData))
+                DispatchQueue.main.async {
+                    completion(.failure(.invalidData))
+                }
                 print(APIError.invalidData)
                 return
             }
             
             if let _ = error {
-                completion(.failure(.unableToComplete))
+                DispatchQueue.main.async {
+                    completion(.failure(.unableToComplete))
+                }
                 print(APIError.unableToComplete)
                 return
             } else {
@@ -64,10 +72,16 @@ final class AppleMusicAPI {
                     do {
                         let decoder = JSONDecoder()
                         let apiResponse = try decoder.decode(model.self, from: data)
-                        completion(.success(apiResponse))
+
+                        DispatchQueue.main.async {
+                            completion(.success(apiResponse))
+                        }
                     } catch {
                         let error = error
-                        completion(.failure(.invalidData))
+
+                        DispatchQueue.main.async {
+                            completion(.failure(.invalidData))
+                        }
                         print("Error:", error.localizedDescription, APIError.invalidData)
                     }
                 } else {

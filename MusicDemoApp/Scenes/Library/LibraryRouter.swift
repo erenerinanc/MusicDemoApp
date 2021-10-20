@@ -23,22 +23,21 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing{
     var dataStore: LibraryDataStore?
     var musicAPI: AppleMusicAPI
     var storeFrontID: String
-    var musicPlayer: SystemMusicPlayer
-    
-    init(storeFrontID: String, musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
+
+    init(storeFrontID: String, musicAPI: AppleMusicAPI) {
         self.musicAPI = musicAPI
         self.storeFrontID = storeFrontID
-        self.musicPlayer = musicPlayer
     }
     
     func routeToCatalogPlaylist(globalID: String) {
-        let destVC = PlaylistViewController(musicAPI: musicAPI, musicPlayer: musicPlayer)
+        let destVC = PlaylistViewController(musicAPI: musicAPI)
         destVC.router?.dataStore?.storefrontID = storeFrontID
         destVC.router?.dataStore?.globalID = globalID
         viewController?.navigationController?.pushViewController(destVC, animated: true)
     }
     
     func routeToMediaPlayer() {
+        guard let musicPlayer = viewController?.appMusicPlayer else { return }
         let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         viewController?.navigationController?.present(destVC, animated: true)
     }

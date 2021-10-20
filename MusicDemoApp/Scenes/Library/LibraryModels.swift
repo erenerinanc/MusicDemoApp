@@ -41,6 +41,7 @@ enum Library {
         
         struct TopSongsViewModel {
             var topSongs: [Library.Fetch.TopSongsViewModel.TopSongs]
+            var topSongsData: [SongData]
             
             struct TopSongs {
                 var artistName: String

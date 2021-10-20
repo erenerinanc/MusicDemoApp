@@ -10,7 +10,6 @@ import Foundation
 protocol LibraryPresentationLogic: AnyObject {
     func presentPlaylists(response: Library.Fetch.PlaylistResponse)
     func presentTopSongs(response: Library.Fetch.TopSongsResponse)
-    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation)
 }
 
 final class LibraryPresenter: LibraryPresentationLogic {
@@ -24,9 +23,7 @@ final class LibraryPresenter: LibraryPresentationLogic {
                                                                                                   )
         }
         
-        DispatchQueue.main.async {
-            self.viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
-        }
+        self.viewController?.displayPlaylists(for: Library.Fetch.PlaylistViewModel(playlists: playlists))
     }
     
     func presentTopSongs(response: Library.Fetch.TopSongsResponse) {
@@ -37,13 +34,7 @@ final class LibraryPresenter: LibraryPresentationLogic {
                                                                                                )
         }
         
-        DispatchQueue.main.async {
-            self.viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs))
-        }
-    }
-    
-    func presentNowPlayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        viewController?.displayNowPlayingSong(songInfo, isPlaying: playbackState.status == .playing)
+        self.viewController?.displayTopSongs(for: Library.Fetch.TopSongsViewModel(topSongs: topSongs, topSongsData: response.topSongs))
     }
     
 }

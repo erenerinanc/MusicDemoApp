@@ -9,7 +9,6 @@ import Foundation
 
 protocol PlaylistPresentationLogic: AnyObject {
     func presentCatalogPlaylist(response: Playlist.Fetch.Response)
-    func presentNowplayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) 
 }
 
 final class PlaylistPresenter: PlaylistPresentationLogic {
@@ -35,14 +34,8 @@ final class PlaylistPresenter: PlaylistPresentationLogic {
         )
         }
         
-        DispatchQueue.main.async {
-            self.viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
-        }
+        self.viewController?.displayPlaylistDetails(for: Playlist.Fetch.ViewModel(catalogPlaylist: catalogPlaylist))
         
-    }
-    
-    func presentNowplayingSong(playbackState: SystemMusicPlayer.PlaybackState, songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        viewController?.displayNowPlayingSong(songInfo, isPlaying: playbackState.status == .playing)
     }
     
 }

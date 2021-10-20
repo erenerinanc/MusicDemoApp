@@ -12,7 +12,6 @@ import SnapKit
 protocol SearchResultsDisplayLogic: AnyObject {
     func displaySearchResults(for viewModel: SearchResults.Fetch.SongViewModel)
     func displaySearchResults(for viewModel: SearchResults.Fetch.ArtistViewModel)
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class SearchResultsViewController: BaseViewController {
@@ -31,9 +30,9 @@ final class SearchResultsViewController: BaseViewController {
 
     // MARK: - Object lifecycle
     
-    init(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
+    init(musicAPI: AppleMusicAPI, storefrontID: String) {
         super.init()
-        setup(musicAPI: musicAPI, storefrontID: storefrontID, musicPlayer: musicPlayer)
+        setup(musicAPI: musicAPI, storefrontID: storefrontID)
     }
     
     override func loadView() {
@@ -44,17 +43,17 @@ final class SearchResultsViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        interactor?.fetchNowPlayingSong()
+        fetchNowPlayingSong()
     }
     
     // MARK: - Setup
     
-    private func setup(musicAPI: AppleMusicAPI, storefrontID: String, musicPlayer: SystemMusicPlayer) {
+    private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
         let viewController = self
         let worker = SearchResultsWorker(musicAPI: musicAPI, storeFrontID: storefrontID)
-        let interactor = SearchResultsInteractor(worker: worker, musicPlayer: musicPlayer)
+        let interactor = SearchResultsInteractor(worker: worker)
         let presenter = SearchResultsPresenter()
-        let router = SearchResultsRouter(musicPlayer: musicPlayer)
+        let router = SearchResultsRouter()
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -63,6 +62,40 @@ final class SearchResultsViewController: BaseViewController {
         router.dataStore = interactor
         tableView.delegate = self
         tableView.dataSource = self
+
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(fetchNowPlayingSong),
+                                                   name: musicPlayer.playerStateDidChange,
+                                                   object: musicPlayer)
+        }
+    }
+
+
+
+    @objc func fetchNowPlayingSong() {
+        guard let song = appMusicPlayer?.playingSongInformation else { return }
+        guard let playbackState = appMusicPlayer?.playbackState else { return }
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
+        }
+
+        if playbackState.status == .playing {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = songViewModel?.songs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 0))
+            }
+        }
+
+        tableView.reloadRows(at: rowsToReload, with: .none)
     }
     
     private func layoutUI() {
@@ -152,7 +185,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            interactor?.playSong(at: indexPath.row)
+            appMusicPlayer?.playSong(at: indexPath.row)
         } else {
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
             router?.routeToArtistDetail(with: urlString)
@@ -180,29 +213,6 @@ extension SearchResultsViewController: SearchResultsDisplayLogic {
     func displaySearchResults(for viewModel: SearchResults.Fetch.ArtistViewModel) {
         artistViewModel = viewModel
         tableView.reloadData()
-    }
-    
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
-        var songIDsToReload: [String] = []
-        if let oldNowPlayingID = self.nowPlayingSongID {
-            songIDsToReload.append(oldNowPlayingID)
-        }
-        
-        if isPlaying {
-            songIDsToReload.append(song.id)
-            self.nowPlayingSongID = song.id
-        } else {
-            self.nowPlayingSongID = nil
-        }
-        
-        var rowsToReload: [IndexPath] = []
-        for songID in songIDsToReload {
-            if let songIndex = songViewModel?.songs.firstIndex(where: { $0.id == songID }) {
-                rowsToReload.append(IndexPath(row: songIndex, section: 0))
-            }
-        }
-        
-        tableView.reloadRows(at: rowsToReload, with: .none)
     }
     
 }

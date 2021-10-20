@@ -20,18 +20,15 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
     
     weak var viewController: PlaylistViewController?
     var dataStore: PlaylistDataStore?
-    var musicPlayer: SystemMusicPlayer
-    
-    init(musicPlayer: SystemMusicPlayer){
-        self.musicPlayer = musicPlayer
-    }
     
     func routeToMediaPlayer() {
+        guard let musicPlayer = viewController?.appMusicPlayer else { return }
         let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         self.viewController?.navigationController?.present(destVC, animated: true)
     }
     
     func pauseSong() {
+        guard let musicPlayer = viewController?.appMusicPlayer else { return }
         let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         destVC.interactor?.pause()
     }

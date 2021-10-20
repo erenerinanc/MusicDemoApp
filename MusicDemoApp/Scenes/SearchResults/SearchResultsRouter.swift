@@ -20,13 +20,9 @@ final class SearchResultsRouter: SearchResultsRoutingLogic, SearchResultsDataPas
     
     weak var viewController: SearchResultsViewController?
     var dataStore: SearchResultsDataStore?
-    let musicPlayer: SystemMusicPlayer
-    
-    init(musicPlayer: SystemMusicPlayer) {
-        self.musicPlayer = musicPlayer
-    }
     
     func routeToMediaPlayer() {
+        guard let musicPlayer = viewController?.appMusicPlayer else { return }
         let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
         viewController?.present(destVC, animated: true, completion: nil)
     }

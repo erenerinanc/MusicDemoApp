@@ -10,12 +10,6 @@ import Foundation
 protocol LibraryBusinessLogic: AnyObject {
     func fetchPlaylists()
     func fetchTopCharts()
-    func fetchNowPlayingSong()
-    
-    func playSong(at index: Int)
-    func play()
-    func pause()
-    func playNextSong()
 }
 
 protocol LibraryDataStore: AnyObject {
@@ -38,19 +32,13 @@ protocol LibraryMusicPlayer: AnyObject {
 extension SystemMusicPlayer: LibraryMusicPlayer { }
 
 final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
-    init(worker: LibraryWorkingLogic, musicPlayer: LibraryMusicPlayer) {
+    init(worker: LibraryWorkingLogic) {
         self.worker = worker
-        self.musicPlayer = musicPlayer
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(playerStateDidChange(_:)),
-                                               name: musicPlayer.playerStateDidChange,
-                                               object: musicPlayer)
     }
     
     var presenter: LibraryPresentationLogic?
     let worker: LibraryWorkingLogic
-    let musicPlayer: LibraryMusicPlayer
-   
+
     var playlists: [PlaylistData]?
     var topSongs: [SongData]?
 
@@ -81,34 +69,6 @@ final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
                 print(error.localizedDescription)
             }
         }
-    }
-    
-    func playSong(at index: Int) {
-        guard let songs = topSongs else { return }
-        musicPlayer.songs = songs
-        musicPlayer.playSong(at: index)
-    }
-    
-    func play() {
-        musicPlayer.play()
-    }
-    
-    func pause() {
-        musicPlayer.pause()
-    }
-    
-    func playNextSong() {
-        musicPlayer.playNextSong()
-    }
-    
-    @objc func playerStateDidChange(_ notification: Notification) {
-        fetchNowPlayingSong()
-    }
-    
-    func fetchNowPlayingSong() {
-        guard let playbackState = musicPlayer.playbackState else { return }
-        guard let songInfo = musicPlayer.playingSongInformation else { return }
-        presenter?.presentNowPlayingSong(playbackState: playbackState, songInfo: songInfo)
     }
 
 }

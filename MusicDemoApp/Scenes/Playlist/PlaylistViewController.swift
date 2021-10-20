@@ -13,7 +13,6 @@ import SwiftUI
 
 protocol PlaylistDisplayLogic: AnyObject {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel)
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
 final class PlaylistViewController: BaseViewController {
@@ -36,21 +35,21 @@ final class PlaylistViewController: BaseViewController {
     
     //MARK: - Object LifeCycle
     
-    init(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
+    init(musicAPI: AppleMusicAPI) {
         super.init()
         self.musicAPI = musicAPI
-        setup(musicAPI: musicAPI, musicPlayer: musicPlayer)
+        setup(musicAPI: musicAPI)
     }
 
     
     // MARK: - Setup
     
-    private func setup(musicAPI: AppleMusicAPI, musicPlayer: SystemMusicPlayer) {
+    private func setup(musicAPI: AppleMusicAPI) {
         let viewController = self
         let worker = PlaylistWorker(musicAPI: musicAPI)
-        let interactor = PlaylistInteractor(worker: worker, musicPlayer: musicPlayer)
+        let interactor = PlaylistInteractor(worker: worker)
         let presenter = PlaylistPresenter()
-        let router = PlaylistRouter(musicPlayer: musicPlayer)
+        let router = PlaylistRouter()
         viewController.interactor = interactor
         viewController.router = router
         interactor.presenter = presenter
@@ -60,6 +59,36 @@ final class PlaylistViewController: BaseViewController {
         tableView.delegate = self
         tableView.dataSource = self
         headerCell.delegate = self
+
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(
+                self, selector: #selector(fetchNowPlayingSong), name: musicPlayer.playerStateDidChange, object: musicPlayer)
+        }
+    }
+
+    @objc func fetchNowPlayingSong() {
+        guard let song = appMusicPlayer?.playingSongInformation else { return }
+        guard let playbackState = appMusicPlayer?.playbackState else { return }
+        var songIDsToReload: [String] = []
+        if let oldNowPlayingID = self.nowPlayingSongID {
+            songIDsToReload.append(oldNowPlayingID)
+        }
+
+        if playbackState.status == .playing {
+            songIDsToReload.append(song.id)
+            self.nowPlayingSongID = song.id
+        } else {
+            self.nowPlayingSongID = nil
+        }
+
+        var rowsToReload: [IndexPath] = []
+        for songID in songIDsToReload {
+            if let songIndex = viewModel?.catalogPlaylist[0].songs.firstIndex(where: { $0.id == songID }) {
+                rowsToReload.append(IndexPath(row: songIndex, section: 1))
+            }
+        }
+
+        tableView.reloadRows(at: rowsToReload, with: .none)
     }
     
     override func loadView() {
@@ -73,7 +102,7 @@ final class PlaylistViewController: BaseViewController {
         modalPresentationStyle = .custom
         
         interactor?.fetchCatalogPlaylist()
-        interactor?.fetchNowPlayingSong()
+        fetchNowPlayingSong()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -106,29 +135,6 @@ extension PlaylistViewController: PlaylistDisplayLogic {
             self.tableView.reloadSections(IndexSet(integer: 1), with: .fade)
         }
     }
-
-    func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
-        var songIDsToReload: [String] = []
-        if let oldNowPlayingID = self.nowPlayingSongID {
-            songIDsToReload.append(oldNowPlayingID)
-        }
-        
-        if isPlaying {
-            songIDsToReload.append(song.id)
-            self.nowPlayingSongID = song.id
-        } else {
-            self.nowPlayingSongID = nil
-        }
-        
-        var rowsToReload: [IndexPath] = []
-        for songID in songIDsToReload {
-            if let songIndex = viewModel?.catalogPlaylist[0].songs.firstIndex(where: { $0.id == songID }) {
-                rowsToReload.append(IndexPath(row: songIndex, section: 1))
-            }
-        }
-        
-        tableView.reloadRows(at: rowsToReload, with: .none)
-    } 
 }
 
 //MARK: - TableView Delegate & DataSource
@@ -137,7 +143,7 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            interactor?.playSong(at: indexPath.row)
+            appMusicPlayer?.playSong(at: indexPath.row)
         }
     }
 
@@ -187,7 +193,7 @@ extension PlaylistViewController: UITableViewDataSource {
 
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
-        interactor?.play()
+        appMusicPlayer?.play()
     }
     
     func imageSwiped() {
