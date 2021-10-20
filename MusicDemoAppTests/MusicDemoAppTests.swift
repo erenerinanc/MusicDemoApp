@@ -14,19 +14,15 @@ class MusicDemoAppTests: XCTestCase {
 
     override func setUp() {
         let api = AppleMusicFeed(developerToken: "", userToken: "")
-        let sessionConfig = URLSessionConfiguration.default
-        sessionConfig.protocolClasses = [StubURLProtocol.self]
-        api.urlSession = URLSession(configuration: sessionConfig)
         sut = LibraryViewController(
             musicAPI: api,
-            storefrontID: "", musicPlayer: SystemMusicPlayer(),
-            worker: LibraryWorker(musicAPI: api, storeFrontID: "")
+            storefrontID: "",
+            worker: LibraryWorkerSpy()
         )
     }
 
     func testPlaylistsWhenViewDidLoad() {
         // When
-        StubURLProtocol.data = "{json}}".data(using: .utf8)!
         sut.interactor?.fetchPlaylists()
         // Then
         XCTAssertEqual(sut.playlistViewModel?.playlists.count, 4)
@@ -63,37 +59,4 @@ final class LibraryWorkerSpy: LibraryWorkingLogic {
         completion(.success(charts))
     }
     
-}
-
-/// URLProtocol for simplifying unit tests by acting man-in-the-middle on for the session.
-/// It's configured to work only with test targets. It won't work if there's no test process in progress.
-public final class StubURLProtocol: URLProtocol {
-
-    /// Result of the request, which is going to happen.
-    public static var data: Data!
-
-}
-
-extension StubURLProtocol {
-
-    public override class func canInit(with request: URLRequest) -> Bool {
-        return true
-    }
-
-    public override class func canInit(with task: URLSessionTask) -> Bool {
-        return true
-    }
-
-    public override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        return request
-    }
-
-    public override func startLoading() {
-        self.client?.urlProtocol(self, didLoad: StubURLProtocol.data)
-    }
-
-    public override func stopLoading() {
-        // Nothing to handle
-    }
-
 }
