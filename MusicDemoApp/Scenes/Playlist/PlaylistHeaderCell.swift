@@ -11,7 +11,6 @@ import Nuke
 
 protocol HeaderUserInteractionDelegate {
     func playButtonTapped()
-    func pauseButtonTapped()
     func imageSwiped()
 }
 
@@ -38,7 +37,7 @@ class PlaylistHeaderCell: UITableViewCell {
         $0.layer.borderColor = Colors.primaryLabel.cgColor
         $0.tintColor = Colors.primaryLabel
         $0.setImage(UIImage(named: "play"), for: .normal)
-        $0.addTarget(self, action: #selector(playPauseButtonTapped(_:)), for: .touchUpInside)
+        $0.addTarget(self, action: #selector(playButtonTapped(_:)), for: .touchUpInside)
     }
     private lazy var routeBackButton = UIButton(type: .system).configure {
         $0.tintColor = .white
@@ -107,17 +106,8 @@ class PlaylistHeaderCell: UITableViewCell {
         }
     }
     
-    @objc func playPauseButtonTapped(_ sender: UIButton) {
-        if isPlayTapped {
-            delegate?.pauseButtonTapped()
-            isPlayTapped = false
-            playPauseButton.setImage(UIImage(named: "play"), for: .normal)
-        } else {
-            delegate?.playButtonTapped()
-            isPlayTapped = true
-            playPauseButton.setImage(UIImage(named: "pause"), for: .normal)
-        }
-        
+    @objc func playButtonTapped(_ sender: UIButton) {
+        delegate?.playButtonTapped()
     }
     
     @objc func imageSwiped(_ gesture: UISwipeGestureRecognizer) {

@@ -68,10 +68,7 @@ final class SearchResultsViewController: BaseViewController {
     private func layoutUI() {
         view.addSubview(tableView)
         view.backgroundColor = Colors.background
-        tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(8)
-            make.top.bottom.trailing.equalToSuperview()
-        }
+        tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
     
     private func configureKeyboard() {
@@ -118,7 +115,8 @@ extension SearchResultsViewController: UITableViewDelegate {
         }
         headerView.addSubview(headerLabel)
         headerLabel.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(headerView.layoutMarginsGuide)
+            make.trailing.equalTo(headerView.layoutMarginsGuide)
+            make.leading.equalTo(headerView.layoutMarginsGuide).inset(4)
             make.top.equalToSuperview().offset(16)
             make.bottom.equalToSuperview().inset(8)
         }

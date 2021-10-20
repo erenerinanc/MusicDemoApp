@@ -59,6 +59,7 @@ class SystemMusicPlayer {
     }
     
     var currentIndexInSongsArray = 0
+    var isShuffled: Bool = false
     
     //MARK: - Object Lifecycle
     init() {
@@ -120,6 +121,18 @@ class SystemMusicPlayer {
         }
        
         playSong(at: currentIndexInSongsArray)
+    }
+    
+    func shuffle() {
+        if isShuffled {
+            songs.removeFirst(currentIndexInSongsArray)
+            musicPlayer.setQueue(with: songs.compactMap(\.id))
+            isShuffled = false
+        } else {
+            let shuffledSongs = songs.shuffled()
+            musicPlayer.setQueue(with: shuffledSongs.compactMap(\.id))
+            isShuffled = true
+        }
     }
     
 }

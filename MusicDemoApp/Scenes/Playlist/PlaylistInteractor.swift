@@ -69,12 +69,7 @@ final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
     }
     
     func play() {
-        guard musicPlayer.playingSongInformation != nil else {
-            playSong(at: 0)
-            return
-        }
-        musicPlayer.play()
-        
+        playSong(at: 0)
     }
     
     func pause() {

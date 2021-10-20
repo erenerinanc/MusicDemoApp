@@ -86,8 +86,7 @@ final class LibraryViewController: BaseViewController{
         view.backgroundColor = Colors.background
         navigationItem.searchController = searchController
         tableView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(8)
-            make.top.trailing.equalToSuperview()
+            make.top.leading.trailing.equalToSuperview()
             make.bottom.equalTo(view.snp.bottom)
         }
     
@@ -198,7 +197,8 @@ extension LibraryViewController: UITableViewDataSource {
         }
         headerView.addSubview(headerLabel)
         headerLabel.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(headerView.layoutMarginsGuide)
+            make.trailing.equalTo(headerView.layoutMarginsGuide)
+            make.leading.equalTo(headerView.layoutMarginsGuide).inset(4)
             make.top.equalToSuperview().offset(16)
             make.bottom.equalToSuperview().inset(8)
         }

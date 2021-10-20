@@ -20,7 +20,7 @@ enum PlayerButton {
 
 protocol MediaPlayerDisplayLogic: AnyObject {
     func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool)
 }
 
 final class MediaPlayerViewController: BaseViewController {
@@ -185,6 +185,7 @@ final class MediaPlayerViewController: BaseViewController {
         contentView.removeFromSuperview()
         volumetapped = false
     }
+    
 }
 
 //MARK: - Display Logic
@@ -196,9 +197,15 @@ extension MediaPlayerViewController: MediaPlayerDisplayLogic {
         self.artistNameLabel.text = songInfo.artistName
     }
     
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
+    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool) {
         let isPlaying = playbackState.status == .playing
         self.isPlaying = isPlaying
+        
+        if isShuffled {
+            playerView.shuffleButton.tintColor = Colors.primaryLabel
+        } else {
+            playerView.shuffleButton.tintColor = Colors.secondaryLabel
+        }
         
         progressView.configure(playbackTime: playbackState.currentTime, songDuration: playbackState.songDuration)
         playerView.playButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
@@ -222,7 +229,7 @@ extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .shuffle:
-            break
+            interactor?.shuffle()
         case .previous:
             interactor?.playPreviousSong()
         case .next:

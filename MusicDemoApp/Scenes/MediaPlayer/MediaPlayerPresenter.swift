@@ -9,7 +9,7 @@ import Foundation
 
 protocol MediaPlayerPresentationLogic: AnyObject {
     func presentSongDetails(songInfo: SystemMusicPlayer.PlayingSongInformation)
-    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
+    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool)
 }
 
 final class MediaPlayerPresenter: MediaPlayerPresentationLogic {
@@ -20,8 +20,8 @@ final class MediaPlayerPresenter: MediaPlayerPresentationLogic {
         viewController?.displaySongDetail(songInfo: songInfo)
     }
         
-    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-        viewController?.displayPlaybackState(playbackState: playbackState)
+    func presentPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool) {
+        viewController?.displayPlaybackState(playbackState: playbackState, isShuffled: isShuffled)
     }
 
 }

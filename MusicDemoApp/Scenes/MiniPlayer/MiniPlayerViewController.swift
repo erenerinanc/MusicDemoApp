@@ -22,6 +22,10 @@ class MiniPlayerViewController: BaseViewController {
     
     //MARK: - Configure UI
     
+    lazy var imageContainerView = UIImageView().configure {
+        $0.backgroundColor = Colors.secondaryBackground.withAlphaComponent(0.95)
+    }
+    
     lazy var songImageView = UIImageView().configure {
         $0.contentMode = .scaleAspectFill
         $0.layer.cornerRadius = CGFloat(10)
@@ -87,23 +91,30 @@ class MiniPlayerViewController: BaseViewController {
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
         view.addGestureRecognizer(gestureRecognizer)
         view.addSubview(songNameLabel)
-        view.addSubview(songImageView)
+        view.addSubview(imageContainerView)
+        imageContainerView.addSubview(songImageView)
         view.addSubview(actionBar)
         actionBar.addSubview(playPauseButton)
         actionBar.addSubview(skipNextButton)
-
+        
+        
+        imageContainerView.snp.makeConstraints { make in
+            make.leading.top.bottom.equalToSuperview()
+            make.width.equalTo(76)
+        }
+        
+        songImageView.snp.makeConstraints { make in
+            make.centerY.equalTo(view.snp.centerY)
+            make.leading.equalToSuperview().inset(16)
+            make.top.bottom.equalToSuperview().inset(8)
+            make.width.equalTo(60)
+        }
         
         songNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(songImageView.snp.trailing).offset(8)
             make.centerY.equalTo(view.snp.centerY)
         }
         
-        songImageView.snp.makeConstraints { make in
-            make.centerY.equalTo(view.snp.centerY)
-            make.leading.equalToSuperview().inset(24)
-            make.top.bottom.equalToSuperview().inset(8)
-            make.width.equalTo(60)
-        }
         
         actionBar.snp.makeConstraints { make in
             make.centerY.equalTo(view.snp.centerY)
@@ -143,11 +154,11 @@ class MiniPlayerViewController: BaseViewController {
     
     func animateLabel() {
 
-        UIView.animate(withDuration: 8.0, delay: 0.0, options: [.repeat, .curveEaseInOut], animations: {
+        UIView.animate(withDuration: 10.0, delay: 0.0, options: [.repeat, .curveEaseInOut], animations: {
             self.songNameLabel.transform = CGAffineTransform(translationX: self.songNameLabel.bounds.origin.x + 200, y: self.songNameLabel.bounds.origin.y)
         }, completion: nil)
         
-        UIView.animate(withDuration: 8.0, delay: 0.0, options: [.repeat, .curveEaseInOut]) {
+        UIView.animate(withDuration: 10.0, delay: 0.0, options: [.repeat, .curveEaseInOut]) {
             self.songNameLabel.transform = CGAffineTransform(translationX: self.songNameLabel.bounds.origin.x - 300, y: self.songNameLabel.bounds.origin.y)
         }
 

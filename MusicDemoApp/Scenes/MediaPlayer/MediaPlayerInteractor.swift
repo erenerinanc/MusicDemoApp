@@ -12,6 +12,7 @@ protocol MediaPlayerBusinessLogic: AnyObject {
     func playPreviousSong()
     func pause()
     func play()
+    func shuffle()
     
     func fetchPlaybackState()
     func fetchSongDetails()
@@ -23,17 +24,17 @@ protocol MediaPlayerDataStore: AnyObject {
 protocol MediaPlayerMusicPlayer: AnyObject {
     func play()
     func pause()
-    #warning("Add shuffle")
-
     func playNextSong()
     func playPreviousSong()
     func playSong(at songIndex: Int)
+    func shuffle()
     
     var songs: [SongData] { get set }
     var playbackState: SystemMusicPlayer.PlaybackState? { get }
     var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
     
     var playerStateDidChange: Notification.Name { get }
+    var isShuffled: Bool { get }
 }
 
 extension SystemMusicPlayer: MediaPlayerMusicPlayer { }
@@ -58,7 +59,8 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
     
     func fetchPlaybackState() {
         guard let playbackState = musicPlayer.playbackState else { return }
-        presenter?.presentPlaybackState(playbackState: playbackState)
+        let isShuffled = musicPlayer.isShuffled
+        presenter?.presentPlaybackState(playbackState: playbackState, isShuffled: isShuffled)
     }
     
     func fetchSongDetails() {
@@ -84,6 +86,10 @@ final class MediaPlayerInteractor: MediaPlayerBusinessLogic, MediaPlayerDataStor
     func pause() {
         guard musicPlayer.playbackState?.status != .paused else { return }
         musicPlayer.pause()
+    }
+    
+    func shuffle() {
+        musicPlayer.shuffle()
     }
     
 }

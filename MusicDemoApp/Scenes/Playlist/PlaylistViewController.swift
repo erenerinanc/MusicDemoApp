@@ -13,7 +13,6 @@ import SwiftUI
 
 protocol PlaylistDisplayLogic: AnyObject {
     func displayPlaylistDetails(for viewModel: Playlist.Fetch.ViewModel)
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
     func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool)
 }
 
@@ -88,6 +87,7 @@ final class PlaylistViewController: BaseViewController {
     
     private func layoutUI() {
         view.addSubview(tableView)
+        view.backgroundColor = Colors.background
         tableView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
     }
 
@@ -105,11 +105,6 @@ extension PlaylistViewController: PlaylistDisplayLogic {
                 self.tableView.reloadSections(IndexSet(integer: 1), with: .fade)
             }
         }
-    }
-    
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-        let isPlaying = playbackState.status == .playing
-        headerCell.playPauseButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
     }
 
     func displayNowPlayingSong(_ song: SystemMusicPlayer.PlayingSongInformation, isPlaying: Bool) {
@@ -142,8 +137,6 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            headerCell.playPauseButton.setImage(UIImage(named: "pause"), for: .normal)
-            headerCell.isPlayTapped = true
             interactor?.playSong(at: indexPath.row)
         }
     }
@@ -195,10 +188,6 @@ extension PlaylistViewController: UITableViewDataSource {
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
         interactor?.play()
-    }
-    
-    func pauseButtonTapped() {
-        interactor?.pause()
     }
     
     func imageSwiped() {

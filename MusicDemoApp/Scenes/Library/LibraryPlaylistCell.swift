@@ -25,12 +25,21 @@ class LibraryPlaylistCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(collectionView)
-        collectionView.snp.makeConstraints { $0.directionalEdges.equalToSuperview() }
+        layoutUI()
+
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func layoutUI() {
+        contentView.addSubview(collectionView)
+        contentView.backgroundColor = Colors.background
+        collectionView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(4)
+            make.top.trailing.bottom.equalToSuperview()
+        }
     }
     
     
