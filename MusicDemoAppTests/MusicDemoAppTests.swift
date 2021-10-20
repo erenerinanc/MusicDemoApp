@@ -10,6 +10,7 @@ import XCTest
 
 class MusicDemoAppTests: XCTestCase {
 
+    var window = UIWindow()
     var sut: LibraryViewController!
 
     override func setUp() {
@@ -19,6 +20,9 @@ class MusicDemoAppTests: XCTestCase {
             storefrontID: "",
             worker: LibraryWorkerSpy()
         )
+        let container = ApplicationContainer(musicPlayer: SystemMusicPlayer(), rootViewController: sut)
+        window.addSubview(container.view)
+        RunLoop.current.run(until: Date())
     }
 
     func testPlaylistsWhenViewDidLoad() {
@@ -33,6 +37,18 @@ class MusicDemoAppTests: XCTestCase {
         sut.interactor?.fetchTopCharts()
         // Then
         XCTAssertEqual(sut.topSongsViewModel?.topSongs.count, 1)
+    }
+
+    func testMediaPlayerPlaysAtIndex_WhenTableViewItemIsSelected() {
+        // Given
+        let newSongIndex = 1
+        let indexPath = IndexPath(row: newSongIndex, section: 1)
+        let tableView = sut.tableView
+        sut.interactor?.fetchTopCharts()
+        // When
+        sut.tableView(tableView, didSelectRowAt: indexPath)
+        // Then
+        XCTAssertEqual(sut.appMusicPlayer?.currentIndexInSongsArray, newSongIndex)
     }
 
 }

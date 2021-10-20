@@ -25,7 +25,7 @@ final class LibraryViewController: BaseViewController{
     //MARK: - Configure UI
     
     private lazy var searchController = UISearchController()
-    private lazy var tableView = UITableView().configure {
+    lazy var tableView = UITableView().configure {
         $0.backgroundColor = Colors.background
         $0.indicatorStyle = .white
         $0.register(SongCell.self, forCellReuseIdentifier: SongCell.reuseID)
