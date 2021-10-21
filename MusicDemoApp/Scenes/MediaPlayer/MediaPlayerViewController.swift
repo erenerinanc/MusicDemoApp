@@ -18,15 +18,8 @@ enum PlayerButton {
     case volume
 }
 
-protocol MediaPlayerDisplayLogic: AnyObject {
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool)
-}
-
 final class MediaPlayerViewController: BaseViewController {
-    
-    var interactor: MediaPlayerBusinessLogic?
-    var router: (MediaPlayerRoutingLogic & MediaPlayerDataPassing)?
+
     
     private var volumetapped: Bool = false
     private var progressTimer: Timer?
@@ -70,9 +63,11 @@ final class MediaPlayerViewController: BaseViewController {
     
     // MARK: - Object lifecycle
     
-    init(musicPlayer: SystemMusicPlayer) {
+    override init() {
         super.init()
-        setup(musicPlayer: musicPlayer)
+        if let appMusicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(self, selector: #selector(playbackStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
+        }
     }
 
     override func loadView() {
@@ -82,25 +77,7 @@ final class MediaPlayerViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        interactor?.fetchSongDetails()
-        interactor?.fetchPlaybackState()
-    }
-
-    
-    // MARK: - Setup
-    
-    private func setup(musicPlayer: SystemMusicPlayer) {
-        let viewController = self
-        let interactor = MediaPlayerInteractor(musicPlayer: musicPlayer)
-        let presenter = MediaPlayerPresenter()
-        let router = MediaPlayerRouter()
-        viewController.interactor = interactor
-        viewController.router = router
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        router.viewController = viewController
-        router.dataStore = interactor
-        playerView.delegate = self
+        fetchPlaybackState()
     }
 
     //MARK: - Layout UI
@@ -153,6 +130,39 @@ final class MediaPlayerViewController: BaseViewController {
         }
     }
     
+    @objc func  playbackStateDidChange(_ notification: Notification) {
+        fetchPlaybackState()
+    }
+    
+    func fetchPlaybackState() {
+        guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
+        guard let playbackState = appMusicPlayer?.playbackState else { return }
+        guard let isShuffled = appMusicPlayer?.isShuffled else { return }
+        isPlaying = appMusicPlayer?.playbackState?.status == .playing
+        
+        Nuke.loadImage(with: nowPlayingSong.artworkURL, into: self.songImageview)
+        songNameLabel.text = nowPlayingSong.songName
+        artistNameLabel.text = nowPlayingSong.artistName
+        progressView.configure(playbackTime: playbackState.currentTime, songDuration: playbackState.songDuration)
+        playerView.playButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
+        
+        if isShuffled {
+            playerView.shuffleButton.tintColor = Colors.primaryLabel
+        } else {
+            playerView.shuffleButton.tintColor = Colors.secondaryLabel
+        }
+        
+        if isPlaying {
+            progressTimer?.invalidate()
+            progressTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] _ in
+                self?.fetchPlaybackState()
+            })
+        } else {
+            progressTimer?.invalidate()
+            progressTimer = nil
+        }
+    }
+    
     
     private func configureVolumeview() {
         view.addSubview(contentView)
@@ -188,40 +198,6 @@ final class MediaPlayerViewController: BaseViewController {
     
 }
 
-//MARK: - Display Logic
-
-extension MediaPlayerViewController: MediaPlayerDisplayLogic {
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        Nuke.loadImage(with: songInfo.artworkURL, into: self.songImageview)
-        self.songNameLabel.text = songInfo.songName
-        self.artistNameLabel.text = songInfo.artistName
-    }
-    
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState, isShuffled: Bool) {
-        let isPlaying = playbackState.status == .playing
-        self.isPlaying = isPlaying
-        
-        if isShuffled {
-            playerView.shuffleButton.tintColor = Colors.primaryLabel
-        } else {
-            playerView.shuffleButton.tintColor = Colors.secondaryLabel
-        }
-        
-        progressView.configure(playbackTime: playbackState.currentTime, songDuration: playbackState.songDuration)
-        playerView.playButton.setImage(UIImage(named: isPlaying ? "pause" : "play"), for: .normal)
-    
-        if isPlaying {
-            progressTimer?.invalidate()
-            progressTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak interactor] _ in
-                interactor?.fetchPlaybackState()
-            })
-        } else {
-            progressTimer?.invalidate()
-            progressTimer = nil
-        }
-
-    }
-}
 
 //MARK: - PlayerView Delegate
 
@@ -229,16 +205,16 @@ extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .shuffle:
-            interactor?.shuffle()
+            appMusicPlayer?.shuffle()
         case .previous:
-            interactor?.playPreviousSong()
+            appMusicPlayer?.playPreviousSong()
         case .next:
-            interactor?.playNextSong()
+            appMusicPlayer?.playNextSong()
         case .playPause:
             if isPlaying {
-                interactor?.pause()
+                appMusicPlayer?.pause()
             } else {
-                interactor?.play()
+                appMusicPlayer?.play()
             }
         case .volume:
             volumetapped = true

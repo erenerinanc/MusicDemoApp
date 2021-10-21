@@ -9,15 +9,7 @@ import UIKit
 import SnapKit
 import Nuke
 
-
-protocol MiniPlayerDisplayLogic: AnyObject {
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState)
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation)
-}
-
 class MiniPlayerViewController: BaseViewController {
-    var interactor: MiniPlayerBusinessLogic?
-    var router: (MiniPlayerRoutingLogic & MiniPlayerDataPassing)?
     var isPlaying: Bool = false
     
     //MARK: - Configure UI
@@ -57,7 +49,9 @@ class MiniPlayerViewController: BaseViewController {
     
     init(musicPlayer: SystemMusicPlayer) {
         super.init()
-        setup(musicPlayer: musicPlayer)
+        if let appMusicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
+        }
     }
     
     override func loadView() {
@@ -67,23 +61,25 @@ class MiniPlayerViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        interactor?.fetchPlaybackState()
-        interactor?.fetchSongDetail()
+        fetchPlaybackState()
     }
     
-    //MARK: - Setup
+    @objc func musicPlayerStateDidChange(_ notification: Notification) {
+        fetchPlaybackState()
+    }
     
-    private func setup(musicPlayer: SystemMusicPlayer) {
-        let viewController = self
-        let interactor = MiniPlayerInteractor(musicPlayer: musicPlayer)
-        let presenter = MiniPlayerPresenter()
-        let router = MiniPlayerRouter(musicPlayer: musicPlayer)
-        viewController.interactor = interactor
-        viewController.router = router
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        router.viewController = viewController
-        router.dataStore = interactor
+    func fetchPlaybackState() {
+        guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
+        isPlaying = appMusicPlayer?.playbackState?.status == .playing
+        playPauseButton.setImage(UIImage(named: isPlaying ? "minipause" : "miniplay"), for: .normal)
+        Nuke.loadImage(with: nowPlayingSong.iconArtworkURL, into: songImageView)
+        songNameLabel.text = nowPlayingSong.songName
+        
+        if isPlaying {
+            animateLabel()
+        } else {
+            stopAnimating()
+        }
     }
     
     private func layoutUI() {
@@ -138,18 +134,19 @@ class MiniPlayerViewController: BaseViewController {
     
     @objc func playPauseButtonTapped() {
         if isPlaying {
-            interactor?.pause()
+            appMusicPlayer?.pause()
         } else {
-            interactor?.play()
+            appMusicPlayer?.play()
         }
     }
     
     @objc func nextSongButtonTapped() {
-        interactor?.playNextSong()
+        appMusicPlayer?.playNextSong()
     }
     
     @objc func viewTapped(_ gesture: UITapGestureRecognizer) {
-        router?.routeToMediaPlayer()
+        let destVC = MediaPlayerViewController()
+        navigationController?.present(destVC, animated: true)
     }
     
     func animateLabel() {
@@ -168,26 +165,5 @@ class MiniPlayerViewController: BaseViewController {
         UIView.animate(withDuration: 0.0, delay: 0, options: []) {
             self.songNameLabel.transform = .identity
         }
-    }
-}
-
-//MARK: - Display Logic
-
-extension MiniPlayerViewController: MiniPlayerDisplayLogic {
-    func displayPlaybackState(playbackState: SystemMusicPlayer.PlaybackState) {
-        let isPlaying = playbackState.status == .playing
-        self.isPlaying = isPlaying
-        playPauseButton.setImage(UIImage(named: isPlaying ? "minipause" : "miniplay"), for: .normal)
-        
-        if isPlaying {
-            animateLabel()
-        } else {
-            stopAnimating()
-        }
-    }
-    
-    func displaySongDetail(songInfo: SystemMusicPlayer.PlayingSongInformation) {
-        Nuke.loadImage(with: songInfo.iconArtworkURL, into: songImageView)
-        songNameLabel.text = songInfo.songName
     }
 }

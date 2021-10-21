@@ -18,57 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         musicPlayer = SystemMusicPlayer()
         
-        let loadingViewController = UIViewController()
-        let indicator = UIActivityIndicatorView()
-        loadingViewController.view.addSubview(indicator)
-        indicator.snp.makeConstraints { $0.center.equalToSuperview() }
-        
-        guard let musicPlayer = musicPlayer else {
-            return false
-        }
-        
-        let appContainer = ApplicationContainer(musicPlayer: musicPlayer, rootViewController: loadingViewController)
+        guard let musicPlayer = musicPlayer else { return false }
+        let appContainer = ApplicationContainer(musicPlayer: musicPlayer)
         
         window?.rootViewController = appContainer
         window?.makeKeyAndVisible()
         print("Application started")
         let developerToken = JWT.shared.generateToken()
-        // REVIEW:
-        // SKCloudServiceTokenizer gibi bir katmanla,
-        // requestAuth, generateToken ve music api çağrıları
-        // tek fonksiyonda yapılabilir.
-        SKCloudServiceController.requestAuthorization { status in
-            print("Authentication requested")
-            if status == .authorized {
-                UserToken(developerToken: developerToken).generateToken { result in
-                    print("Authorized")
-                    switch result {
-                    case .success(let token):
-                        let musicAPI = AppleMusicFeed(developerToken: developerToken, userToken: token)
-                        musicAPI.fetch(request: APIRequest.getStoreFront(), model: Storefront.self) { result in
-                            switch result {
-                            case .success(let response):
-                                guard let id = response.data?[0].id else { return }
-                                DispatchQueue.main.async {
-                                    guard let musicPlayer = self.musicPlayer else { return }
-                                    let worker = LibraryWorker(musicAPI: musicAPI, storeFrontID: id)
-                                    let libraryVC = LibraryViewController(musicAPI: musicAPI, storefrontID: id, worker: worker)
-                                    appContainer.navController.setViewControllers([libraryVC], animated: true)
-                                }
-                            case .failure(let error):
-                                print(error.localizedDescription)
-                            }
-                        }
-                    case .failure(let error):
-                        print(error.localizedDescription)
-                    }
-                }
-            } else {
-                let alertVC = UIAlertController(title: "Apple Music Permission Required", message: nil, preferredStyle: .alert)
-                loadingViewController.present(alertVC, animated: true)
-            }
-        }
-          
+        let tokenizer = SKCloudServiceTokenizer()
+        tokenizer.generateAuth(developerToken: developerToken, appContainer: appContainer)
         return true
     }
 

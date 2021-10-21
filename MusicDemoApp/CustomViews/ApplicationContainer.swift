@@ -15,10 +15,9 @@ extension UIViewController {
 
 class ApplicationContainer: BaseViewController {
     let musicPlayer: SystemMusicPlayer
-    let navController: UINavigationController
-    init(musicPlayer: SystemMusicPlayer, rootViewController: UIViewController) {
+    let navController = UINavigationController()
+    init(musicPlayer: SystemMusicPlayer) {
         self.musicPlayer = musicPlayer
-        self.navController = UINavigationController(rootViewController: rootViewController)
         super.init()
     }
     
