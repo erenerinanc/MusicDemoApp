@@ -27,6 +27,7 @@ enum SearchResults {
         
         struct SongViewModel {
             var songs: [SearchResults.Fetch.SongViewModel.Song]
+            var songData: [SongData]
             
             struct Song {
                 var name: String

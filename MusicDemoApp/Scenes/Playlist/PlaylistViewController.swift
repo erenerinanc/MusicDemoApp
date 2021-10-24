@@ -40,6 +40,38 @@ final class PlaylistViewController: BaseViewController {
         self.musicAPI = musicAPI
         setup(musicAPI: musicAPI)
     }
+    
+    override func loadView() {
+        super.loadView()
+        layoutUI()
+        showLoadingView()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        modalPresentationStyle = .custom
+        
+        interactor?.fetchCatalogPlaylist()
+        fetchNowPlayingSong()
+    }
+    
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(
+                self, selector: #selector(fetchNowPlayingSong), name: musicPlayer.playerStateDidChange, object: musicPlayer)
+        }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+        super.viewWillAppear(animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        super.viewWillDisappear(animated)
+    }
 
     
     // MARK: - Setup
@@ -59,11 +91,6 @@ final class PlaylistViewController: BaseViewController {
         tableView.delegate = self
         tableView.dataSource = self
         headerCell.delegate = self
-
-        if let musicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(
-                self, selector: #selector(fetchNowPlayingSong), name: musicPlayer.playerStateDidChange, object: musicPlayer)
-        }
     }
 
     @objc func fetchNowPlayingSong() {
@@ -89,30 +116,6 @@ final class PlaylistViewController: BaseViewController {
         }
 
         tableView.reloadRows(at: rowsToReload, with: .none)
-    }
-    
-    override func loadView() {
-        super.loadView()
-        layoutUI()
-        showLoadingView()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        modalPresentationStyle = .custom
-        
-        interactor?.fetchCatalogPlaylist()
-        fetchNowPlayingSong()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
-        super.viewWillAppear(animated)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-        super.viewWillDisappear(animated)
     }
     
     private func layoutUI() {
@@ -143,6 +146,8 @@ extension PlaylistViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 1 {
+            guard let songs = viewModel?.songData else { return }
+            appMusicPlayer?.songs = songs
             appMusicPlayer?.playSong(at: indexPath.row)
         }
     }
@@ -193,7 +198,9 @@ extension PlaylistViewController: UITableViewDataSource {
 
 extension PlaylistViewController: HeaderUserInteractionDelegate {
     func playButtonTapped() {
-        appMusicPlayer?.play()
+        guard let songs = viewModel?.songData else { return }
+        appMusicPlayer?.songs = songs
+        appMusicPlayer?.playSong(at: 0)
     }
     
     func imageSwiped() {

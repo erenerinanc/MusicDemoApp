@@ -20,6 +20,7 @@ final class SearchResultsViewController: BaseViewController {
     var router: (SearchResultsRoutingLogic & SearchResultsDataPassing)?
     var songViewModel: SearchResults.Fetch.SongViewModel?
     var artistViewModel: SearchResults.Fetch.ArtistViewModel?
+    var musicPlayer: SystemMusicPlayer? { presentingViewController?.appMusicPlayer }
     var nowPlayingSongID: String?
     
     private lazy var tableView = UITableView().configure {
@@ -46,6 +47,18 @@ final class SearchResultsViewController: BaseViewController {
         fetchNowPlayingSong()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // UISearchController's parent is nil
+        if let musicPlayer = musicPlayer {
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(fetchNowPlayingSong),
+                                                   name: musicPlayer.playerStateDidChange,
+                                                   object: musicPlayer)
+        }
+        
+        print("a")
+    }
     // MARK: - Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String) {
@@ -62,20 +75,13 @@ final class SearchResultsViewController: BaseViewController {
         router.dataStore = interactor
         tableView.delegate = self
         tableView.dataSource = self
-
-        if let musicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(fetchNowPlayingSong),
-                                                   name: musicPlayer.playerStateDidChange,
-                                                   object: musicPlayer)
-        }
     }
 
 
 
     @objc func fetchNowPlayingSong() {
-        guard let song = appMusicPlayer?.playingSongInformation else { return }
-        guard let playbackState = appMusicPlayer?.playbackState else { return }
+        guard let song = musicPlayer?.playingSongInformation else { return }
+        guard let playbackState = musicPlayer?.playbackState else { return }
         var songIDsToReload: [String] = []
         if let oldNowPlayingID = self.nowPlayingSongID {
             songIDsToReload.append(oldNowPlayingID)
@@ -185,7 +191,9 @@ extension SearchResultsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            appMusicPlayer?.playSong(at: indexPath.row)
+            guard let songs = songViewModel?.songData else { return }
+            musicPlayer?.songs = songs
+            musicPlayer?.playSong(at: indexPath.row)
         } else {
             guard let urlString = artistViewModel?.artists[indexPath.row].url else { return }
             router?.routeToArtistDetail(with: urlString)

@@ -23,7 +23,7 @@ final class SearchResultsRouter: SearchResultsRoutingLogic, SearchResultsDataPas
     
     func routeToMediaPlayer() {
         guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
+        let destVC = MediaPlayerViewController()
         viewController?.present(destVC, animated: true, completion: nil)
     }
     

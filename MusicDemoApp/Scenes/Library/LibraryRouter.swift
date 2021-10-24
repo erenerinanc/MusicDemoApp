@@ -38,7 +38,7 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing{
     
     func routeToMediaPlayer() {
         guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
+        let destVC = MediaPlayerViewController()
         viewController?.navigationController?.present(destVC, animated: true)
     }
 

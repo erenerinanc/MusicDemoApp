@@ -23,6 +23,7 @@ enum Playlist {
         
         struct ViewModel {
             var catalogPlaylist: [Playlist.Fetch.ViewModel.CatalogPlaylist]
+            var songData: [SongData]
             
             struct CatalogPlaylist {
                 var artworkURL: String
@@ -36,7 +37,6 @@ enum Playlist {
                     var songArtworkURL: String
                     var id: String
                 }
-
             }
           
         }

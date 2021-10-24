@@ -9,7 +9,16 @@ import UIKit
 
 extension UIViewController {
     var appMusicPlayer: SystemMusicPlayer? {
-        return (parent?.parent as? ApplicationContainer)?.musicPlayer
+        var someParent: UIViewController? = parent
+        while let parent = someParent {
+            if let appContainer = parent as? ApplicationContainer {
+                return appContainer.musicPlayer
+            }
+            
+            someParent = parent.parent
+        }
+        
+        return nil
     }
 }
 

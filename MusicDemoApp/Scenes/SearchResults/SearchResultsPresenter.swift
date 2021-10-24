@@ -22,7 +22,7 @@ final class SearchResultsPresenter: SearchResultsPresentationLogic {
                                                                                         artworkURL: $0.attributes?.artwork?.url ?? "",
                                                                                         id: $0.id ?? "")
         }
-        viewController?.displaySearchResults(for: SearchResults.Fetch.SongViewModel(songs: songs))
+        viewController?.displaySearchResults(for: SearchResults.Fetch.SongViewModel(songs: songs, songData: response.songs))
     }
     
     func presentSearchedArtists(response: SearchResults.Fetch.ArtistResponse) {

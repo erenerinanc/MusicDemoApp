@@ -66,7 +66,7 @@ final class MediaPlayerViewController: BaseViewController {
     override init() {
         super.init()
         if let appMusicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(self, selector: #selector(playbackStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
+            NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
         }
     }
 
@@ -77,7 +77,7 @@ final class MediaPlayerViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchPlaybackState()
+        fetchNowPlayingSong()
     }
 
     //MARK: - Layout UI
@@ -130,11 +130,11 @@ final class MediaPlayerViewController: BaseViewController {
         }
     }
     
-    @objc func  playbackStateDidChange(_ notification: Notification) {
-        fetchPlaybackState()
+    @objc func  musicPlayerStateDidChange(_ notification: Notification) {
+        fetchNowPlayingSong()
     }
     
-    func fetchPlaybackState() {
+    func fetchNowPlayingSong() {
         guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
         guard let playbackState = appMusicPlayer?.playbackState else { return }
         guard let isShuffled = appMusicPlayer?.isShuffled else { return }
@@ -155,7 +155,7 @@ final class MediaPlayerViewController: BaseViewController {
         if isPlaying {
             progressTimer?.invalidate()
             progressTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { [weak self] _ in
-                self?.fetchPlaybackState()
+                self?.fetchNowPlayingSong()
             })
         } else {
             progressTimer?.invalidate()

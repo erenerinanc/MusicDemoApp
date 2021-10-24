@@ -16,15 +16,6 @@ protocol SearchResultsDataStore: AnyObject {
     var searchedArtist: [ArtistsData]? {get}
 }
 
-protocol SearchResultsMusicPlayer: AnyObject {
-    func playSong(at index: Int)
-    var songs: [SongData] { get set }
-    var playbackState: SystemMusicPlayer.PlaybackState? { get }
-    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
-    var playerStateDidChange: Notification.Name { get }
-}
-
-extension SystemMusicPlayer: SearchResultsMusicPlayer { }
 
 final class SearchResultsInteractor: SearchResultsBusinessLogic, SearchResultsDataStore {
     

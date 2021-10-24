@@ -26,7 +26,6 @@ class MiniPlayerViewController: BaseViewController {
     lazy var songNameLabel = UILabel().configure {
         $0.textColor = .white
         $0.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        $0.text = "Not playing"
         $0.adjustsFontSizeToFitWidth = true
     }
     lazy var playPauseButton = UIButton(type: .system).configure {
@@ -49,9 +48,6 @@ class MiniPlayerViewController: BaseViewController {
     
     init(musicPlayer: SystemMusicPlayer) {
         super.init()
-        if let appMusicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
-        }
     }
     
     override func loadView() {
@@ -61,24 +57,13 @@ class MiniPlayerViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchPlaybackState()
+        fetchNowPlayingSong()
     }
     
-    @objc func musicPlayerStateDidChange(_ notification: Notification) {
-        fetchPlaybackState()
-    }
-    
-    func fetchPlaybackState() {
-        guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
-        isPlaying = appMusicPlayer?.playbackState?.status == .playing
-        playPauseButton.setImage(UIImage(named: isPlaying ? "minipause" : "miniplay"), for: .normal)
-        Nuke.loadImage(with: nowPlayingSong.iconArtworkURL, into: songImageView)
-        songNameLabel.text = nowPlayingSong.songName
-        
-        if isPlaying {
-            animateLabel()
-        } else {
-            stopAnimating()
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: musicPlayer.playerStateDidChange, object: appMusicPlayer)
         }
     }
     
@@ -132,6 +117,24 @@ class MiniPlayerViewController: BaseViewController {
         }
     }
     
+    @objc func musicPlayerStateDidChange(_ notification: Notification) {
+        fetchNowPlayingSong()
+    }
+    
+    func fetchNowPlayingSong() {
+        guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
+        isPlaying = appMusicPlayer?.playbackState?.status == .playing
+        playPauseButton.setImage(UIImage(named: isPlaying ? "minipause" : "miniplay"), for: .normal)
+        Nuke.loadImage(with: nowPlayingSong.iconArtworkURL, into: songImageView)
+        songNameLabel.text = nowPlayingSong.songName
+        
+        if isPlaying {
+            animateLabel()
+        } else {
+            stopAnimating()
+        }
+    }
+    
     @objc func playPauseButtonTapped() {
         if isPlaying {
             appMusicPlayer?.pause()
@@ -158,7 +161,6 @@ class MiniPlayerViewController: BaseViewController {
         UIView.animate(withDuration: 10.0, delay: 0.0, options: [.repeat, .curveEaseInOut]) {
             self.songNameLabel.transform = CGAffineTransform(translationX: self.songNameLabel.bounds.origin.x - 300, y: self.songNameLabel.bounds.origin.y)
         }
-
     }
     
     func stopAnimating() {

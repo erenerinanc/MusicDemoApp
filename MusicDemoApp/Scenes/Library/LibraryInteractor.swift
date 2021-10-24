@@ -17,19 +17,6 @@ protocol LibraryDataStore: AnyObject {
     var topSongs: [SongData]? { get }
 }
 
-protocol LibraryMusicPlayer: AnyObject {
-    func play()
-    func pause()
-    func playSong(at index: Int)
-    func playNextSong()
-    
-    var songs: [SongData] { get set }
-    var playbackState: SystemMusicPlayer.PlaybackState? { get }
-    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
-    var playerStateDidChange: Notification.Name { get }
-}
-
-extension SystemMusicPlayer: LibraryMusicPlayer { }
 
 final class LibraryInteractor: LibraryBusinessLogic, LibraryDataStore {
     init(worker: LibraryWorkingLogic) {

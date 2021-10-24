@@ -15,7 +15,7 @@ protocol LibraryDisplayLogic: AnyObject {
     func displayTopSongs(for viewModel: Library.Fetch.TopSongsViewModel)
 }
 
-final class LibraryViewController: BaseViewController{
+final class LibraryViewController: BaseViewController {
     
     var interactor: LibraryBusinessLogic?
     var router: (LibraryRoutingLogic & LibraryDataPassing)?
@@ -59,6 +59,14 @@ final class LibraryViewController: BaseViewController{
         navigationController?.navigationBar.sizeToFit()
     }
     
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
+        if let musicPlayer = appMusicPlayer {
+            NotificationCenter.default.addObserver(
+                self, selector: #selector(musicPlayerStateDidChange), name: musicPlayer.playerStateDidChange, object: musicPlayer)
+        }
+    }
+    
     // MARK: - Setup
     
     private func setup(musicAPI: AppleMusicAPI, storefrontID: String, worker: LibraryWorkingLogic) {
@@ -78,13 +86,13 @@ final class LibraryViewController: BaseViewController{
         playlistCell.collectionView.dataSource = self
         searchController = UISearchController(searchResultsController: SearchResultsViewController(musicAPI: musicAPI, storefrontID: storefrontID))
 
-        if let musicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(
-                self, selector: #selector(fetchNowPlayingSong), name: musicPlayer.playerStateDidChange, object: musicPlayer)
-        }
     }
 
-    @objc func fetchNowPlayingSong() {
+    @objc func musicPlayerStateDidChange() {
+        fetchNowPlayingSong()
+    }
+    
+    func fetchNowPlayingSong() {
         guard let song = appMusicPlayer?.playingSongInformation else { return }
         guard let playbackState = appMusicPlayer?.playbackState else { return }
         var songIDsToReload: [String] = []
@@ -158,6 +166,8 @@ extension LibraryViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let songs = topSongsViewModel?.topSongsData else { return }
+        appMusicPlayer?.songs = songs
         appMusicPlayer?.playSong(at: indexPath.row)
     }
 }

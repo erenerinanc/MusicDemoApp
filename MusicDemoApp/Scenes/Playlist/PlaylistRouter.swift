@@ -9,7 +9,6 @@ import Foundation
 
 protocol PlaylistRoutingLogic: AnyObject {
     func routeToMediaPlayer()
-    func pauseSong()
 }
 
 protocol PlaylistDataPassing: AnyObject {
@@ -22,14 +21,8 @@ final class PlaylistRouter: PlaylistRoutingLogic, PlaylistDataPassing {
     var dataStore: PlaylistDataStore?
     
     func routeToMediaPlayer() {
-        guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
+        let destVC = MediaPlayerViewController()
         self.viewController?.navigationController?.present(destVC, animated: true)
     }
-    
-    func pauseSong() {
-        guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
-        destVC.interactor?.pause()
-    }
+
 }

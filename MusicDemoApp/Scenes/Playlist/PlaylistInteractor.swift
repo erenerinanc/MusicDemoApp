@@ -17,22 +17,7 @@ protocol PlaylistDataStore: AnyObject {
     var globalID: String? { get set }
 }
 
-protocol PlaylistMusicPlayer: AnyObject {
-    func play()
-    func pause()
-    func playSong(at index: Int)
-    func playNextSong()
-    
-    var songs: [SongData] { get set }
-    var playingSongInformation: SystemMusicPlayer.PlayingSongInformation? { get }
-    var playbackState: SystemMusicPlayer.PlaybackState? { get }
-    var playerStateDidChange: Notification.Name { get }
-}
-
-extension SystemMusicPlayer: PlaylistMusicPlayer { }
-
 final class PlaylistInteractor: PlaylistBusinessLogic, PlaylistDataStore {
-    var mediaPlayerInteractor: MediaPlayerInteractor?
     
     init(worker: PlaylistWorkingLogic) {
         self.worker = worker
