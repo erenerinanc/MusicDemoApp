@@ -10,7 +10,6 @@ import UIKit
 
 protocol LibraryRoutingLogic: AnyObject {
     func routeToCatalogPlaylist(globalID: String)
-    func routeToMediaPlayer()
 }
 
 protocol LibraryDataPassing: AnyObject {
@@ -35,12 +34,5 @@ final class LibraryRouter: LibraryRoutingLogic, LibraryDataPassing{
         destVC.router?.dataStore?.globalID = globalID
         viewController?.navigationController?.pushViewController(destVC, animated: true)
     }
-    
-    func routeToMediaPlayer() {
-        guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController()
-        viewController?.navigationController?.present(destVC, animated: true)
-    }
-
     
 }

@@ -148,8 +148,9 @@ class MiniPlayerViewController: BaseViewController {
     }
     
     @objc func viewTapped(_ gesture: UITapGestureRecognizer) {
-        let destVC = MediaPlayerViewController()
-        navigationController?.present(destVC, animated: true)
+        guard let musicPlayer = appMusicPlayer else { return }
+        let destVC = MediaPlayerViewController(musicPlayer: musicPlayer)
+        present(destVC, animated: true)
     }
     
     func animateLabel() {

@@ -56,8 +56,6 @@ final class SearchResultsViewController: BaseViewController {
                                                    name: musicPlayer.playerStateDidChange,
                                                    object: musicPlayer)
         }
-        
-        print("a")
     }
     // MARK: - Setup
     

@@ -8,7 +8,6 @@
 import Foundation
 
 protocol SearchResultsRoutingLogic: AnyObject {
-    func routeToMediaPlayer()
     func routeToArtistDetail(with url: String)
 }
 
@@ -20,12 +19,6 @@ final class SearchResultsRouter: SearchResultsRoutingLogic, SearchResultsDataPas
     
     weak var viewController: SearchResultsViewController?
     var dataStore: SearchResultsDataStore?
-    
-    func routeToMediaPlayer() {
-        guard let musicPlayer = viewController?.appMusicPlayer else { return }
-        let destVC = MediaPlayerViewController()
-        viewController?.present(destVC, animated: true, completion: nil)
-    }
     
     func routeToArtistDetail(with url: String) {
         let destVC = ArtistDetailsViewController(url: url)

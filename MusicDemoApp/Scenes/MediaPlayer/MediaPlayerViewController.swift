@@ -23,6 +23,7 @@ final class MediaPlayerViewController: BaseViewController {
     
     private var volumetapped: Bool = false
     private var progressTimer: Timer?
+    var musicPlayer: SystemMusicPlayer?
     var isPlaying: Bool = false
     
     //MARK: - Configure UI
@@ -63,11 +64,10 @@ final class MediaPlayerViewController: BaseViewController {
     
     // MARK: - Object lifecycle
     
-    override init() {
+    init(musicPlayer: SystemMusicPlayer) {
         super.init()
-        if let appMusicPlayer = appMusicPlayer {
-            NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: appMusicPlayer.playerStateDidChange, object: appMusicPlayer)
-        }
+        self.musicPlayer = musicPlayer
+        NotificationCenter.default.addObserver(self, selector: #selector(musicPlayerStateDidChange(_:)), name: musicPlayer.playerStateDidChange, object: musicPlayer)
     }
 
     override func loadView() {
@@ -80,6 +80,7 @@ final class MediaPlayerViewController: BaseViewController {
         fetchNowPlayingSong()
     }
 
+
     //MARK: - Layout UI
  
     private func layoutUI() {
@@ -90,6 +91,7 @@ final class MediaPlayerViewController: BaseViewController {
         view.addSubview(artistNameLabel)
         view.addSubview(progressView)
         view.addSubview(playerView)
+        playerView.delegate = self
         
         swipeView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(4)
@@ -135,10 +137,10 @@ final class MediaPlayerViewController: BaseViewController {
     }
     
     func fetchNowPlayingSong() {
-        guard let nowPlayingSong = appMusicPlayer?.playingSongInformation else { return }
-        guard let playbackState = appMusicPlayer?.playbackState else { return }
-        guard let isShuffled = appMusicPlayer?.isShuffled else { return }
-        isPlaying = appMusicPlayer?.playbackState?.status == .playing
+        guard let nowPlayingSong = musicPlayer?.playingSongInformation else { return }
+        guard let playbackState = musicPlayer?.playbackState else { return }
+        guard let isShuffled = musicPlayer?.isShuffled else { return }
+        isPlaying = musicPlayer?.playbackState?.status == .playing
         
         Nuke.loadImage(with: nowPlayingSong.artworkURL, into: self.songImageview)
         songNameLabel.text = nowPlayingSong.songName
@@ -205,16 +207,16 @@ extension MediaPlayerViewController: MediaPlayerButtonsViewDelegate {
     func buttonTapped(with button: PlayerButton) {
         switch button {
         case .shuffle:
-            appMusicPlayer?.shuffle()
+            musicPlayer?.shuffle()
         case .previous:
-            appMusicPlayer?.playPreviousSong()
+            musicPlayer?.playPreviousSong()
         case .next:
-            appMusicPlayer?.playNextSong()
+            musicPlayer?.playNextSong()
         case .playPause:
             if isPlaying {
-                appMusicPlayer?.pause()
+                musicPlayer?.pause()
             } else {
-                appMusicPlayer?.play()
+                musicPlayer?.play()
             }
         case .volume:
             volumetapped = true
